@@ -1,10 +1,8 @@
-<!-- path: assets/js/public.js -->
-<script type="module">
 // public.js — ฝั่งผู้ใช้ (realtime + chat r6 เปิดเฉพาะเมื่อกดปุ่ม)
 import { auth, db, ensureAnonAuth } from './firebase-init.js';
 import {
   collection, doc, getDoc, getDocs, addDoc, onSnapshot,
-  query, where, orderBy, serverTimestamp, increment, setDoc, updateDoc
+  query, where, orderBy, serverTimestamp, increment, updateDoc
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 import { el } from './utils.js';
 
@@ -15,7 +13,7 @@ let sessionId = localStorage.getItem('sessionId') || null;
 async function init(){
   const user = await ensureAnonAuth();
   if(!sessionId){ sessionId = Math.random().toString(36).slice(2); localStorage.setItem('sessionId', sessionId); }
-  document.getElementById('yearNow')?.textContent = new Date().getFullYear();
+  const y = document.getElementById('yearNow'); if(y) y.textContent = new Date().getFullYear();
   await loadSettings();
   bindRealtime();
   setupSearch(); setupBooking(); setupReview(); setupQuote();
@@ -26,10 +24,10 @@ init();
 async function loadSettings(){
   const s = await getDoc(settingsRef);
   const data = s.exists()? s.data(): { phone:'0800000000', line:'@yourline', facebook:'https://facebook.com/', mapUrl:'https://www.google.com/maps?q=Bangkok&output=embed' };
-  el('#mapEmbed').src = data.mapUrl;
-  el('#fabCall').href = `tel:${data.phone||''}`;
-  el('#fabLine').href = `https://line.me/R/ti/p/${(data.line||'').replace('@','')}`;
-  el('#fabFb').href = data.facebook||'#';
+  const m = el('#mapEmbed'); if(m) m.src = data.mapUrl||'';
+  const call = el('#fabCall'); if(call) call.href = `tel:${data.phone||''}`;
+  const line = el('#fabLine'); if(line) line.href = `https://line.me/R/ti/p/${(data.line||'').replace('@','')}`;
+  const fb = el('#fabFb'); if(fb) fb.href = data.facebook||'#';
 }
 
 function bindRealtime(){
@@ -39,7 +37,7 @@ function bindRealtime(){
     let i=0; snap.forEach(d=>{
       const b=d.data();
       wrap.insertAdjacentHTML('beforeend', `<div class="carousel-item ${i===0?'active':''}">
-        <img src="${b.imageUrl}" class="d-block w-100" alt="">
+        <img src="${b.imageUrl||''}" class="d-block w-100" alt="">
         <div class="carousel-caption text-start bg-black bg-opacity-25 rounded-3 p-3">
           <h3 class="fw-bold">${b.title||''}</h3><p class="mb-0">${b.subtitle||''}</p>
         </div></div>`);
@@ -52,7 +50,9 @@ function bindRealtime(){
     const list = el('#promo-cards'); if(!list) return; list.innerHTML='';
     let count=0, now=new Date();
     snap.forEach(docu=>{
-      const p=docu.data(); const start=p.start?.toDate?.()||new Date(p.start||0); const end=p.end?.toDate?.()||new Date(p.end||0);
+      const p=docu.data(); 
+      const start = p.start?.toDate?.() ? p.start.toDate() : (p.start? new Date(p.start): new Date(0));
+      const end   = p.end?.toDate?.()   ? p.end.toDate()   : (p.end? new Date(p.end): new Date(0));
       if(now>=start && now<=end){
         count++;
         list.insertAdjacentHTML('beforeend', `<div class="col-md-4">
@@ -63,7 +63,7 @@ function bindRealtime(){
           </div></div>`);
       }
     });
-    el('#promo-range-label').textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})` : 'ยังไม่มีโปรโมชันที่ใช้งาน';
+    const lbl = el('#promo-range-label'); if(lbl) lbl.textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})` : 'ยังไม่มีโปรโมชันที่ใช้งาน';
   });
 
   // Services
@@ -86,7 +86,7 @@ function bindRealtime(){
   // Areas
   onSnapshot(collection(db,'serviceAreas'), snap=>{
     const ul = el('#area-list'); if(!ul) return; ul.innerHTML='';
-    snap.forEach(a=>{ const d=a.data(); ul.insertAdjacentHTML('beforeend', `<li class="list-group-item d-flex justify-content-between"><span>${d.name}</span><span class="text-muted small">${d.province||''}</span></li>`); });
+    snap.forEach(a=>{ const d=a.data(); ul.insertAdjacentHTML('beforeend', `<li class="list-group-item d-flex justify-content-between"><span>${d.name||''}</span><span class="text-muted small">${d.province||''}</span></li>`); });
   });
 
   // Reviews (approved only)
@@ -94,7 +94,7 @@ function bindRealtime(){
     const wrap = el('#reviewList'); if(!wrap) return; wrap.innerHTML='';
     const list=[]; snap.forEach(r=>list.push(r.data()));
     let avg=0; if(list.length) avg=list.reduce((a,b)=>a+Number(b.rating||0),0)/list.length;
-    el('#avgRating').textContent = list.length? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${list.length} รีวิว` : 'ยังไม่มีรีวิวที่อนุมัติ';
+    const avgEl = el('#avgRating'); if(avgEl) avgEl.textContent = list.length? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${list.length} รีวิว` : 'ยังไม่มีรีวิวที่อนุมัติ';
     list.forEach(r=>{
       wrap.insertAdjacentHTML('beforeend', `<div class="col-md-6"><div class="card h-100">
         ${r.imageUrl?`<img src="${r.imageUrl}" class="card-img-top" alt="รีวิว">`:''}
@@ -120,7 +120,8 @@ function bindRealtime(){
 
 // ---------- search & forms ----------
 function setupSearch(){
-  el('#btnSearch').addEventListener('click', async()=>{
+  const btn = el('#btnSearch'); if(!btn) return;
+  btn.addEventListener('click', async()=>{
     const text = (el('#searchText').value||'').toLowerCase();
     const area = (el('#searchArea').value||'').toLowerCase();
     const sSnap = await getDocs(collection(db,'services')); const aSnap = await getDocs(collection(db,'serviceAreas'));
@@ -132,7 +133,7 @@ function setupSearch(){
 }
 
 function setupBooking(){
-  const form = el('#bookingForm');
+  const form = el('#bookingForm'); if(!form) return;
   form.addEventListener('submit', async (e)=>{
     e.preventDefault(); const data = Object.fromEntries(new FormData(form).entries());
     data.createdAt=serverTimestamp(); data.status='pending';
@@ -142,17 +143,17 @@ function setupBooking(){
 }
 
 function setupReview(){
-  const form = el('#reviewForm');
+  const form = el('#reviewForm'); if(!form) return;
   form.addEventListener('submit', async (e)=>{
     e.preventDefault(); const data=Object.fromEntries(new FormData(form).entries());
     data.rating=Number(data.rating||5); data.approved=false; data.createdAt=serverTimestamp();
-    try{ await addDoc(collection(db,'reviews'), data); form.reset(); bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide(); alert('ส่งรีวิวแล้ว รออนุมัติ'); }
+    try{ await addDoc(collection(db,'reviews'), data); form.reset(); const m = document.getElementById('reviewModal'); if(m && window.bootstrap){ window.bootstrap.Modal.getInstance(m)?.hide(); } alert('ส่งรีวิวแล้ว รออนุมัติ'); }
     catch(err){ alert('ผิดพลาด โปรดลองอีกครั้ง'); console.error(err); }
   });
 }
 
 function setupQuote(){
-  const form = el('#quoteForm');
+  const form = el('#quoteForm'); if(!form) return;
   form.addEventListener('submit', async (e)=>{
     e.preventDefault(); const data=Object.fromEntries(new FormData(form).entries()); data.createdAt=serverTimestamp(); data.status='open';
     try{ await addDoc(collection(db,'tickets'), data); form.reset(); el('#quoteMsg').textContent='ส่งคำขอแล้ว'; }
@@ -170,16 +171,18 @@ async function setupChat(user){
         send = el('#chatSend'),
         toggleBtn = el('#toggleChat');
 
+  if(!widget || !fab || !body || !input || !send || !toggleBtn){ return; }
+
   // เริ่มต้น: ซ่อนกล่องเสมอ (ไม่เด้งเอง)
   widget.classList.remove('minimized');
   widget.classList.remove('open'); // ให้แน่ใจว่าเริ่มปิด
 
   function openChat(open){
     widget.classList.toggle('open', open);
-    if(open){ badge.style.display='none'; resetUnreadUser(); }
+    if(open){ badge && (badge.style.display='none'); resetUnreadUser(); }
   }
   fab.addEventListener('click', ()=> openChat(!widget.classList.contains('open')));
-  toggleBtn.addEventListener('click', ()=> openChat(false)); // ปุ่ม – = ปิดกล่อง
+  toggleBtn.addEventListener('click', ()=> openChat(false)); // ปุ่มปิด
 
   // สร้าง thread ครั้งแรก
   let createdNow = false;
@@ -205,8 +208,8 @@ async function setupChat(user){
   // ฟังตัวเลขค้างอ่าน (แสดงเฉพาะตอนปิดกล่อง)
   onSnapshot(doc(db,'chatThreads', currentThreadId), snap=>{
     const d=snap.data()||{}; const n = Number(d.unreadUser||0);
-    if(!widget.classList.contains('open') && n>0){ badge.textContent=String(n); badge.style.display='inline-block'; }
-    else{ badge.style.display='none'; }
+    if(!widget.classList.contains('open') && n>0){ if(badge){ badge.textContent=String(n); badge.style.display='inline-block'; } }
+    else{ if(badge) badge.style.display='none'; }
   });
 
   // ส่งข้อความ
@@ -229,4 +232,3 @@ async function setupChat(user){
     await updateDoc(doc(db,'chatThreads', currentThreadId), { unreadUser: 0 });
   }
 }
-</script>
