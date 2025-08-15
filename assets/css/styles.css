@@ -8,16 +8,13 @@ section h2{ font-weight:700 }
 #promo-cards .card{ transition:transform .15s ease; }
 #promo-cards .card:hover{ transform:translateY(-3px) }
 
-/* ปุ่มลอยโซเชียล */
-.floating-buttons{ position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:1030; }
-.floating-buttons a{ display:flex; align-items:center; gap:8px; background:#fff; color:#000; padding:10px 12px; border-radius:999px; text-decoration:none; box-shadow:0 8px 24px rgba(0,0,0,.08); border:1px solid #e9ecef }
-.floating-buttons a .bi{ font-size:1.2rem }
+/* ปุ่มลอยแบบวงกลม (ซ้ายล่าง) */
+.fab-dock{ position:fixed; left:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:1031; }
+.fab{ width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:50%; border:none; box-shadow:0 8px 24px rgba(0,0,0,.12); background:#fff; color:#111; text-decoration:none; position:relative; }
+.fab .badge{ position:absolute; top:-6px; right:-6px; }
 
 /* วิดเจ็ตแชท */
-.chat-fab{ position:fixed; left:16px; bottom:16px; z-index:1031; width:46px; height:46px; border-radius:50%; border:none; box-shadow:0 8px 24px rgba(0,0,0,.12); background:#fff; display:flex; align-items:center; justify-content:center; }
-.chat-fab .badge{ position:absolute; top:-6px; right:-6px; }
-
-.chat-widget{ position:fixed; left:16px; bottom:76px; width:280px; z-index:1030; background:#fff; border:1px solid #e9ecef; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.1); overflow:hidden; }
+.chat-widget{ position:fixed; left:16px; bottom:80px; width:280px; z-index:1030; background:#fff; border:1px solid #e9ecef; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.1); overflow:hidden; }
 .chat-widget.left{ left:16px; right:auto; }
 .chat-header{ padding:.6rem .8rem; background:var(--soft); border-bottom:1px solid #e9ecef; font-weight:600 }
 .chat-body{ height:240px; overflow:auto; padding:.6rem }
