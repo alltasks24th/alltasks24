@@ -1,42 +1,42 @@
-// public.js — ฝั่งผู้ใช้ (realtime + chat unread + all sections visible)
+// public.js — ฝั่งผู้ใช้ (realtime + chat r5.1 + no auto-reply)
 import { auth, db, ensureAnonAuth } from './firebase-init.js';
 import {
   collection, doc, getDoc, getDocs, addDoc, onSnapshot,
-  query, where, orderBy, serverTimestamp, increment, updateDoc
+  query, where, orderBy, serverTimestamp, increment, setDoc, updateDoc
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 import { el } from './utils.js';
 
-let currentThreadId = localStorage.getItem('chatThreadId') || null;
+const settingsRef = doc(db, 'settings', 'public');
+let currentThreadId = localStorage.getItem('chatThreadIdV2') || null;
+let sessionId = localStorage.getItem('sessionId') || null;
 
-// ---------- init ----------
 async function init(){
-  await ensureAnonAuth();
+  const user = await ensureAnonAuth();
+  if(!sessionId){ sessionId = Math.random().toString(36).slice(2); localStorage.setItem('sessionId', sessionId); }
   document.getElementById('yearNow').textContent = new Date().getFullYear();
+  await loadSettings();
   bindRealtime();
-  setupSearch(); setupBooking(); setupReview(); setupQuote(); setupChat();
+  setupSearch(); setupBooking(); setupReview(); setupQuote();
+  setupChat(user);
 }
 init();
 
-// ---------- realtime bindings ----------
-function bindRealtime(){
-  // Settings
-  onSnapshot(doc(db,'settings','public'), snap=>{
-    const d = snap.exists()? snap.data(): {};
-    el('#mapEmbed') && (el('#mapEmbed').src = d.mapUrl || 'https://www.google.com/maps?q=Bangkok&output=embed');
-    buildFloatingButtons(d);
-  });
+async function loadSettings(){
+  const s = await getDoc(settingsRef);
+  const data = s.exists()? s.data(): { phone:'0800000000', line:'@yourline', facebook:'https://facebook.com/', mapUrl:'https://www.google.com/maps?q=Bangkok&output=embed' };
+  el('#mapEmbed').src = data.mapUrl;
+  el('#fabCall').href = `tel:${data.phone||''}`;
+  el('#fabLine').href = `https://line.me/R/ti/p/${(data.line||'').replace('@','')}`;
+  el('#fabFb').href = data.facebook||'#';
+}
 
+function bindRealtime(){
   // Banners
   onSnapshot(collection(db,'banners'), snap=>{
     const wrap = el('#banner-slides'); if(!wrap) return; wrap.innerHTML='';
     let i=0; snap.forEach(d=>{
       const b=d.data();
-      wrap.insertAdjacentHTML('beforeend', `<div class="carousel-item ${i===0?'active':''}">
-        <img src="${b.imageUrl}" class="d-block w-100" alt="banner">
-        <div class="carousel-caption text-start bg-black bg-opacity-25 rounded-3 p-3">
-          <h3 class="fw-bold">${b.title||''}</h3><p class="mb-0">${b.subtitle||''}</p>
-        </div></div>`);
-      i++;
+      wrap.insertAdjacentHTML('beforeend', `<div class="carousel-item ${i===0?'active':''}"><img src="${b.imageUrl}" class="d-block w-100"><div class="carousel-caption text-start bg-black bg-opacity-25 rounded-3 p-3"><h3 class="fw-bold">${b.title||''}</h3><p class="mb-0">${b.subtitle||''}</p></div></div>`); i++;
     });
   });
 
@@ -48,22 +48,16 @@ function bindRealtime(){
       const p=docu.data(); const start=p.start?.toDate?.()||new Date(p.start||0); const end=p.end?.toDate?.()||new Date(p.end||0);
       if(now>=start && now<=end){
         count++;
-        list.insertAdjacentHTML('beforeend', `<div class="col-md-4"><div class="card h-100">
-          <img src="${p.imageUrl||'assets/img/promo.png'}" class="card-img-top"><div class="card-body">
-          <h5 class="card-title">${p.title||'โปรโมชัน'}</h5><p class="card-text">${p.description||''}</p></div>
-          <div class="card-footer small text-muted">ถึง ${end.toLocaleDateString('th-TH')}</div></div></div>`);
+        list.insertAdjacentHTML('beforeend', `<div class="col-md-4"><div class="card h-100"><img src="${p.imageUrl||'assets/img/promo.png'}" class="card-img-top"><div class="card-body"><h5 class="card-title">${p.title||'โปรโมชัน'}</h5><p class="card-text">${p.description||''}</p></div><div class="card-footer small text-muted">ถึง ${end.toLocaleDateString('th-TH')}</div></div></div>`);
       }
     });
-    el('#promo-range-label') && (el('#promo-range-label').textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})`:'ยังไม่มีโปรโมชันที่ใช้งาน');
+    el('#promo-range-label').textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})` : 'ยังไม่มีโปรโมชันที่ใช้งาน';
   });
 
   // Services
   onSnapshot(collection(db,'services'), snap=>{
-    const wrap = el('#service-cards'); if(!wrap) return; wrap.innerHTML='';
-    snap.forEach(s=>{ const d=s.data(); wrap.insertAdjacentHTML('beforeend', `<div class="col-md-4"><div class="card h-100">
-      <img src="${d.imageUrl||'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1400&auto=format&fit=crop'}" class="card-img-top">
-      <div class="card-body"><div class="text-muted small">${d.category||''}</div><h5 class="card-title">${d.name||''}</h5><p class="card-text">${d.description||''}</p></div>
-    </div></div>`); });
+    const wrap = el('#service-cards'); wrap.innerHTML='';
+    snap.forEach(s=>{ const d=s.data(); wrap.insertAdjacentHTML('beforeend', `<div class="col-md-4"><div class="card h-100"><img src="${d.imageUrl||'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1400&auto=format&fit=crop'}" class="card-img-top"><div class="card-body"><div class="text-muted small">${d.category||''}</div><h5 class="card-title">${d.name||''}</h5><p class="card-text">${d.description||''}</p></div></div></div>`); });
   });
 
   // Areas
@@ -73,14 +67,12 @@ function bindRealtime(){
   });
 
   // Reviews (approved only)
-  onSnapshot(collection(db,'reviews'), snap=>{
+  onSnapshot(query(collection(db,'reviews'), where('approved','==',true), orderBy('createdAt','asc')), snap=>{
     const wrap = el('#reviewList'); if(!wrap) return; wrap.innerHTML='';
-    const list=[]; snap.forEach(r=>{ const d=r.data(); if(d.approved) list.push(d); });
+    const list=[]; snap.forEach(r=>{ list.push(r.data()); });
     let avg=0; if(list.length) avg=list.reduce((a,b)=>a+Number(b.rating||0),0)/list.length;
-    el('#avgRating') && (el('#avgRating').textContent = list.length? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${list.length} รีวิว` : 'ยังไม่มีรีวิวที่อนุมัติ');
-    list.forEach(r=>{ wrap.insertAdjacentHTML('beforeend', `<div class="col-md-6"><div class="card h-100">
-      ${r.imageUrl?`<img src="${r.imageUrl}" class="card-img-top">`:''}
-      <div class="card-body"><div class="d-flex justify-content-between"><strong>${r.name||'ผู้ใช้'}</strong><span class="badge text-bg-success">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></div><p class="mb-0 mt-2">${r.text||''}</p></div></div></div>`); });
+    el('#avgRating').textContent = list.length? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${list.length} รีวิว` : 'ยังไม่มีรีวิวที่อนุมัติ';
+    list.forEach(r=>{ wrap.insertAdjacentHTML('beforeend', `<div class="col-md-6"><div class="card h-100">${r.imageUrl?`<img src="${r.imageUrl}" class="card-img-top" alt="รีวิว">`:''}<div class="card-body"><div class="d-flex justify-content-between"><strong>${r.name||'ผู้ใช้'}</strong><span class="badge text-bg-success">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></div><p class="mb-0 mt-2">${r.text||''}</p></div></div></div>`); });
   });
 
   // FAQ realtime
@@ -95,41 +87,30 @@ function bindRealtime(){
   });
 }
 
-function buildFloatingButtons(data){
-  const fb = document.getElementById('floatingButtons');
-  if(!fb) return;
-  fb.innerHTML = `
-    <a href="tel:${data.phone||''}" target="_blank"><i class="bi bi-telephone"></i> โทร</a>
-    <a href="https://line.me/R/ti/p/${(data.line||'').replace('@','')}" target="_blank"><i class="bi bi-line"></i> LINE</a>
-    <a href="${data.facebook||'#'}" target="_blank"><i class="bi bi-facebook"></i> Facebook</a>`;
-}
-
-// ---------- search & forms ----------
 function setupSearch(){
-  const btn = el('#btnSearch'); if(!btn) return;
-  btn.addEventListener('click', async()=>{
-    const text = (el('#searchText').value||'').toLowerCase();
-    const area = (el('#searchArea').value||'').toLowerCase();
+  document.getElementById('btnSearch').addEventListener('click', async()=>{
+    const text = (document.getElementById('searchText').value||'').toLowerCase();
+    const area = (document.getElementById('searchArea').value||'').toLowerCase();
     const sSnap = await getDocs(collection(db,'services')); const aSnap = await getDocs(collection(db,'serviceAreas'));
     const sList=[]; sSnap.forEach(d=>sList.push(d.data())); const aList=[]; aSnap.forEach(d=>aList.push(d.data()));
     const sMatch = sList.filter(s=> !text || [s.name,s.category,s.description].join(' ').toLowerCase().includes(text));
     const aMatch = aList.filter(a=> !area || [a.name,a.province].join(' ').toLowerCase().includes(area));
-    el('#searchResults').innerHTML = `<div class="alert alert-info">พบบริการ ${sMatch.length} และพื้นที่ ${aMatch.length}</div>`;
+    document.getElementById('searchResults').innerHTML = `<div class="alert alert-info">พบบริการ ${sMatch.length} และพื้นที่ ${aMatch.length}</div>`;
   });
 }
 
 function setupBooking(){
-  const form = el('#bookingForm'); if(!form) return;
+  const form = document.getElementById('bookingForm');
   form.addEventListener('submit', async (e)=>{
     e.preventDefault(); const data = Object.fromEntries(new FormData(form).entries());
     data.createdAt=serverTimestamp(); data.status='pending';
-    try{ await addDoc(collection(db,'bookings'), data); form.reset(); el('#bookingMsg').textContent='ส่งคำขอแล้ว'; }
-    catch(err){ el('#bookingMsg').textContent='ผิดพลาด โปรดลองใหม่'; console.error(err); }
+    try{ await addDoc(collection(db,'bookings'), data); form.reset(); document.getElementById('bookingMsg').textContent='ส่งคำขอแล้ว'; }
+    catch(err){ document.getElementById('bookingMsg').textContent='ผิดพลาด โปรดลองใหม่'; console.error(err); }
   });
 }
 
 function setupReview(){
-  const form = el('#reviewForm'); if(!form) return;
+  const form = document.getElementById('reviewForm');
   form.addEventListener('submit', async (e)=>{
     e.preventDefault(); const data=Object.fromEntries(new FormData(form).entries());
     data.rating=Number(data.rating||5); data.approved=false; data.createdAt=serverTimestamp();
@@ -139,18 +120,18 @@ function setupReview(){
 }
 
 function setupQuote(){
-  const form = el('#quoteForm'); if(!form) return;
+  const form = document.getElementById('quoteForm');
   form.addEventListener('submit', async (e)=>{
     e.preventDefault(); const data=Object.fromEntries(new FormData(form).entries()); data.createdAt=serverTimestamp(); data.status='open';
-    try{ await addDoc(collection(db,'tickets'), data); form.reset(); el('#quoteMsg').textContent='ส่งคำขอแล้ว'; }
-    catch(err){ el('#quoteMsg').textContent='ผิดพลาด โปรดลองใหม่'; console.error(err); }
+    try{ await addDoc(collection(db,'tickets'), data); form.reset(); document.getElementById('quoteMsg').textContent='ส่งคำขอแล้ว'; }
+    catch(err){ document.getElementById('quoteMsg').textContent='ผิดพลาด โปรดลองใหม่'; console.error(err); }
   });
 }
 
 // ---------- Chat (user) ----------
-async function setupChat(){
-  const widget = el('#chatWidget'), fab = el('#chatFab'), badge = el('#chatFabBadge');
-  const body = el('#chatBody'), input = el('#chatMessage'), send = el('#chatSend'), toggleBtn = el('#toggleChat');
+async function setupChat(user){
+  const widget = document.getElementById('chatWidget'), fab = document.getElementById('fabChat'), badge = document.getElementById('fabChatBadge');
+  const body = document.getElementById('chatBody'), input = document.getElementById('chatMessage'), send = document.getElementById('chatSend'), toggleBtn = document.getElementById('toggleChat');
 
   function openChat(open){
     widget.classList.toggle('minimized', !open);
@@ -160,43 +141,49 @@ async function setupChat(){
   toggleBtn.addEventListener('click', ()=> openChat(!widget.classList.contains('minimized')));
 
   // สร้าง thread ครั้งแรก
+  let createdNow = false;
   if(!currentThreadId){
-    const t = await addDoc(collection(db,'chatThreads'), { createdAt: serverTimestamp(), lastMessage:'เริ่มสนทนา', status:'open', uid: auth.currentUser?.uid||null, unreadAdmin: 1, unreadUser: 0 });
-    currentThreadId = t.id; localStorage.setItem('chatThreadId', currentThreadId);
-    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text:'สวัสดีค่ะ/ครับ พิมพ์ "จอง", "ราคา", "พื้นที่"', createdAt: serverTimestamp() });
+    const t = await addDoc(collection(db,'chatThreads'), { 
+      createdAt: serverTimestamp(),
+      lastMessage:'เริ่มสนทนา',
+      status:'open',
+      uid: user?.uid||null,
+      sessionId,
+      unreadAdmin: 0, // เริ่ม 0
+      unreadUser: 1   // มีข้อความต้อนรับ 1 ข้อความ
+    });
+    currentThreadId = t.id; localStorage.setItem('chatThreadIdV2', currentThreadId);
+    createdNow = true;
   }
 
-  // ฟังข้อความ (เฉพาะ thread ของตัวเอง)
-  onSnapshot(query(collection(db,'chatThreads', currentThreadId, 'messages'), orderBy('createdAt')), snap=>{
+  // ฟังข้อความเรียลไทม์
+  onSnapshot(query(collection(db,'chatThreads', currentThreadId, 'messages'), orderBy('createdAt','asc')), snap=>{
     body.innerHTML=''; snap.forEach(m=>{ const d=m.data(); body.insertAdjacentHTML('beforeend', `<div class="chat-msg ${d.sender}">${d.text}</div>`); body.scrollTop = body.scrollHeight; });
   });
 
-  // ฟัง unreadUser ที่ thread
+  // ฟังตัวเลขค้างอ่าน
   onSnapshot(doc(db,'chatThreads', currentThreadId), snap=>{
     const d=snap.data()||{}; const n = Number(d.unreadUser||0);
     if(n>0 && widget.classList.contains('minimized')){ badge.textContent=String(n); badge.style.display='inline-block'; }
   });
 
-  async function resetUnreadUser(){
-    if(!currentThreadId) return;
-    await updateDoc(doc(db,'chatThreads', currentThreadId), { unreadUser: 0 });
-  }
-
-  async function autoReply(text){
-    const t=text.toLowerCase(); let reply='ขอบคุณที่ติดต่อครับ/ค่ะ ทีมงานจะตอบกลับโดยเร็ว';
-    if(t.includes('จอง')) reply='ไปที่ส่วน "จองงาน/นัดหมาย" แล้วกรอกฟอร์มได้เลยครับ';
-    if(t.includes('ราคา')) reply='ราคาขึ้นกับบริการ/พื้นที่ กรอก "ขอใบเสนอราคา" แล้วทีมงานจะติดต่อกลับ';
-    if(t.includes('พื้นที่')) reply='ดู "พื้นที่ให้บริการ + แผนที่" ในหน้าเว็บได้เลย';
-    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text:reply, createdAt: serverTimestamp() });
-    await updateDoc(doc(db,'chatThreads', currentThreadId), { unreadUser: increment(1) });
-  }
-
+  // ส่งข้อความ
   async function sendMsg(){
     const text = input.value.trim(); if(!text) return;
     await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'user', text, createdAt: serverTimestamp() });
     await updateDoc(doc(db,'chatThreads', currentThreadId), { lastMessage: text, unreadAdmin: increment(1) });
-    input.value=''; autoReply(text);
+    input.value='';
   }
   send.addEventListener('click', sendMsg);
   input.addEventListener('keypress', e=>{ if(e.key==='Enter') sendMsg(); });
+
+  // ส่งข้อความต้อนรับครั้งเดียว
+  if(createdNow){
+    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text:'สวัสดีค่ะ/ครับ ขอบคุณที่ทักหาเรา ทิ้งข้อความไว้ได้เลย ทีมงานจะตอบกลับเร็วที่สุด', createdAt: serverTimestamp() });
+  }
+
+  async function resetUnreadUser(){
+    if(!currentThreadId) return;
+    await updateDoc(doc(db,'chatThreads', currentThreadId), { unreadUser: 0 });
+  }
 }

@@ -1,4 +1,4 @@
-// admin.js — หลังบ้าน realtime + unread badge + owner bootstrap
+// admin.js — realtime + chat badges
 import { auth, db, ensureAnonAuth, logout } from './firebase-init.js';
 import {
   collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc,
@@ -10,31 +10,12 @@ async function init(){
   await ensureAnonAuth();
   if(!auth.currentUser || auth.currentUser.isAnonymous){ location.href='login.html'; return; }
   el('#btnLogout')?.addEventListener('click', ()=>logout().then(()=>location.href='login.html'));
-  await ensureRoleDocument(auth.currentUser.uid);
   const role = await getUserRole(auth.currentUser.uid);
   el('#roleBadge').textContent = role.toUpperCase();
-
   bindDashboard(); bindServices(); bindAreas(); bindBookings(); bindQuotes();
   bindReviews(); bindUsers(); bindPromos(); bindBanners(); bindFaq(); bindSettings(); bindChats();
 }
 init();
-
-async function ensureRoleDocument(uid){
-  try{
-    const uref = doc(db,'users', uid);
-    const snap = await getDoc(uref);
-    const usersSnap = await getDocs(collection(db,'users'));
-    const firstRun = usersSnap.size === 0;
-    const bar = el('#firstRun');
-    if(bar){
-      bar.style.display = (!snap.exists() && firstRun) ? 'flex' : 'none';
-      el('#btnBootstrapOwner').onclick = async ()=>{
-        try{ await setDoc(uref, { uid, role:'owner', createdAt: serverTimestamp() }); alert('ตั้ง Owner สำเร็จ'); location.reload(); }
-        catch(err){ alert('บันทึก Owner ไม่สำเร็จ: ' + (err.code || err.message)); }
-      };
-    }
-  }catch(err){ alert('ตั้งค่าครั้งแรกผิดพลาด: ' + (err.code || err.message)); }
-}
 
 async function getUserRole(uid){
   const u = await getDoc(doc(db,'users', uid));
@@ -64,8 +45,8 @@ function bindServices(){
       {label:'ชื่อ', value:'name'}, {label:'หมวด', value:'category'},
       {label:'รายละเอียด', value: i=> i.description?.slice(0,80)||'' }
     ], i=>`<div class="btn-group">
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="edit">แก้ไข</button>
-      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-act="del">ลบ</button></div>`);
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="services" data-act="edit">แก้ไข</button>
+      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-ref="services" data-act="del">ลบ</button></div>`);
   });
   el('#btnAddService').onclick = async ()=>{
     const name = prompt('ชื่อบริการ'); if(!name) return;
@@ -82,8 +63,8 @@ function bindAreas(){
       {label:'ชื่อพื้นที่', value:'name'}, {label:'จังหวัด', value:'province'},
       {label:'โน้ต', value: i=> i.note||'' }
     ], i=>`<div class="btn-group">
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="edit">แก้ไข</button>
-      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-act="del">ลบ</button></div>`);
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="serviceAreas" data-act="edit">แก้ไข</button>
+      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-ref="serviceAreas" data-act="del">ลบ</button></div>`);
   });
   el('#btnAddArea').onclick = async ()=>{
     const name = prompt('ชื่อพื้นที่'); if(!name) return;
@@ -101,9 +82,9 @@ function bindBookings(){
       {label:'พื้นที่', value:'area'}, {label:'วันเวลา', value: i=> `${i.date||''} ${i.time||''}`},
       {label:'สถานะ', value:'status'}
     ], i=>`<div class="btn-group">
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="set:confirmed">ยืนยัน</button>
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="set:done">เสร็จสิ้น</button>
-      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-act="del">ลบ</button></div>`);
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="bookings" data-act="set:confirmed">ยืนยัน</button>
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="bookings" data-act="set:done">เสร็จสิ้น</button>
+      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-ref="bookings" data-act="del">ลบ</button></div>`);
   });
 }
 
@@ -116,8 +97,8 @@ function bindQuotes(){
       {label:'ติดต่อ', value:'contact'}, {label:'สถานะ', value:'status'},
       {label:'รายละเอียด', value: i=> i.details?.slice(0,80)||'' }
     ], i=>`<div class="btn-group">
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="set:closed">ปิดงาน</button>
-      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-act="del">ลบ</button></div>`);
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="tickets" data-act="set:closed">ปิดงาน</button>
+      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-ref="tickets" data-act="del">ลบ</button></div>`);
   });
 }
 
@@ -130,8 +111,8 @@ function bindReviews(){
       {label:'อนุมัติ', value: i=> i.approved? pill('Yes','success'):pill('No','warning') },
       {label:'ข้อความ', value: i=> i.text?.slice(0,60)||'' }
     ], i=>`<div class="btn-group">
-      <button class="btn btn-sm btn-outline-success" data-id="${i.id}" data-act="set:approve">อนุมัติ</button>
-      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-act="del">ลบ</button></div>`);
+      <button class="btn btn-sm btn-outline-success" data-id="${i.id}" data-ref="reviews" data-act="set:approve">อนุมัติ</button>
+      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-ref="reviews" data-act="del">ลบ</button></div>`);
   });
 }
 
@@ -143,10 +124,10 @@ function bindUsers(){
       {label:'UID', value:'uid'}, {label:'อีเมล', value:'email'},
       {label:'บทบาท', value:'role'}
     ], i=>`<div class="btn-group">
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="role:viewer">Viewer</button>
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="role:admin">Admin</button>
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="role:owner">Owner</button>
-      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-act="del">ลบ</button></div>`);
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="users" data-act="role:viewer">Viewer</button>
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="users" data-act="role:admin">Admin</button>
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="users" data-act="role:owner">Owner</button>
+      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-ref="users" data-act="del">ลบ</button></div>`);
   });
   el('#btnAddUser').onclick = async ()=>{
     const uid = prompt('UID ผู้ใช้'); if(!uid) return;
@@ -163,8 +144,8 @@ function bindPromos(){
       {label:'ชื่อ', value:'title'}, {label:'ช่วงเวลา', value: i=> `${i.start?.toDate?.().toLocaleDateString('th-TH')||'-'} - ${i.end?.toDate?.().toLocaleDateString('th-TH')||'-'}`},
       {label:'คำอธิบาย', value: i=> i.description?.slice(0,60)||'' }
     ], i=>`<div class="btn-group">
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="edit">แก้ไข</button>
-      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-act="del">ลบ</button></div>`);
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="promotions" data-act="edit">แก้ไข</button>
+      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-ref="promotions" data-act="del">ลบ</button></div>`);
   });
   el('#btnAddPromo').onclick = async ()=>{
     const title = prompt('ชื่อโปรโมชัน'); if(!title) return;
@@ -183,8 +164,8 @@ function bindBanners(){
       {label:'ชื่อ', value:'title'}, {label:'คำโปรย', value:'subtitle'},
       {label:'รูปภาพ', value: i=> i.imageUrl? `<a href="${i.imageUrl}" target="_blank">เปิดรูป</a>`:'' }
     ], i=>`<div class="btn-group">
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="edit">แก้ไข</button>
-      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-act="del">ลบ</button></div>`);
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="banners" data-act="edit">แก้ไข</button>
+      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-ref="banners" data-act="del">ลบ</button></div>`);
   });
   el('#btnAddBanner').onclick = async ()=>{
     const title = prompt('ชื่อ'); const subtitle = prompt('คำโปรย'); const imageUrl = prompt('ลิงก์รูปภาพ');
@@ -199,8 +180,8 @@ function bindFaq(){
     renderTable('#faqTable', arr, [
       {label:'คำถาม', value:'q'}, {label:'คำตอบ', value: i=> i.a?.slice(0,80)||'' }
     ], i=>`<div class="btn-group">
-      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-act="edit">แก้ไข</button>
-      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-act="del">ลบ</button></div>`);
+      <button class="btn btn-sm btn-outline-secondary" data-id="${i.id}" data-ref="faqs" data-act="edit">แก้ไข</button>
+      <button class="btn btn-sm btn-outline-danger" data-id="${i.id}" data-ref="faqs" data-act="del">ลบ</button></div>`);
   });
   el('#btnAddFaq').onclick = async ()=>{
     const q = prompt('คำถาม'); if(!q) return;
@@ -242,7 +223,7 @@ let activeThreadId = null;
 function openThread(id){
   activeThreadId = id; document.getElementById('chatRoom').style.display='block'; document.getElementById('chatRoomTitle').textContent='ห้องแชท #'+id.slice(0,6);
   const body = document.getElementById('chatRoomBody');
-  onSnapshot(query(collection(db,'chatThreads', id, 'messages'), orderBy('createdAt')), snap=>{
+  onSnapshot(query(collection(db,'chatThreads', id, 'messages'), orderBy('createdAt','asc')), snap=>{
     body.innerHTML=''; snap.forEach(m=>{ const d=m.data(); const who = d.sender==='user'? 'primary-subtle' : (d.sender==='agent'?'success-subtle':'secondary-subtle'); body.insertAdjacentHTML('beforeend', `<div class="p-2 rounded mb-1 bg-${who}">${d.sender}: ${d.text}</div>`); body.scrollTop=body.scrollHeight; });
   });
   // reset unread for admin when open
@@ -255,20 +236,14 @@ function openThread(id){
   };
 }
 
-// ---------- Generic row actions ----------
+// ---------- Row actions ----------
 document.body.addEventListener('click', async (e)=>{
   const btn = e.target.closest('button'); if(!btn) return;
   const act = btn.dataset.act; if(!act) return;
-  const id = btn.dataset.id;
-  let refName = btn.closest('div.table-responsive')?.querySelector('table')?.parentElement?.parentElement?.id || '';
-  // map container id to collection
-  refName = refName.replace('Table',''); // e.g., serviceTable -> service
-  const map = { service:'services', area:'serviceAreas', booking:'bookings', quote:'tickets', review:'reviews', user:'users', promo:'promotions', banner:'banners', faq:'faqs' };
-  const col = map[refName.replace('Table','')] || map[refName];
-  if(!col) return;
-  const dref = doc(db, col, id);
+  const id = btn.dataset.id; const refName = btn.dataset.ref; if(!refName) return;
+  const dref = doc(db, refName, id);
   if(act==='del'){ if(confirm('ลบรายการนี้?')) await deleteDoc(dref); return; }
-  if(act.startsWith('set:')){ const [,val]=act.split(':'); if(col in {bookings:1,tickets:1}) await updateDoc(dref,{status:val}); if(col==='reviews'&&val==='approve') await updateDoc(dref,{approved:true}); return; }
+  if(act.startsWith('set:')){ const [,val]=act.split(':'); if(refName==='bookings'||refName==='tickets') await updateDoc(dref,{status:val}); if(refName==='reviews'&&val==='approve') await updateDoc(dref,{approved:true}); return; }
   if(act.startsWith('role:')){ const [,role]=act.split(':'); await updateDoc(dref,{role}); return; }
   if(act==='edit'){
     const snap = await getDoc(dref); const data=snap.data()||{};
