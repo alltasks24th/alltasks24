@@ -224,7 +224,7 @@ async function setupChat(user){
 
   // ส่งข้อความต้อนรับครั้งเดียวตอนสร้าง thread (ไม่มี auto-reply ต่อไป)
   if(createdNow){
-    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text:'สวัสดีค่ะ/ครับ ขอบคุณที่ทักหาเรา ทิ้งข้อความไว้ได้เลย ทีมงานจะตอบกลับเร็วที่สุด', createdAt: serverTimestamp() });
+    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text: 'ยินดีให้บริการ 24 ชั่วโมง ฝากข้อความไว้ได้เลยครับ', createdAt: serverTimestamp() });
   }
 
   async function resetUnreadUser(){
