@@ -1,0 +1,57 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // สาธารณะอ่านได้ (เฉพาะ collection ที่กำหนด)
+    match /services/{doc} { allow read: if true; allow write: if isAdmin(); }
+    match /serviceAreas/{doc} { allow read: if true; allow write: if isAdmin(); }
+    match /banners/{doc} { allow read: if true; allow write: if isAdmin(); }
+    match /promotions/{doc} { allow read: if true; allow write: if isAdmin(); }
+    match /faqs/{doc} { allow read: if true; allow write: if isAdmin(); }
+    match /settings/{doc} { allow read: if true; allow write: if isAdmin(); }
+
+    // แบบฟอร์มสาธารณะ: ใครๆ เขียนได้ แต่อ่านจำกัด
+    match /bookings/{doc} {
+      allow create: if true; 
+      allow read, update, delete: if isAdmin();
+    }
+    match /tickets/{doc} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /reviews/{doc} {
+      allow create: if true;
+      allow read: if resource.data.approved == true || isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    // แชท
+    match /chatThreads/{doc} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+      match /messages/{msg} {
+        allow create: if true;
+        allow read: if isAdmin();
+      }
+    }
+
+    // ผู้ใช้/บทบาท
+    match /users/{uid} {
+      allow read: if isAdmin();
+      allow create: if request.auth != null; // อนุโลมเฉพาะผู้ล็อกอินจัดการตนเองในขั้นแรก
+      allow update, delete: if isOwner();
+    }
+  }
+
+  function isAdmin(){
+    return request.auth != null && (
+      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin','owner']
+    );
+  }
+  function isOwner(){
+    return request.auth != null && (
+      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner'
+    );
+  }
+}
