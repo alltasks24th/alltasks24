@@ -30,9 +30,7 @@
   </div>
 
   <ul class="nav nav-pills mb-3" id="adminTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tabDash" type="button">แดชบอร์ด</button>
-    </li>
+    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tabDash" type="button">แดชบอร์ด</button></li>
     <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabServices">บริการ</button></li>
     <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabAreas">พื้นที่</button></li>
     <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabBookings">การจอง</button></li>
@@ -47,7 +45,6 @@
   </ul>
 
   <div class="tab-content">
-    <!-- Dashboard -->
     <div class="tab-pane fade show active" id="tabDash">
       <div class="row g-3">
         <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">คำขอจอง</div><div id="statBookings" class="stat-value">0</div></div></div></div>
@@ -57,7 +54,6 @@
       </div>
     </div>
 
-    <!-- Services -->
     <div class="tab-pane fade" id="tabServices">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="mb-0">บริการ + หมวดหมู่</h5>
@@ -66,7 +62,6 @@
       <div id="serviceTable"></div>
     </div>
 
-    <!-- Areas -->
     <div class="tab-pane fade" id="tabAreas">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="mb-0">พื้นที่ให้บริการ</h5>
@@ -75,25 +70,21 @@
       <div id="areaTable"></div>
     </div>
 
-    <!-- Bookings -->
     <div class="tab-pane fade" id="tabBookings">
       <h5>การจองงาน/นัดหมาย</h5>
       <div id="bookingTable"></div>
     </div>
 
-    <!-- Quotes -->
     <div class="tab-pane fade" id="tabQuotes">
       <h5>คำขอใบเสนอราคา / แจ้งปัญหา</h5>
       <div id="quoteTable"></div>
     </div>
 
-    <!-- Reviews -->
     <div class="tab-pane fade" id="tabReviews">
       <h5>รีวิว (อนุมัติ/ลบ)</h5>
       <div id="reviewTable"></div>
     </div>
 
-    <!-- Users & Roles -->
     <div class="tab-pane fade" id="tabUsers">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="mb-0">ผู้ใช้ / บทบาท</h5>
@@ -102,7 +93,6 @@
       <div id="userTable"></div>
     </div>
 
-    <!-- Promotions -->
     <div class="tab-pane fade" id="tabPromos">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="mb-0">โปรโมชัน</h5>
@@ -111,7 +101,6 @@
       <div id="promoTable"></div>
     </div>
 
-    <!-- Banners -->
     <div class="tab-pane fade" id="tabBanners">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="mb-0">แบนเนอร์สไลด์</h5>
@@ -120,7 +109,6 @@
       <div id="bannerTable"></div>
     </div>
 
-    <!-- FAQ -->
     <div class="tab-pane fade" id="tabFAQ">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="mb-0">คำถามที่พบบ่อย</h5>
@@ -129,46 +117,20 @@
       <div id="faqTable"></div>
     </div>
 
-    <!-- Settings -->
     <div class="tab-pane fade" id="tabSettings">
       <h5>ตั้งค่าทั่วไปของเว็บไซต์</h5>
       <form id="settingsForm" class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">ชื่อเว็บไซต์</label>
-          <input name="siteName" class="form-control" placeholder="รับจ้างสารพัด 24 ชั่วโมง">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Hero Text</label>
-          <input name="heroText" class="form-control" placeholder="จ้างง่าย ทำไว โปร่งใส">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">เบอร์โทร</label>
-          <input name="phone" class="form-control" placeholder="080-xxx-xxxx">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">LINE</label>
-          <input name="line" class="form-control" placeholder="@yourline">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Facebook URL</label>
-          <input name="facebook" class="form-control" placeholder="https://facebook.com/yourpage">
-        </div>
-        <div class="col-12">
-          <label class="form-label">Google Maps Embed URL</label>
-          <input name="mapUrl" class="form-control" placeholder="https://www.google.com/maps?q=Bangkok&output=embed">
-        </div>
-        <div class="col-12">
-          <label class="form-label">นโยบายสื่อ/รูปภาพ</label>
-          <textarea name="mediaPolicy" class="form-control" rows="3" placeholder="ใช้รูปจากลิงก์หรือในโฟลเดอร์เท่านั้น..."></textarea>
-        </div>
-        <div class="col-12">
-          <button class="btn btn-primary" type="submit">บันทึก</button>
-          <span id="settingsMsg" class="small text-muted ms-2"></span>
-        </div>
+        <div class="col-md-6"><label class="form-label">ชื่อเว็บไซต์</label><input name="siteName" class="form-control" placeholder="รับจ้างสารพัด 24 ชั่วโมง"></div>
+        <div class="col-md-6"><label class="form-label">Hero Text</label><input name="heroText" class="form-control" placeholder="จ้างง่าย ทำไว โปร่งใส"></div>
+        <div class="col-md-4"><label class="form-label">เบอร์โทร</label><input name="phone" class="form-control" placeholder="080-xxx-xxxx"></div>
+        <div class="col-md-4"><label class="form-label">LINE</label><input name="line" class="form-control" placeholder="@yourline"></div>
+        <div class="col-md-4"><label class="form-label">Facebook URL</label><input name="facebook" class="form-control" placeholder="https://facebook.com/yourpage"></div>
+        <div class="col-12"><label class="form-label">Google Maps Embed URL</label><input name="mapUrl" class="form-control" placeholder="https://www.google.com/maps?q=Bangkok&output=embed"></div>
+        <div class="col-12"><label class="form-label">นโยบายสื่อ/รูปภาพ</label><textarea name="mediaPolicy" class="form-control" rows="3" placeholder="ใช้รูปจากลิงก์หรือในโฟลเดอร์เท่านั้น..."></textarea></div>
+        <div class="col-12"><button class="btn btn-primary" type="submit">บันทึก</button><span id="settingsMsg" class="small text-muted ms-2"></span></div>
       </form>
     </div>
 
-    <!-- Live Chats -->
     <div class="tab-pane fade" id="tabChats">
       <h5>ห้องแชททั้งหมด</h5>
       <div id="chatThreadList" class="list-group"></div>
