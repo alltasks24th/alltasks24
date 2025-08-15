@@ -6,7 +6,6 @@ service cloud.firestore {
     function isOwner()  { return isSignedIn() && roleOf(request.auth.uid) == 'owner'; }
     function isAdmin()  { return isSignedIn() && (roleOf(request.auth.uid) in ['admin','owner']); }
 
-    // bootstrap first user
     match /users/{userId} {
       allow create: if isSignedIn() && request.auth.uid == userId && !exists(/databases/$(database)/documents/users/$(userId));
       allow read: if isAdmin();
@@ -24,12 +23,13 @@ service cloud.firestore {
     match /tickets/{doc}  { allow create: if true; allow read, update, delete: if isAdmin(); }
     match /reviews/{doc}  { allow create: if true; allow read: if resource.data.approved == true || isAdmin(); allow update, delete: if isAdmin(); }
 
-    match /chatThreads/{doc} {
-      allow create: if true;
-      allow read, update, delete: if isAdmin();
+    // แชท: เจ้าของ thread อ่าน/เขียนได้, ผู้ดูแลอ่านทั้งหมดได้
+    match /chatThreads/{threadId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
       match /messages/{msg} {
-        allow create: if true;
-        allow read: if isAdmin();
+        allow create: if isSignedIn();
+        allow read: if isAdmin() || (isSignedIn() && get(/databases/$(database)/documents/chatThreads/$(threadId)).data.uid == request.auth.uid);
       }
     }
   }

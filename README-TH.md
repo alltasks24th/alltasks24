@@ -1,14 +1,16 @@
-# alltasks24.online — เวอร์ชันแก้บั๊ก
-แก้ไข:
-- Login ไม่ redirect → แก้ `assets/js/auth.js`
-- ปุ่ม "ตั้งฉันเป็น Owner" ไม่ทำงาน → แก้ `assets/js/admin.js` (ตรวจ firstRun ถูกต้อง + try/catch)
-- แชทสดย่อไม่ได้ → เพิ่ม toggle JS และ CSS class `.minimized`
+# alltasks24.online — r4 (2025-08-15 16:51 UTC)
+สิ่งที่แก้ให้ตามคำขอ:
+- FAQ ฝั่งผู้ใช้ **Realtime** — เพิ่มแล้วขึ้นทันที
+- แชตสด: ขนาดเล็ก, อยู่ซ้ายล่าง, เริ่มปิด, มี **badge** จำนวนข้อความใหม่ (ทั้งฝั่งหน้าเว็บและหลังบ้าน)
+- หลังบ้าน/หน้าเว็บ **Realtime** — ใช้ Firestore `onSnapshot` ทุกส่วนหลัก
+- **เปิดให้ผู้ใช้ทั่วไปเห็นทุก section** (ไม่มีการซ่อน) — แต่สิทธิ์แก้ไข/จัดการยังคงอยู่ในหลังบ้าน
+- Rules ปรับให้เจ้าของ thread อ่านได้ (anon auth) และ admin/owner อ่านทั้งหมดได้
 
-## วิธีติดตั้งเร็ว
+## ติดตั้ง
 1) Firebase Console → Authentication → เปิด **Email/Password**
-2) Firestore → สร้างฐานข้อมูล (Production) → Rules ใส่จากไฟล์ `firestore.rules` แล้ว **Publish**
-3) อัปโหลดไฟล์ทั้งหมดขึ้นโฮสติ้ง (Firebase Hosting หรือเว็บเซิร์ฟเวอร์ของคุณ)
-4) เข้า `login.html` → ล็อกอิน (อีเมล/รหัสที่สร้างใน Authentication)
-5) เข้า `admin.html` → ถ้ายังไม่มี user เลย จะมีปุ่ม "ตั้งฉันเป็น Owner" ให้กดครั้งเดียว
-
-อัปเดตล่าสุด: 2025-08-15 16:12 UTC
+2) Firestore → สร้าง DB (Production) → กดแท็บ **Rules** → วางไฟล์ `firestore.rules` แล้ว **Publish**
+3) อัปโหลดไฟล์ทั้งหมดไปยังโฮสติ้งของคุณ
+4) ทดสอบ:
+   - เปิด `login.html` → ล็อกอินผู้ดูแล → เข้า `admin.html`
+   - เพิ่ม FAQ/บริการ/โปรโมชัน → หน้า `index.html` จะอัปเดตทันที
+   - แชต: ผู้ใช้พิมพ์ข้อความ → หลังบ้านขึ้น badge, ฝั่งผู้ใช้เมื่อได้รับข้อความใหม่จะเห็น badge ที่ปุ่มแชท

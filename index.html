@@ -16,7 +16,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navMain">
-      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3" id="navLinks">
         <li class="nav-item"><a class="nav-link" href="#services">บริการของเรา</a></li>
         <li class="nav-item"><a class="nav-link" href="#search">ค้นหาบริการ/พื้นที่</a></li>
         <li class="nav-item"><a class="nav-link" href="#areas">พื้นที่ให้บริการ</a></li>
@@ -29,12 +29,12 @@
   </nav>
 </header>
 
-<section class="bg-light py-4 py-lg-5">
+<section class="bg-light py-4 py-lg-5" id="hero">
   <div class="container">
     <div id="heroCarousel" class="carousel slide rounded-4 overflow-hidden shadow-sm" data-bs-ride="carousel">
       <div class="carousel-inner" id="banner-slides">
         <div class="carousel-item active">
-          <img src="https://images.unsplash.com/photo-1604014237800-1c9102c63d4b?q=80&w=1600&auto=format&fit=crop" class="d-block w-100" alt="hero">
+          <img src="https://images.unsplash.com/photo-1604014237800-1c9102c63d4b?q=80&w=1600&auto=format&fit=crop" class="d-block w-100" alt="banner">
           <div class="carousel-caption text-start bg-black bg-opacity-25 rounded-3 p-3">
             <h3 class="fw-bold">รับจ้างสารพัด 24 ชั่วโมง</h3>
             <p class="mb-0">จ้างง่าย ทำไว โปร่งใส มีรีวิวจริง</p>
@@ -158,9 +158,14 @@
   <div class="container"><h2 class="h4 mb-3"><i class="bi bi-question-circle me-2"></i>คำถามที่พบบ่อย (FAQ)</h2><div class="accordion" id="faqAccordion"></div></div>
 </section>
 
-<div id="floatingButtons" class="floating-buttons"></div>
+<!-- ปุ่มแชทเล็ก (ซ้ายล่าง) -->
+<button id="chatFab" class="chat-fab" type="button" aria-label="เปิดแชท">
+  <i class="bi bi-chat-dots"></i>
+  <span class="badge bg-danger" id="chatFabBadge" style="display:none">0</span>
+</button>
 
-<div class="chat-widget" id="chatWidget">
+<!-- วิดเจ็ตแชท -->
+<div class="chat-widget minimized left" id="chatWidget">
   <div class="chat-header">
     <i class="bi bi-chat-dots me-1"></i> แชทสด
     <button class="btn btn-sm btn-light float-end" id="toggleChat" type="button"><i class="bi bi-dash-lg"></i></button>
@@ -174,7 +179,7 @@
 
 <footer class="py-5 border-top bg-white mt-5">
   <div class="container small text-muted">
-    <div id="footerText">© <span id="yearNow"></span> alltasks24.online — Patched {now}</div>
+    <div id="footerText">© <span id="yearNow"></span> alltasks24.online — r4 {now}</div>
   </div>
 </footer>
 
