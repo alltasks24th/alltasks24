@@ -1,4 +1,4 @@
-// admin.js — แผงหลังบ้าน
+// admin.js — แผงหลังบ้าน (เวอร์ชันแก้บั๊ก first-run + ปุ่ม Owner)
 import { auth, db, ensureAnonAuth, logout } from './firebase-init.js';
 import {
   collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc,
@@ -10,12 +10,14 @@ const OWNER_UID_HARDCODE = "2gJTJh0R9TNAAPqtHOtNkerLOIm2";
 
 async function init(){
   const user = await ensureAnonAuth();
-  // ต้องเป็นผู้ดูแล: ให้ไป login ก่อน
+
+  // ต้องเป็นผู้ดูแล: ถ้า anonymous ให้ไป login ก่อน
   if(!auth.currentUser || auth.currentUser.isAnonymous){
     location.href = 'login.html';
     return;
   }
-  el('#btnLogout').addEventListener('click', ()=>logout().then(()=>location.href='login.html'));
+
+  el('#btnLogout')?.addEventListener('click', ()=>logout().then(()=>location.href='login.html'));
 
   await ensureRoleDocument(auth.currentUser.uid);
   const role = await getUserRole(auth.currentUser.uid);
@@ -37,25 +39,45 @@ async function init(){
 }
 init();
 
+/**
+ * แก้บั๊ก: การเช็ค firstRun ต้องใช้ .size จาก usersSnap ไม่ใช่ !() .size
+ * เพิ่ม try/catch พร้อม alert error ให้เห็นชัด เมื่อ rules ไม่อนุญาต
+ */
 async function ensureRoleDocument(uid){
-  const uref = doc(db,'users', uid);
-  const snap = await getDoc(uref);
-  const firstRun = !(await getDocs(collection(db,'users'))).size;
-  if(!snap.exists() && firstRun){
-    // แสดงปุ่ม ตั้งค่าครั้งแรก
-    el('#firstRun').style.display='flex';
-    el('#btnBootstrapOwner').onclick = async ()=>{
-      await setDoc(uref, { uid, role:'owner', createdAt: serverTimestamp() });
-      alert('บันทึกสิทธิ์ Owner ให้คุณแล้ว');
-      location.reload();
-    };
-  }else{
-    el('#firstRun').style.display='none';
-  }
+  try{
+    const uref = doc(db,'users', uid);
+    const snap = await getDoc(uref);
 
-  // ให้ UID เจ้าของที่ส่งมา เป็น owner เสมอ (ครั้งแรก)
-  if(uid===OWNER_UID_HARDCODE && !snap.exists()){
-    await setDoc(uref, { uid, role:'owner', createdAt: serverTimestamp() });
+    // ✅ เช็คจำนวน users ที่มีอยู่จริง
+    const usersSnap = await getDocs(collection(db,'users'));
+    const firstRun = usersSnap.size === 0;
+
+    // ✅ แสดงปุ่มตั้ง Owner ในครั้งแรก + ผูก onClick เสมอเมื่อแถบเหลืองแสดง
+    const firstRunBar = el('#firstRun');
+    if(firstRunBar){
+      firstRunBar.style.display = (!snap.exists() && firstRun) ? 'flex' : 'none';
+      const btn = el('#btnBootstrapOwner');
+      if(btn){
+        btn.onclick = async ()=>{
+          try{
+            await setDoc(uref, { uid, role:'owner', createdAt: serverTimestamp() });
+            alert('บันทึกสิทธิ์ Owner ให้คุณแล้ว');
+            location.reload();
+          }catch(err){
+            console.error(err);
+            alert('บันทึก Owner ไม่สำเร็จ: ' + (err.code || err.message));
+          }
+        };
+      }
+    }
+
+    // ✅ auto-assign ให้ UID เจ้าของที่กำหนดไว้ เมื่อยังไม่มีเอกสาร
+    if(uid===OWNER_UID_HARDCODE && !snap.exists()){
+      await setDoc(uref, { uid, role:'owner', createdAt: serverTimestamp() });
+    }
+  }catch(err){
+    console.error(err);
+    alert('ตั้งค่าครั้งแรกผิดพลาด: ' + (err.code || err.message));
   }
 }
 
