@@ -17,7 +17,7 @@ section h2{ font-weight:700 }
 .chat-widget{
   display:none;            /* เริ่มต้นซ่อนเสมอ */
   position:fixed;
-  right:16px !important;   /* บังคับไปขวาล่าง */
+  right:10px !important;   /* บังคับไปขวาล่าง */
   left:auto !important;
   bottom:80px;
   width:320px;
