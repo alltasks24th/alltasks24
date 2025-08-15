@@ -4,7 +4,6 @@ import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, signInAnonymously, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
 import { getFirestore, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-// *** ใช้ค่าจากผู้ใช้ ***
 const firebaseConfig = {
   apiKey: "AIzaSyCTaUmv6VZNczMFvznNm01M__g7k2v6a3E",
   authDomain: "alltasks24-f75ec.firebaseapp.com",
