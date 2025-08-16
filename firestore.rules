@@ -1,36 +1,73 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isSignedIn() { return request.auth != null; }
-    function roleOf(uid) { return get(/databases/$(database)/documents/users/$(uid)).data.role; }
-    function isOwner()  { return isSignedIn() && roleOf(request.auth.uid) == 'owner'; }
-    function isAdmin()  { return isSignedIn() && (roleOf(request.auth.uid) in ['admin','owner']); }
 
-    match /users/{userId} {
-      allow create: if isSignedIn() && request.auth.uid == userId && !exists(/databases/$(database)/documents/users/$(userId));
-      allow read: if isAdmin();
-      allow update, delete: if isOwner();
+    function isSignedIn() { return request.auth != null; }
+
+    // Admin = custom claim {admin:true} OR UID อยู่ใน settings/acl.admins (array)
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.admin == true ||
+        (exists(/databases/$(database)/documents/settings/acl) &&
+         request.auth.uid in get(/databases/$(database)/documents/settings/acl).data.admins)
+      );
     }
 
-    match /services/{doc}       { allow read: if true; allow write: if isAdmin(); }
-    match /serviceAreas/{doc}   { allow read: if true; allow write: if isAdmin(); }
-    match /banners/{doc}        { allow read: if true; allow write: if isAdmin(); }
-    match /promotions/{doc}     { allow read: if true; allow write: if isAdmin(); }
-    match /faqs/{doc}           { allow read: if true; allow write: if isAdmin(); }
-    match /settings/{doc}       { allow read: if true; allow write: if isAdmin(); }
+    // ---------- Public content (อ่านได้ทุกคน / เขียนเฉพาะแอดมิน) ----------
+    match /banners/{id}         { allow read: if true; allow write: if isAdmin(); }
+    match /promotions/{id}      { allow read: if true; allow write: if isAdmin(); }
+    match /services/{id}        { allow read: if true; allow write: if isAdmin(); }
+    match /serviceAreas/{id}    { allow read: if true; allow write: if isAdmin(); }
+    match /faqs/{id}            { allow read: if true; allow write: if isAdmin(); }
 
-    match /bookings/{doc} { allow create: if true; allow read, update, delete: if isAdmin(); }
-    match /tickets/{doc}  { allow create: if true; allow read, update, delete: if isAdmin(); }
-    match /reviews/{doc}  { allow create: if true; allow read: if resource.data.approved == true || isAdmin(); allow update, delete: if isAdmin(); }
+    // settings/public อ่านได้สาธารณะ, เอกสารอื่น ๆ ใน settings อ่าน/เขียนเฉพาะแอดมิน
+    match /settings/{docId} {
+      allow read: if docId == "public" || isAdmin();
+      allow write: if isAdmin();
+    }
 
-    // แชท: เจ้าของ thread อ่าน/เขียนได้, ผู้ดูแลอ่านทั้งหมดได้
+    // ---------- Reviews ----------
+    match /reviews/{id} {
+      // ใครก็ส่งรีวิวได้ (approved=false ตั้งต้น)
+      allow create: if true;
+      // แสดงเฉพาะที่อนุมัติแล้ว (หรือแอดมิน)
+      allow read: if resource.data.approved == true || isAdmin();
+      // อนุมัติ/แก้ไข/ลบ เฉพาะแอดมิน
+      allow update, delete: if isAdmin();
+    }
+
+    // ---------- Bookings / Tickets (แบบฟอร์มลูกค้า) ----------
+    match /bookings/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /tickets/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ---------- Live Chat ----------
+    // โครงสร้าง: chatThreads/{threadId} (fields: uid, sessionId, unreadAdmin, unreadUser, ...)
+    //             chatThreads/{threadId}/messages/{msgId} (fields: sender, text, createdAt)
     match /chatThreads/{threadId} {
+      // ต้อง sign-in (anonymous ก็ได้) ตอนสร้าง/อ่าน/แก้ไข thread ของตัวเอง
       allow create: if isSignedIn();
-      allow read, update, delete: if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
-      match /messages/{msg} {
-        allow create: if isSignedIn();
-        allow read: if isAdmin() || (isSignedIn() && get(/databases/$(database)/documents/chatThreads/$(threadId)).data.uid == request.auth.uid);
+      allow read, update: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.uid);
+      allow delete: if isAdmin();
+
+      match /messages/{msgId} {
+        // อ่าน/เขียนเฉพาะเจ้าของ thread หรือแอดมิน
+        allow read, create: if isAdmin() || (
+          isSignedIn() &&
+          request.auth.uid == get(/databases/$(database)/documents/chatThreads/$(threadId)).data.uid
+        );
+        allow update, delete: if isAdmin();
       }
+    }
+
+    // ---------- Default deny ----------
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
