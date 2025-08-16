@@ -1,53 +1,48 @@
+<!-- reviews.html (อัปเดตพาธให้ตรงกับหน้าแรก) -->
 <!doctype html>
 <html lang="th">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>รีวิวลูกค้าทั้งหมด • alltasks24.online</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>รีวิวลูกค้าทั้งหมด — alltasks24.online</title>
 
-  <!-- Bootstrap + สไตล์ของเว็บ -->
+  <!-- Bootstrap core -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/styles.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons (ถ้าหน้าแรกมีอยู่แล้วจะเหมือนกัน) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- ใช้พาธเดียวกับหน้าแรก (สำคัญ) -->
+  <link href="assets/styles.css" rel="stylesheet">
 </head>
-<body>
-  <!-- แถบนำทางโทนเดียวกับหน้าแรก -->
-  <nav class="navbar bg-white shadow-sm sticky-top">
-    <div class="container-xxl d-flex justify-content-between align-items-center">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
-        <span class="fw-semibold">alltasks24.online</span>
-      </a>
-      <a class="btn btn-outline-secondary btn-sm" href="/">← กลับหน้าแรก</a>
+<body class="bg-body-tertiary">
+
+  <header class="border-bottom bg-white">
+    <div class="container-xxl d-flex align-items-center" style="height:56px">
+      <a href="/" class="navbar-brand fw-bold text-primary-emphasis mb-0">alltasks24.online</a>
+      <div class="ms-auto">
+        <a href="/" class="btn btn-sm btn-outline-secondary">← กลับหน้าแรก</a>
+      </div>
     </div>
-  </nav>
+  </header>
 
   <main class="container-xxl py-4">
-    <div class="d-flex justify-content-between align-items-end mb-3">
-      <h1 class="h4 mb-0">รีวิวลูกค้าทั้งหมด</h1>
-      <!-- public.js จะเติมข้อความค่าเฉลี่ย -->
-      <div id="avgAll" class="text-muted small"></div>
+    <div class="d-flex align-items-center mb-3">
+      <h5 class="mb-0">รีวิวลูกค้าทั้งหมด</h5>
+      <small id="allReviewsStats" class="ms-auto text-muted"></small>
     </div>
 
-    <!-- กริดรายการรีวิว: public.js จะเรนเดอร์การ์ดให้ -->
-    <div id="reviewAllList"
-         class="row row-cols-1 row-cols-md-2 g-3"
-         data-page-size="12"></div>
+    <!-- grid เดียวกับหน้าแรก -->
+    <div id="allReviewsList" class="row g-3"></div>
 
-    <!-- ปุ่มโหลดเพิ่ม (ซ่อนเองเมื่อโหลดครบ) -->
-    <div class="text-center mt-3">
-      <button id="loadMoreReviews" class="btn btn-outline-primary">โหลดเพิ่ม</button>
-    </div>
+    <footer class="text-center text-muted small py-5">
+      © 2025 alltasks24.online
+    </footer>
   </main>
 
-  <footer class="site-footer text-center text-muted small py-4">
-    © <span id="yearNow"></span> alltasks24.online
-  </footer>
-
-  <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script type="module" src="/firebase-init.js"></script>
-  <script type="module" src="/public.js"></script>
-  <script>
-    document.getElementById('yearNow').textContent = new Date().getFullYear();
-  </script>
+  <!-- พาธ JS ให้เหมือนหน้าแรก (ไม่ต้องใส่ / นำหน้า) -->
+  <script type="module" src="firebase-init.js"></script>
+  <script type="module" src="public.js"></script>
 </body>
 </html>
