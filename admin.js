@@ -200,33 +200,35 @@ onSnapshot(
   snap => {
     const tbody = document.getElementById('ticketTableBody');
     if (!tbody) return;
-    tbody.innerHTML = '';
 
+    const rows = [];
     snap.forEach(d => {
-      const t = d.data();
-      const fullDetail = (t.detail ?? t.details ?? t.message ?? '').toString();
-      tbody.insertAdjacentHTML('beforeend', `
+      const t = d.data() || {};
+      const email = t.email ?? t.contact ?? '-';          // ฟอร์มใช้ contact
+      const subject = t.subject ?? t.type ?? '-';         // ฟอร์มใช้ type
+      const detail = (t.detail ?? t.details ?? t.message ?? '').toString();
+      const status = t.status ?? 'open';
+
+      rows.push(`
         <tr data-id="${d.id}">
-          <td>${t.email || '-'}</td>
-          <td>
-            <div class="fw-semibold">${t.subject || '-'}</div>
-            <div class="small text-muted" style="white-space:pre-line">${fullDetail}</div>
-          </td>
-          <td>${t.status || 'open'}</td>
+          <td>${email}</td>
+          <td>${subject}</td>
+          <td class="small text-wrap" style="max-width:420px;white-space:pre-line">${detail || '-'}</td>
+          <td><span class="badge ${status==='closed'?'bg-secondary':'bg-success'}">${status}</span></td>
           <td class="text-end">
-            <button class="btn btn-sm btn-outline-primary" data-action="close">ปิด</button>
+            <button class="btn btn-sm btn-outline-primary" data-act="close">ปิด</button>
           </td>
         </tr>
       `);
     });
-
-    // ปุ่มปิดงาน
-    tbody.querySelectorAll('button[data-action="close"]').forEach(btn => {
-      btn.onclick = async (e) => {
-        const tr = e.target.closest('tr');
-        const id = tr?.dataset?.id;
-        if (id) await updateDoc(doc(db,'tickets', id), { status: 'closed' });
-      };
-    });
+    tbody.innerHTML = rows.join('');
   }
 );
+
+// ปุ่มปิดงาน (ใช้ event delegation ป้องกัน listener หายเวลา re-render)
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-act="close"]');
+  if (!btn) return;
+  const id = btn.closest('tr')?.dataset?.id;
+  if (id) await updateDoc(doc(db,'tickets', id), { status: 'closed' });
+});
