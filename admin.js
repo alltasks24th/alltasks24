@@ -3,7 +3,7 @@ import { db } from './firebase-init.js';
 import { requireAdmin, logout } from './auth.js';
 import {
   collection, doc, addDoc, updateDoc, deleteDoc, getDoc, getDocs, onSnapshot,
-  query, orderBy, serverTimestamp, Timestamp, where, increment, setDoc // <-- เพิ่ม setDoc
+  query, orderBy, serverTimestamp, Timestamp, where, increment, setDoc // <-- ใช้ setDoc ด้วย
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
 const $ = (s, r=document)=> r.querySelector(s);
@@ -15,6 +15,7 @@ requireAdmin(async (user, role)=>{
   onSnapshot(collection(db,'roles'), snap=> $('#countUsers').textContent = snap.size);
   onSnapshot(collection(db,'promotions'), snap=> $('#countPromos').textContent = snap.size);
 
+  // === SERVICES ===
   onSnapshot(collection(db,'services'), snap=>{
     const tbody = $('#svcTableBody'); tbody.innerHTML='';
     snap.forEach(d=>{
@@ -38,6 +39,7 @@ requireAdmin(async (user, role)=>{
     bootstrap.Modal.getInstance(document.getElementById('svcModal')).hide();
   });
 
+  // === FAQ ===
   onSnapshot(collection(db,'faqs'), snap=>{
     const list=$('#faqList'); list.innerHTML='';
     snap.forEach(d=> list.insertAdjacentHTML('beforeend', `<li class="list-group-item d-flex justify-content-between align-items-center" data-id="${d.id}">${d.data().q}<button class="btn btn-sm btn-outline-danger btn-del">ลบ</button></li>`));
@@ -48,6 +50,7 @@ requireAdmin(async (user, role)=>{
     await addDoc(collection(db,'faqs'), {q,a, createdAt:serverTimestamp()}); $('#faqQ').value=''; $('#faqA').value='';
   });
 
+  // === PROMOTIONS ===
   onSnapshot(collection(db,'promotions'), snap=>{
     const tbody=$('#promoTableBody'); tbody.innerHTML='';
     snap.forEach(d=>{
@@ -78,6 +81,7 @@ requireAdmin(async (user, role)=>{
     bootstrap.Modal.getInstance(document.getElementById('promoModal')).hide();
   });
 
+  // === BANNERS ===
   onSnapshot(collection(db,'banners'), snap=>{
     const tbody=$('#bannerTableBody'); tbody.innerHTML='';
     snap.forEach(d=>{
@@ -102,18 +106,40 @@ requireAdmin(async (user, role)=>{
     bootstrap.Modal.getInstance(document.getElementById('bannerModal')).hide();
   });
 
+  // === SETTINGS (แก้ให้ใช้ setDoc merge เพื่อไม่สร้าง doc ใหม่) ===
   const sRef=doc(db,'settings','public');
   $('#saveSettings').addEventListener('click', async ()=>{
-    const data={ siteName:$('#setSite').value, phone:$('#setPhone').value, line:$('#setLine').value, facebook:$('#setFb').value,
-    hero:$('#setHero').value, mediaPolicy:$('#setPolicy').value, mapUrl:$('#setMap').value, updatedAt: serverTimestamp() };
-    await updateDoc(sRef, data).catch(async()=> await addDoc(collection(db,'settings'), {id:'public', ...data}));
-    alert('บันทึกแล้ว');
+    const data={
+      siteName:$('#setSite').value,
+      phone:$('#setPhone').value,
+      line:$('#setLine').value,
+      facebook:$('#setFb').value,
+      hero:$('#setHero').value,
+      mediaPolicy:$('#setPolicy').value,
+      mapUrl:$('#setMap').value,
+      updatedAt: serverTimestamp()
+    };
+    try{
+      await setDoc(sRef, data, { merge:true });   // ✅ อัปเดต/สร้างตัวเดิม ไม่สร้างอันใหม่เรื่อยๆ
+      alert('บันทึกแล้ว');
+    }catch(err){
+      console.error(err);
+      alert('บันทึกไม่สำเร็จ: ' + (err?.code || err?.message || err));
+    }
   });
   const sSnap = await getDoc(sRef);
   if(sSnap.exists()){
-    const v=sSnap.data(); $('#setSite').value=v.siteName||'alltasks24.online'; $('#setPhone').value=v.phone||''; $('#setLine').value=v.line||''; $('#setFb').value=v.facebook||''; $('#setHero').value=v.hero||''; $('#setPolicy').value=v.mediaPolicy||''; $('#setMap').value=v.mapUrl||'';
+    const v=sSnap.data();
+    $('#setSite').value=v.siteName||'alltasks24.online';
+    $('#setPhone').value=v.phone||'';
+    $('#setLine').value=v.line||'';
+    $('#setFb').value=v.facebook||'';
+    $('#setHero').value=v.hero||'';
+    $('#setPolicy').value=v.mediaPolicy||'';
+    $('#setMap').value=v.mapUrl||'';
   }
 
+  // === CHAT ===
   onSnapshot(query(collection(db,'chatThreads'), orderBy('createdAt','desc')), snap=>{
     const list=$('#threadList'); list.innerHTML='';
     snap.forEach(d=>{
@@ -143,7 +169,7 @@ requireAdmin(async (user, role)=>{
     inp.value='';
   });
 
-  // ==================== AREAS (ย้ายเข้ามาให้รันเฉพาะแอดมิน) ====================
+  // ==================== AREAS (ทำงานเฉพาะแอดมิน) ====================
   (() => {
     const list = document.getElementById('areaListAdmin');
     const addBtn = document.getElementById('areaAdd');
@@ -169,7 +195,7 @@ requireAdmin(async (user, role)=>{
           </div>
           <div class="btn-group btn-group-sm">
             <button class="btn btn-outline-primary" data-act="map">ดูแผนที่</button>
-            <button class="btn btn-outline-success" data-act="default">ใช้แผนที่นี้</button> <!-- เพิ่มปุ่ม -->
+            <button class="btn btn-outline-success" data-act="default">ใช้แผนที่นี้</button>
             <button class="btn btn-outline-danger" data-act="del">ลบ</button>
           </div>
         </li>
@@ -304,8 +330,8 @@ onSnapshot(
     const rows = [];
     snap.forEach(d => {
       const t = d.data() || {};
-      const email = t.email ?? t.contact ?? '-';          // ฟอร์มใช้ contact
-      const subject = t.subject ?? t.type ?? '-';         // ฟอร์มใช้ type
+      const email = t.email ?? t.contact ?? '-';
+      const subject = t.subject ?? t.type ?? '-';
       const detail = (t.detail ?? t.details ?? t.message ?? '').toString();
       const status = t.status ?? 'open';
 
@@ -325,7 +351,7 @@ onSnapshot(
   }
 );
 
-// ปุ่มปิดงาน (ใช้ event delegation ป้องกัน listener หายเวลา re-render)
+// ปุ่มปิดงาน
 document.addEventListener('click', async (e) => {
   const btn = e.target.closest('[data-act="close"]');
   if (!btn) return;
@@ -333,6 +359,7 @@ document.addEventListener('click', async (e) => {
   if (id) await updateDoc(doc(db,'tickets', id), { status: 'closed' });
 });
 
+// === REVIEWS — pending ===
 onSnapshot(
   query(collection(db,'reviews'), where('approved','==', false)),
   snap => {
@@ -391,10 +418,11 @@ onSnapshot(
     `).join('');
 
     // ปุ่มยกเลิกอนุมัติ
-    tbody.querySelectorAll('.btn-unapprove').forEach(b => b.onclick = async e => {
-      const id = e.target.closest('tr')?.dataset?.id;
-      if (id) await updateDoc(doc(db,'reviews', id), { approved: false });
-    });
+    tbody.querySelectorAll('.btn-unapprove')
+      .forEach(b => b.onclick = async (e) => {
+        const id = e.target.closest('tr')?.dataset?.id;
+        if (id) await updateDoc(doc(db,'reviews', id), { approved: false });
+      });
 
     // ปุ่มลบ
     tbody.querySelectorAll('.btn-del').forEach(b => b.onclick = async e => {
