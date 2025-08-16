@@ -155,7 +155,7 @@ requireAdmin(async (user, role)=>{
     if (!addBtn) return;
 
     // Realtime list
-    onSnapshot(collection(db, 'areas'), (snap) => {
+    onSnapshot(collection(db, 'serviceAreas'), (snap) => {
       if (!list) return;
       const items = [];
       snap.forEach(d => items.push({ id: d.id, ...d.data() }));
@@ -194,7 +194,7 @@ requireAdmin(async (user, role)=>{
       addBtn.textContent = 'กำลังบันทึก...';
 
       try {
-        await addDoc(collection(db, 'areas'), {
+        await addDoc(collection(db, 'serviceAreas'), {
           name, province, ...(geo ? { geo } : {}),
           createdAt: serverTimestamp()
         });
@@ -222,7 +222,7 @@ requireAdmin(async (user, role)=>{
       const act = btn.dataset.act;
 
       if (act === 'del' && id) {
-        if (confirm('ลบพื้นที่นี้?')) await deleteDoc(doc(db, 'areas', id));
+        if (confirm('ลบพื้นที่นี้?')) await deleteDoc(doc(db, 'serviceAreas', id));
         return;
       }
 
