@@ -333,47 +333,38 @@ onSnapshot(
     `).join('');
   });
 
-  // เพิ่มพื้นที่
-  addBtn.addEventListener('click', async () => {
-    const name = (nameInp.value || '').trim();
-    const province = (provInp.value || '').trim();
-    const geoStr = (geoInp.value || '').trim();
-    if (!name) { alert('กรุณากรอกชื่อพื้นที่'); return; }
+// เพิ่มพื้นที่ (เวอร์ชันมี feedback + error)
+addBtn.addEventListener('click', async () => {
+  const name = (nameInp.value || '').trim();
+  const province = (provInp.value || '').trim();
+  const geoStr = (geoInp.value || '').trim();
+  if (!name) { alert('กรุณากรอกชื่อพื้นที่'); return; }
 
-    // ถ้ามี GeoJSON ให้ตรวจสอบคร่าว ๆ
-    let geo = null;
-    if (geoStr) {
-      try { geo = JSON.parse(geoStr); }
-      catch { alert('รูปแบบ GeoJSON ไม่ถูกต้อง'); return; }
-    }
+  let geo = null;
+  if (geoStr) {
+    try { geo = JSON.parse(geoStr); }
+    catch { alert('รูปแบบ GeoJSON ไม่ถูกต้อง'); return; }
+  }
 
+  addBtn.disabled = true;
+  const oldLabel = addBtn.textContent;
+  addBtn.textContent = 'กำลังบันทึก...';
+
+  try {
     await addDoc(collection(db, 'areas'), {
-      name, province, geo,
+      name, province, ...(geo ? { geo } : {}),
       createdAt: serverTimestamp()
     });
-
     nameInp.value = '';
     provInp.value = '';
     geoInp.value  = '';
-  });
-
-  // กดปุ่มในรายการ (ดูแผนที่/ลบ)
-  list.addEventListener('click', async (e) => {
-    const btn = e.target.closest('button[data-act]');
-    if (!btn) return;
-    const li = btn.closest('li');
-    const id = li?.dataset?.id;
-    const act = btn.dataset.act;
-
-    if (act === 'del' && id) {
-      if (confirm('ลบพื้นที่นี้?')) await deleteDoc(doc(db, 'areas', id));
-      return;
-    }
-    if (act === 'map') {
-      const title = li.querySelector('.fw-semibold')?.textContent || '';
-      const prov  = li.querySelector('.small')?.textContent || '';
-      const q = encodeURIComponent(`${title} ${prov}`);
-      if (mapIframe) mapIframe.src = `https://www.google.com/maps?q=${q}&output=embed`;
-    }
-  });
-})();
+    alert('เพิ่มพื้นที่เรียบร้อย');
+    // onSnapshot จะเติมรายการใน #areaListAdmin ให้อัตโนมัติ
+  } catch (err) {
+    console.error(err);
+    alert(`เพิ่มไม่สำเร็จ: ${err?.message || err}`);
+  } finally {
+    addBtn.disabled = false;
+    addBtn.textContent = oldLabel;
+  }
+});
