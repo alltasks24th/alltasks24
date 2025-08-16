@@ -301,3 +301,79 @@ onSnapshot(
     });
   }
 );
+
+// --- AREAS (พื้นที่ให้บริการ) ---
+(() => {
+  const list = document.getElementById('areaListAdmin');
+  const addBtn = document.getElementById('areaAdd');
+  const nameInp = document.getElementById('areaName');
+  const provInp = document.getElementById('areaProv');
+  const geoInp  = document.getElementById('areaGeo');
+  const mapIframe = document.getElementById('adminMap');
+  if (!list || !addBtn) return;
+
+  // โหลดรายการแบบเรียลไทม์
+  onSnapshot(collection(db, 'areas'), (snap) => {
+    const items = [];
+    snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+    // เก่า–>ใหม่ หรือจะสลับเป็นใหม่อยู่บนก็ได้
+    items.sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0));
+
+    list.innerHTML = items.map(a => `
+      <li class="list-group-item d-flex justify-content-between align-items-center" data-id="${a.id}">
+        <div>
+          <div class="fw-semibold">${a.name || '-'}</div>
+          <div class="small text-muted">${a.province || ''}</div>
+        </div>
+        <div class="btn-group btn-group-sm">
+          <button class="btn btn-outline-primary" data-act="map">ดูแผนที่</button>
+          <button class="btn btn-outline-danger" data-act="del">ลบ</button>
+        </div>
+      </li>
+    `).join('');
+  });
+
+  // เพิ่มพื้นที่
+  addBtn.addEventListener('click', async () => {
+    const name = (nameInp.value || '').trim();
+    const province = (provInp.value || '').trim();
+    const geoStr = (geoInp.value || '').trim();
+    if (!name) { alert('กรุณากรอกชื่อพื้นที่'); return; }
+
+    // ถ้ามี GeoJSON ให้ตรวจสอบคร่าว ๆ
+    let geo = null;
+    if (geoStr) {
+      try { geo = JSON.parse(geoStr); }
+      catch { alert('รูปแบบ GeoJSON ไม่ถูกต้อง'); return; }
+    }
+
+    await addDoc(collection(db, 'areas'), {
+      name, province, geo,
+      createdAt: serverTimestamp()
+    });
+
+    nameInp.value = '';
+    provInp.value = '';
+    geoInp.value  = '';
+  });
+
+  // กดปุ่มในรายการ (ดูแผนที่/ลบ)
+  list.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    const li = btn.closest('li');
+    const id = li?.dataset?.id;
+    const act = btn.dataset.act;
+
+    if (act === 'del' && id) {
+      if (confirm('ลบพื้นที่นี้?')) await deleteDoc(doc(db, 'areas', id));
+      return;
+    }
+    if (act === 'map') {
+      const title = li.querySelector('.fw-semibold')?.textContent || '';
+      const prov  = li.querySelector('.small')?.textContent || '';
+      const q = encodeURIComponent(`${title} ${prov}`);
+      if (mapIframe) mapIframe.src = `https://www.google.com/maps?q=${q}&output=embed`;
+    }
+  });
+})();
