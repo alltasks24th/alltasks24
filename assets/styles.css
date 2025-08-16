@@ -43,3 +43,21 @@ a{color:var(--primary)}a:hover{filter:brightness(.9)}
 .table thead th{background:#F6F3FF}
 .badge-outline{border:1px solid var(--border);color:#4c1d95;background:#fff}
 .site-footer{background:#ffffff;border-top:1px solid var(--border)}
+
+/* === Chat bubbles (public + admin) === */
+.chat-msg{margin:.5rem 0;display:flex}
+.chat-msg.user{justify-content:flex-end}
+.chat-msg .bubble{max-width:75%;padding:.5rem .75rem;border-radius:1rem;word-break:break-word}
+.chat-msg .meta{font-size:.75rem;color:#6c757d;margin:0 .5rem .25rem}
+.chat-msg.user .bubble{background:#eef4ff}   /* ผู้ใช้ (ลูกค้า) ฟ้าอ่อน */
+.chat-msg.admin .bubble{background:#eaf7ea}  /* แอดมิน เขียวอ่อน */
+.chat-msg.bot .bubble{background:#f1f1f1}    /* ระบบ เทาอ่อน */
+
+/* (ใช้กับหน้าแอดมินได้เหมือนกัน) */
+.chat-row{margin:.5rem 0;display:flex}
+.chat-row.admin{justify-content:flex-start}
+.chat-row.user{justify-content:flex-end}
+.chat-row .bubble{max-width:75%;padding:.5rem .75rem;border-radius:1rem;background:#f7f7f7}
+.chat-row.admin .bubble{background:#eaf7ea}
+.chat-row.user .bubble{background:#eef4ff}
+.chat-row .meta{font-size:.75rem;color:#6c757d;margin:0 0 .25rem}
