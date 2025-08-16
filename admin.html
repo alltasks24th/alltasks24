@@ -73,13 +73,17 @@
         <div class="row g-3">
           <div class="col-lg-8">
             <div class="card card-clean p-2">
-              <div class="ratio ratio-16x9"><iframe id="adminMap" src="https://www.google.com/maps?q=Bangkok&output=embed"></iframe></div>
+              <div class="ratio ratio-16x9">
+                <iframe id="adminMap" src="https://www.google.com/maps?q=Bangkok&output=embed"></iframe>
+              </div>
             </div>
           </div>
           <div class="col-lg-4">
             <div class="card card-clean p-3">
               <h6>พื้นที่ให้บริการ</h6>
+              <!-- รายการจะแสดงตรงนี้ -->
               <ul class="list-group" id="areaListAdmin"></ul>
+              <!-- ฟอร์มเพิ่มพื้นที่ -->
               <div class="mt-3">
                 <input id="areaName" class="form-control mb-2" placeholder="ชื่อพื้นที่">
                 <input id="areaProv" class="form-control mb-2" placeholder="จังหวัด">
@@ -90,7 +94,7 @@
           </div>
         </div>
       </div>
-
+      
       <div class="tab-pane fade" id="tab-bookings">
         <h5>การจองงาน/นัดหมาย</h5>
         <table class="table table-hover align-middle">
