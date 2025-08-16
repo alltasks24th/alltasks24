@@ -3,7 +3,7 @@ import { db } from './firebase-init.js';
 import { requireAdmin, logout } from './auth.js';
 import {
   collection, doc, addDoc, updateDoc, deleteDoc, getDoc, getDocs, onSnapshot,
-  query, orderBy, serverTimestamp, Timestamp, where, increment, setDoc // <-- เพิ่ม setDoc
+  query, orderBy, serverTimestamp, Timestamp, where, increment, setDoc // <-- มี setDoc
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
 const $ = (s, r=document)=> r.querySelector(s);
@@ -102,17 +102,40 @@ requireAdmin(async (user, role)=>{
     bootstrap.Modal.getInstance(document.getElementById('bannerModal')).hide();
   });
 
-  const sRef=doc(db,'settings','public');
+  // ===== SETTINGS (แก้เฉพาะตรงนี้ให้บันทึกทับ settings/public เสมอ) =====
+  const sRef = doc(db,'settings','public');
   $('#saveSettings').addEventListener('click', async ()=>{
-    const data={ siteName:$('#setSite').value, phone:$('#setPhone').value, line:$('#setLine').value, facebook:$('#setFb').value,
-    hero:$('#setHero').value, mediaPolicy:$('#setPolicy').value, mapUrl:$('#setMap').value, updatedAt: serverTimestamp() };
-    await updateDoc(sRef, data).catch(async()=> await addDoc(collection(db,'settings'), {id:'public', ...data}));
-    alert('บันทึกแล้ว');
+    const data = {
+      siteName: $('#setSite').value,
+      phone: $('#setPhone').value,
+      line: $('#setLine').value,
+      facebook: $('#setFb').value,
+      hero: $('#setHero').value,
+      mediaPolicy: $('#setPolicy').value,
+      mapUrl: $('#setMap').value,
+      updatedAt: serverTimestamp()
+    };
+    try {
+      await setDoc(sRef, data, { merge: true }); // ✅ เขียนทับ/อัปเดตที่ doc เดิม ไม่สร้างเอกสารใหม่เรื่อย ๆ
+      alert('บันทึกแล้ว');
+    } catch (err) {
+      console.error(err);
+      alert('บันทึกไม่สำเร็จ: ' + (err?.code || err?.message || err));
+    }
   });
+
   const sSnap = await getDoc(sRef);
   if(sSnap.exists()){
-    const v=sSnap.data(); $('#setSite').value=v.siteName||'alltasks24.online'; $('#setPhone').value=v.phone||''; $('#setLine').value=v.line||''; $('#setFb').value=v.facebook||''; $('#setHero').value=v.hero||''; $('#setPolicy').value=v.mediaPolicy||''; $('#setMap').value=v.mapUrl||'';
+    const v=sSnap.data();
+    $('#setSite').value=v.siteName||'alltasks24.online';
+    $('#setPhone').value=v.phone||'';
+    $('#setLine').value=v.line||'';
+    $('#setFb').value=v.facebook||'';
+    $('#setHero').value=v.hero||'';
+    $('#setPolicy').value=v.mediaPolicy||'';
+    $('#setMap').value=v.mapUrl||'';
   }
+  // ===== END SETTINGS =====
 
   onSnapshot(query(collection(db,'chatThreads'), orderBy('createdAt','desc')), snap=>{
     const list=$('#threadList'); list.innerHTML='';
@@ -304,8 +327,8 @@ onSnapshot(
     const rows = [];
     snap.forEach(d => {
       const t = d.data() || {};
-      const email = t.email ?? t.contact ?? '-';          // ฟอร์มใช้ contact
-      const subject = t.subject ?? t.type ?? '-';         // ฟอร์มใช้ type
+      const email = t.email ?? t.contact ?? '-';
+      const subject = t.subject ?? t.type ?? '-';
       const detail = (t.detail ?? t.details ?? t.message ?? '').toString();
       const status = t.status ?? 'open';
 
@@ -325,7 +348,7 @@ onSnapshot(
   }
 );
 
-// ปุ่มปิดงาน (ใช้ event delegation ป้องกัน listener หายเวลา re-render)
+// ปุ่มปิดงาน
 document.addEventListener('click', async (e) => {
   const btn = e.target.closest('[data-act="close"]');
   if (!btn) return;
@@ -391,7 +414,7 @@ onSnapshot(
     `).join('');
 
     // ปุ่มยกเลิกอนุมัติ
-    tbody.querySelectorAll('.btn-unapprove').forEach(b => b.onclick = async e => {
+    tbody.querySelectorAll('.btn-unapprove').forEach b => b.onclick = async e => {
       const id = e.target.closest('tr')?.dataset?.id;
       if (id) await updateDoc(doc(db,'reviews', id), { approved: false });
     });
