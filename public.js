@@ -1,4 +1,3 @@
-
 // public.js — ฝั่งผู้ใช้ (realtime + chat เปิดเมื่อกดปุ่ม)
 import { auth, db, ensureAnonAuth } from './firebase-init.js';
 import {
@@ -266,8 +265,26 @@ async function setupChat(user){
     createdNow = true;
   }
 
+  // helper แปลงวันเวลา
+  const fmtDT = (ts)=>{
+    const d = ts?.toDate?.() ? ts.toDate() : (ts instanceof Date ? ts : new Date());
+    return d.toLocaleString('th-TH', { dateStyle:'short', timeStyle:'short' });
+  };
+
   onSnapshot(query(collection(db,'chatThreads', currentThreadId, 'messages'), orderBy('createdAt','asc')), snap=>{
-    body.innerHTML=''; snap.forEach(m=>{ const d=m.data(); body.insertAdjacentHTML('beforeend', `<div class="chat-msg ${d.sender}">${d.text}</div>`); body.scrollTop = body.scrollHeight; });
+    body.innerHTML='';
+    snap.forEach(m=>{
+      const d=m.data();
+      const who = d.sender==='admin' ? 'แอดมิน' : (d.sender==='bot' ? 'ระบบ' : 'ฉัน');
+      const when = d.createdAt ? fmtDT(d.createdAt) : '';
+      body.insertAdjacentHTML('beforeend', `
+        <div class="chat-msg ${d.sender}">
+          <div class="meta">${who} • ${when}</div>
+          <div class="text">${d.text}</div>
+        </div>
+      `);
+    });
+    body.scrollTop = body.scrollHeight;
   });
 
   onSnapshot(doc(db,'chatThreads', currentThreadId), snap=>{
