@@ -158,7 +158,7 @@ requireAdmin(async (user, role)=>{
   $('#btnLogout').addEventListener('click', logout);
 });
 
-// === BOOKINGS — realtime list (show phone + details, newest first) ===
+// === BOOKINGS — realtime list (7 cols: name | service | phone | detail | date | status | actions) ===
 onSnapshot(
   query(collection(db, 'bookings'), orderBy('createdAt', 'desc')),
   snap => {
@@ -169,43 +169,32 @@ onSnapshot(
     snap.forEach(d => {
       const b = d.data() || {};
 
-      // วันที่/เวลา (รองรับทั้งฟิลด์ date/time และ createdAt)
       const prettyDate = (() => {
-        if (b.date) {
-          return String(b.date) + (b.time ? ` ${b.time}` : '');
-        }
+        if (b.date) return String(b.date) + (b.time ? ` ${b.time}` : '');
         const dt = b.createdAt?.toDate?.() ? b.createdAt.toDate() : null;
         return dt
           ? dt.toLocaleDateString('th-TH') + ' ' +
             dt.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
-          : '';
+          : '-';
       })();
 
-      // รายละเอียด (รองรับชื่อฟิลด์ทั้ง details/detail)
       const details = (b.details ?? b.detail ?? '-').toString();
 
-      tbody.insertAdjacentHTML(
-        'beforeend',
-        `
+      tbody.insertAdjacentHTML('beforeend', `
         <tr data-id="${d.id}">
           <td>${b.name || '-'}</td>
           <td>
             <div class="fw-semibold">${b.service || '-'}</div>
-            <div class="small text-muted">
-              ${b.area || ''}${prettyDate ? ' • ' + prettyDate : ''}
-            </div>
+            <div class="small text-muted">${b.area || ''}</div>
           </td>
           <td>${b.phone || '-'}</td>
-          <td class="small text-wrap" style="max-width:420px; white-space:pre-line;">
-            ${details}
-          </td>
+          <td class="small text-wrap" style="max-width:420px;white-space:pre-line;">${details}</td>
+          <td>${prettyDate}</td>
           <td>
             <span class="badge ${
-              b.status === 'done'
-                ? 'text-bg-success'
-                : b.status === 'confirmed'
-                ? 'text-bg-primary'
-                : 'text-bg-secondary'
+              b.status === 'done' ? 'text-bg-success'
+              : b.status === 'confirmed' ? 'text-bg-primary'
+              : 'text-bg-secondary'
             }">${b.status || 'pending'}</span>
           </td>
           <td class="text-end">
@@ -214,8 +203,7 @@ onSnapshot(
             <button class="btn btn-sm btn-outline-danger" data-action="del">ลบ</button>
           </td>
         </tr>
-      `
-      );
+      `);
     });
 
     // เปลี่ยนสถานะ
@@ -228,7 +216,7 @@ onSnapshot(
       };
     });
 
-    // ลบรายการ
+    // ลบ
     tbody.querySelectorAll('button[data-action="del"]').forEach(btn => {
       btn.onclick = async e => {
         const tr = e.target.closest('tr');
@@ -238,6 +226,7 @@ onSnapshot(
     });
   }
 );
+
 // === TICKETS — show detail + newest first ===
 onSnapshot(
   query(collection(db,'tickets'), orderBy('createdAt','desc')),
