@@ -106,7 +106,7 @@ requireAdmin(async (user, role)=>{
     bootstrap.Modal.getInstance(document.getElementById('bannerModal')).hide();
   });
 
-  // === SETTINGS (แก้ให้ใช้ setDoc merge เพื่อไม่สร้าง doc ใหม่) ===
+  // === SETTINGS (ใช้ setDoc merge) ===
   const sRef=doc(db,'settings','public');
   $('#saveSettings').addEventListener('click', async ()=>{
     const data={
@@ -120,7 +120,7 @@ requireAdmin(async (user, role)=>{
       updatedAt: serverTimestamp()
     };
     try{
-      await setDoc(sRef, data, { merge:true });   // ✅ อัปเดต/สร้างตัวเดิม ไม่สร้างอันใหม่เรื่อยๆ
+      await setDoc(sRef, data, { merge:true });
       alert('บันทึกแล้ว');
     }catch(err){
       console.error(err);
@@ -139,7 +139,7 @@ requireAdmin(async (user, role)=>{
     $('#setMap').value=v.mapUrl||'';
   }
 
-  // === CHAT ===
+  // === CHAT (ปรับเรนเดอร์ให้มีชื่อและเวลา + สีบับเบิล) ===
   onSnapshot(query(collection(db,'chatThreads'), orderBy('createdAt','desc')), snap=>{
     const list=$('#threadList'); list.innerHTML='';
     snap.forEach(d=>{
@@ -156,9 +156,30 @@ requireAdmin(async (user, role)=>{
   async function openThread(id){
     currentThread=id;
     if(unsubMsg) unsubMsg(); $('#chatMsgs').innerHTML='';
+
+    // helper แปลงวันเวลา
+    const fmtDT = (ts)=>{
+      const d = ts?.toDate?.() ? ts.toDate() : (ts instanceof Date ? ts : new Date());
+      return d.toLocaleString('th-TH', { dateStyle:'short', timeStyle:'short' });
+    };
+
     unsubMsg = onSnapshot(query(collection(db,'chatThreads', id, 'messages'), orderBy('createdAt','asc')), snap=>{
       const wrap=$('#chatMsgs'); wrap.innerHTML='';
-      snap.forEach(m=>{ const d=m.data(); wrap.insertAdjacentHTML('beforeend', `<div class="small my-1"><span class="badge ${d.sender==='user'?'text-bg-light':'text-bg-primary'}">${d.sender}</span> ${d.text}</div>`); wrap.scrollTop=wrap.scrollHeight; });
+      snap.forEach(m=>{
+        const d=m.data();
+        const who = d.sender==='admin' ? 'แอดมิน' : (d.sender==='bot' ? 'ระบบ' : 'ผู้ใช้');
+        const when = d.createdAt ? fmtDT(d.createdAt) : '';
+        // บับเบิล + เมตา
+        wrap.insertAdjacentHTML('beforeend', `
+          <div class="chat-row ${d.sender}">
+            <div class="chat-bubble ${d.sender}">
+              <div class="meta">${who} • ${when}</div>
+              <div class="text">${d.text}</div>
+            </div>
+          </div>
+        `);
+      });
+      wrap.scrollTop=wrap.scrollHeight;
     });
     await updateDoc(doc(db,'chatThreads', id), { unreadAdmin: 0 });
   }
