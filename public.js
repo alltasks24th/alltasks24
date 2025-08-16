@@ -89,20 +89,54 @@ function bindRealtime(){
     snap.forEach(a=>{ const d=a.data(); ul.insertAdjacentHTML('beforeend', `<li class="list-group-item d-flex justify-content-between"><span>${d.name||''}</span><span class="text-muted small">${d.province||''}</span></li>`); });
   });
 
-  onSnapshot(query(collection(db,'reviews'), where('approved','==',true), orderBy('createdAt','asc')), snap=>{
-    const wrap = document.getElementById('reviewList'); if(!wrap) return; wrap.innerHTML='';
-    const list=[]; snap.forEach(r=>list.push(r.data()));
-    let avg=0; if(list.length) avg=list.reduce((a,b)=>a+Number(b.rating||0),0)/list.length;
-    const avgEl = document.getElementById('avg'); if(avgEl) avgEl.textContent = list.length? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${list.length} รีวิว` : 'ยังไม่มีรีวิวที่อนุมัติ';
-    list.forEach(r=>{
-      wrap.insertAdjacentHTML('beforeend', `<div class="col-md-6"><div class="card card-clean h-100">
-        ${r.imageUrl?`<img src="${r.imageUrl}" class="svc-thumb" alt="รีวิว">`:''}
-        <div class="card-body">
-          <div class="d-flex justify-content-between"><strong>${r.name||'ผู้ใช้'}</strong><span class="badge text-bg-success">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></div>
-          <p class="mb-0 mt-2 text-muted">${r.text||''}</p>
-        </div></div></div>`);
+// Reviews (approved only) — no composite index needed
+onSnapshot(
+  query(collection(db,'reviews'), where('approved','==', true)),
+  snap => {
+    const wrap = document.getElementById('reviewList');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+
+    // เก็บลงอาเรย์แล้ว sort ตามเวลา (เก่า→ใหม่)
+    const list = [];
+    snap.forEach(docu => {
+      const r = docu.data() || {};
+      const ts = r.createdAt?.toDate?.()
+        ? r.createdAt.toDate().getTime()
+        : (r.createdAt ? new Date(r.createdAt).getTime() : 0);
+      list.push({ ...r, __ts: ts });
     });
-  });
+    list.sort((a,b) => a.__ts - b.__ts);
+
+    // คำนวณค่าเฉลี่ย
+    let avg = 0;
+    if (list.length) avg = list.reduce((s, x) => s + Number(x.rating || 0), 0) / list.length;
+    const avgEl = document.getElementById('avg');
+    if (avgEl) {
+      avgEl.textContent = list.length
+        ? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${list.length} รีวิว`
+        : 'ยังไม่มีรีวิวที่อนุมัติ';
+    }
+
+    // เรนเดอร์รายการ
+    list.forEach(r => {
+      wrap.insertAdjacentHTML('beforeend', `
+        <div class="col-md-6">
+          <div class="card card-clean h-100">
+            ${r.imageUrl ? `<img src="${r.imageUrl}" class="svc-thumb" alt="รีวิว">` : ''}
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <strong>${r.name || 'ผู้ใช้'}</strong>
+                <span class="badge text-bg-success">${'★'.repeat(r.rating||0)}${'☆'.repeat(5-(r.rating||0))}</span>
+              </div>
+              <p class="mb-0 mt-2 text-muted" style="white-space:pre-line">${r.text || ''}</p>
+            </div>
+          </div>
+        </div>
+      `);
+    });
+  }
+);
 
   onSnapshot(collection(db,'faqs'), snap=>{
     const acc = document.getElementById('faqAccordion'); if(!acc) return; acc.innerHTML='';
