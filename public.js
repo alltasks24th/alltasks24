@@ -89,9 +89,10 @@ function bindRealtime(){
     snap.forEach(a=>{ const d=a.data(); ul.insertAdjacentHTML('beforeend', `<li class="list-group-item d-flex justify-content-between"><span>${d.name||''}</span><span class="text-muted small">${d.province||''}</span></li>`); });
   });
 
-  onSnapshot(query(collection(db,'reviews'), where('approved','==',true), orderBy('createdAt','asc')), snap=>{
+  onSnapshot(query(collection(db,'reviews'), where('approved','==',true)), snap=>{
     const wrap = document.getElementById('reviewList'); if(!wrap) return; wrap.innerHTML='';
     const list=[]; snap.forEach(r=>list.push(r.data()));
+    list.sort((a,b)=> (a.createdAt?.toMillis?.()||0) - (b.createdAt?.toMillis?.()||0));
     let avg=0; if(list.length) avg=list.reduce((a,b)=>a+Number(b.rating||0),0)/list.length;
     const avgEl = document.getElementById('avg'); if(avgEl) avgEl.textContent = list.length? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${list.length} รีวิว` : 'ยังไม่มีรีวิวที่อนุมัติ';
     list.forEach(r=>{
@@ -199,6 +200,15 @@ async function setupChat(user){
     createdNow = true;
   }
 
+  // ตรวจสอบว่า thread ยังอยู่ ถ้าไม่อยู่ให้สร้างใหม่
+  try{
+    const _snap = await getDoc(doc(db,'chatThreads', currentThreadId));
+    if(!_snap.exists()){
+      localStorage.removeItem('chatThreadIdV2');
+      currentThreadId = null;
+      return setupChat(user);
+    }
+  }catch(e){ console.warn('ตรวจสอบ thread ล้มเหลว', e); }
   onSnapshot(query(collection(db,'chatThreads', currentThreadId, 'messages'), orderBy('createdAt','asc')), snap=>{
     body.innerHTML=''; snap.forEach(m=>{ const d=m.data(); body.insertAdjacentHTML('beforeend', `<div class="chat-msg ${d.sender}">${d.text}</div>`); body.scrollTop = body.scrollHeight; });
   });
