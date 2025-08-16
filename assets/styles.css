@@ -1,10 +1,12 @@
-
 :root{
   --bg:#F7F5FF; --card:#FFFFFF; --ink:#0F172A; --muted:#475569;
   --primary:#6D28D9; --accent:#4338CA; --soft:#EDE9FE; --border:#E9E7FF;
 }
 *{box-sizing:border-box}
 body{font-family:'Kanit',system-ui,Arial;color:var(--ink);background:var(--bg)}
+/* ✅ ให้หน้าที่เผลอใช้ bg-body-tertiary ก็ยังได้พื้นหลังตามธีม */
+body.bg-body-tertiary{background:var(--bg)!important}
+
 a{color:var(--primary)}a:hover{filter:brightness(.9)}
 .navbar{background:rgba(255,255,255,.92)!important;border-bottom:1px solid var(--border);backdrop-filter:saturate(140%) blur(6px)}
 .navbar .nav-link{color:#1f2937}.navbar .nav-link:hover{color:#4c1d95}
