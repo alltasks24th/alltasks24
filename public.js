@@ -140,19 +140,52 @@ function setupBooking(){
 }
 
 function setupReview(){
-  const saveBtn = document.getElementById('saveReview'); if(!saveBtn) return;
-  saveBtn.addEventListener('click', async ()=>{
-    const rating=Number(document.getElementById('rating').value||5);
-    const text=document.getElementById('reviewText').value.trim();
-    if(!text){ alert('กรุณากรอกรีวิว'); return; }
-    const data={ rating, text, approved:false, createdAt: serverTimestamp() };
-    try{
-      await addDoc(collection(db,'reviews'), data);
-      document.getElementById('reviewText').value='';
-      const m = document.getElementById('reviewModal'); if(m && window.bootstrap){ window.bootstrap.Modal.getInstance(m)?.hide(); }
-      alert('ส่งรีวิวแล้ว รออนุมัติ');
-    }catch(err){
-      alert('ผิดพลาด โปรดลองอีกครั้ง'); console.error(err);
+  const saveBtn = document.getElementById('saveReview');
+  if (!saveBtn) return;
+
+  saveBtn.addEventListener('click', async () => {
+    // เก็บค่าจากฟอร์ม (มี/ไม่มีช่องไหนก็ได้ โค้ดจะกัน null ให้)
+    const nameEl   = document.getElementById('reviewName');
+    const ratingEl = document.getElementById('rating');
+    const textEl   = document.getElementById('reviewText');
+    const photoEl  = document.getElementById('reviewPhoto'); // ถ้ามีช่องแนบลิงก์รูป ให้ใส่ id="reviewPhoto"
+
+    const name   = (nameEl?.value || '').trim() || 'ผู้ใช้';
+    const rating = Math.max(1, Math.min(5, Number(ratingEl?.value || 5)));
+    const text   = (textEl?.value || '').trim();
+    const photo  = (photoEl?.value || '').trim();
+
+    if (!text) { alert('กรุณากรอกรีวิว'); return; }
+
+    const data = {
+      name,
+      rating,
+      text,
+      imageUrl: photo || null,     // แนบลิงก์รูป (ถ้ามี)
+      approved: false,             // ส่งแล้วให้รออนุมัติ
+      createdAt: serverTimestamp()
+    };
+
+    try {
+      await addDoc(collection(db, 'reviews'), data);
+
+      // เคลียร์ฟอร์ม
+      if (nameEl)   nameEl.value   = '';
+      if (textEl)   textEl.value   = '';
+      if (photoEl)  photoEl.value  = '';
+      if (ratingEl) ratingEl.value = '5';
+
+      // ปิดโมดัล (ถ้าใช้ Bootstrap)
+      const modalEl = document.getElementById('reviewModal');
+      if (modalEl && window.bootstrap) {
+        const inst = window.bootstrap.Modal.getInstance(modalEl) || new window.bootstrap.Modal(modalEl);
+        inst.hide();
+      }
+
+      alert('ส่งรีวิวแล้ว • รอแอดมินอนุมัติ');
+    } catch (err) {
+      console.error(err);
+      alert('ส่งรีวิวไม่สำเร็จ กรุณาลองใหม่');
     }
   });
 }
