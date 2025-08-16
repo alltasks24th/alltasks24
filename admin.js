@@ -333,38 +333,36 @@ onSnapshot(
     `).join('');
   });
 
-// เพิ่มพื้นที่ (เวอร์ชันมี feedback + error)
+// เพิ่มพื้นที่ (เวอร์ชันมีสถานะ/แจ้งผล)
 addBtn.addEventListener('click', async () => {
   const name = (nameInp.value || '').trim();
   const province = (provInp.value || '').trim();
   const geoStr = (geoInp.value || '').trim();
+
   if (!name) { alert('กรุณากรอกชื่อพื้นที่'); return; }
 
+  // แปลง GeoJSON ถ้ากรอกมา
   let geo = null;
   if (geoStr) {
     try { geo = JSON.parse(geoStr); }
     catch { alert('รูปแบบ GeoJSON ไม่ถูกต้อง'); return; }
   }
 
+  // แสดงสถานะปุ่ม
   addBtn.disabled = true;
-  const oldLabel = addBtn.textContent;
+  const old = addBtn.textContent;
   addBtn.textContent = 'กำลังบันทึก...';
 
   try {
-    await addDoc(collection(db, 'areas'), {
-      name, province, ...(geo ? { geo } : {}),
-      createdAt: serverTimestamp()
-    });
-    nameInp.value = '';
-    provInp.value = '';
-    geoInp.value  = '';
+    await addDoc(collection(db, 'areas'), { name, province, geo, createdAt: serverTimestamp() });
+    // ล้างฟอร์ม + แจ้งผล
+    nameInp.value = ''; provInp.value = ''; geoInp.value = '';
     alert('เพิ่มพื้นที่เรียบร้อย');
-    // onSnapshot จะเติมรายการใน #areaListAdmin ให้อัตโนมัติ
   } catch (err) {
     console.error(err);
-    alert(`เพิ่มไม่สำเร็จ: ${err?.message || err}`);
+    alert('เพิ่มไม่สำเร็จ: ' + (err.code || err.message));
   } finally {
     addBtn.disabled = false;
-    addBtn.textContent = oldLabel;
+    addBtn.textContent = old;
   }
 });
