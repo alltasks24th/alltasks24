@@ -167,3 +167,39 @@ requireAdmin(async (user, role)=>{
 
   $('#btnLogout').addEventListener('click', logout);
 });
+
+// === BOOKINGS — realtime list ===
+onSnapshot(query(collection(db,'bookings'), orderBy('createdAt','desc')), snap=>{
+  const tbody = $('#bookTableBody'); if(!tbody) return;
+  tbody.innerHTML='';
+  snap.forEach(d=>{
+    const b = d.data();
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr data-id="${d.id}">
+        <td>${b.name||'-'}</td>
+        <td>
+          <div class="fw-semibold">${b.service||'-'}</div>
+          <div class="small text-muted">${b.area||''}</div>
+        </td>
+        <td>${(b.date||'-')} ${(b.time||'')}</td>
+        <td>
+          <span class="badge ${ b.status==='done'?'text-bg-success' : b.status==='confirmed'?'text-bg-primary':'text-bg-secondary' }">
+            ${b.status||'pending'}
+          </span>
+        </td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-primary" data-action="status" data-s="confirmed">ยืนยัน</button>
+          <button class="btn btn-sm btn-outline-success" data-action="status" data-s="done">เสร็จสิ้น</button>
+          <button class="btn btn-sm btn-outline-danger" data-action="del">ลบ</button>
+        </td>
+      </tr>`);
+  });
+  tbody.querySelectorAll('button[data-action="status"]').forEach(btn=> btn.onclick = async (e)=>{
+    const tr = e.target.closest('tr'); const id = tr?.dataset?.id; const s = e.target.dataset.s;
+    if(id) await updateDoc(doc(db,'bookings',id), { status: s });
+  });
+  tbody.querySelectorAll('button[data-action="del"]').forEach(btn=> btn.onclick = async (e)=>{
+    const tr = e.target.closest('tr'); const id = tr?.dataset?.id;
+    if(id && confirm('ลบรายการนี้?')) await deleteDoc(doc(db,'bookings', id));
+  });
+});
