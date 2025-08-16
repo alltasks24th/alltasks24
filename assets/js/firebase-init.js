@@ -1,9 +1,9 @@
-// firebase-init.js — Firebase v9 modular
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js';
-import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, signInAnonymously, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
-import { getFirestore, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+// assets/js/firebase-init.js — robust anon auth
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
+// >>> ใส่ config ของโปรเจกต์คุณเอง (เวอร์ชันที่คุณให้ไว้) <<<
 const firebaseConfig = {
   apiKey: "AIzaSyCTaUmv6VZNczMFvznNm01M__g7k2v6a3E",
   authDomain: "alltasks24-f75ec.firebaseapp.com",
@@ -14,17 +14,33 @@ const firebaseConfig = {
   measurementId: "G-RBZ1Y0P6E0"
 };
 
-export const app = initializeApp(firebaseConfig);
-export const analytics = getAnalytics(app);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const ts = serverTimestamp;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+// คงสถานะไว้ใน localStorage เพื่อให้ incognito (แต่ยังเปิด local storage) ใช้ได้
+setPersistence(auth, browserLocalPersistence).catch(()=>{});
 
-export async function ensureAnonAuth(){
-  await setPersistence(auth, browserLocalPersistence);
-  if(!auth.currentUser){
-    try{ await signInAnonymously(auth); }catch(e){ console.error(e); }
-  }
-  return new Promise(res=>onAuthStateChanged(auth, u=>res(u)));
+const db = getFirestore(app);
+
+// เรียกใช้เพื่อให้ผู้ใช้ทั่วไป sign-in แบบ Anonymous อัตโนมัติ
+export function ensureAnonAuth(){
+  return new Promise((resolve) => {
+    try{
+      onAuthStateChanged(auth, async (user) => {
+        if (user) return resolve(user);
+        try {
+          const cred = await signInAnonymously(auth);
+          resolve(cred.user);
+        } catch (e) {
+          console.warn('Anonymous Sign-in is disabled or failed:', e?.message || e);
+          // ยัง resolve(null) เพื่อให้ส่วนอ่านสาธารณะทำงานได้
+          resolve(null);
+        }
+      });
+    }catch(e){
+      console.error('Auth init error:', e);
+      resolve(null);
+    }
+  });
 }
-export async function logout(){ try{ await signOut(auth); }catch(e){ console.error(e); } }
+
+export { app, auth, db };
