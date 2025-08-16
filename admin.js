@@ -1,4 +1,3 @@
-
 // admin.js — ฝั่งหลังบ้าน (Realtime + CRUD คร่าว ๆ)
 import { db } from './firebase-init.js';
 import { requireAdmin, logout } from './auth.js';
@@ -144,6 +143,99 @@ requireAdmin(async (user, role)=>{
     inp.value='';
   });
 
+  // ==================== AREAS (ย้ายเข้ามาให้รันเฉพาะแอดมิน) ====================
+  (() => {
+    const list = document.getElementById('areaListAdmin');
+    const addBtn = document.getElementById('areaAdd');
+    const nameInp = document.getElementById('areaName');
+    const provInp = document.getElementById('areaProv');
+    const geoInp  = document.getElementById('areaGeo');
+    const mapIframe = document.getElementById('adminMap');
+
+    if (!addBtn) return;
+
+    // Realtime list
+    onSnapshot(collection(db, 'areas'), (snap) => {
+      if (!list) return;
+      const items = [];
+      snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+      items.sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0));
+
+      list.innerHTML = items.map(a => `
+        <li class="list-group-item d-flex justify-content-between align-items-center" data-id="${a.id}">
+          <div>
+            <div class="fw-semibold">${a.name || '-'}</div>
+            <div class="small text-muted">${a.province || ''}</div>
+          </div>
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-primary" data-act="map">ดูแผนที่</button>
+            <button class="btn btn-outline-danger" data-act="del">ลบ</button>
+          </div>
+        </li>
+      `).join('');
+    });
+
+    // Add area
+    addBtn.addEventListener('click', async () => {
+      const name = (nameInp?.value || '').trim();
+      const province = (provInp?.value || '').trim();
+      const geoStr = (geoInp?.value || '').trim();
+
+      if (!name) { alert('กรุณากรอกชื่อพื้นที่'); return; }
+
+      let geo = null;
+      if (geoStr) {
+        try { geo = JSON.parse(geoStr); }
+        catch { alert('รูปแบบ GeoJSON ไม่ถูกต้อง'); return; }
+      }
+
+      addBtn.disabled = true;
+      const old = addBtn.textContent;
+      addBtn.textContent = 'กำลังบันทึก...';
+
+      try {
+        await addDoc(collection(db, 'areas'), {
+          name, province, ...(geo ? { geo } : {}),
+          createdAt: serverTimestamp()
+        });
+
+        if (nameInp) nameInp.value = '';
+        if (provInp) provInp.value = '';
+        if (geoInp)  geoInp.value  = '';
+        alert('เพิ่มพื้นที่เรียบร้อย');
+      } catch (err) {
+        console.error(err);
+        alert('เพิ่มไม่สำเร็จ: ' + (err?.code || err?.message || err));
+      } finally {
+        addBtn.disabled = false;
+        addBtn.textContent = old;
+      }
+    });
+
+    // Click list (map / delete)
+    list?.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+
+      const li = btn.closest('li');
+      const id = li?.dataset?.id;
+      const act = btn.dataset.act;
+
+      if (act === 'del' && id) {
+        if (confirm('ลบพื้นที่นี้?')) await deleteDoc(doc(db, 'areas', id));
+        return;
+      }
+
+      if (act === 'map') {
+        const title = li.querySelector('.fw-semibold')?.textContent || '';
+        const prov  = li.querySelector('.small')?.textContent || '';
+        const q = encodeURIComponent(`${title} ${prov}`);
+        if (mapIframe) mapIframe.src = `https://www.google.com/maps?q=${q}&output=embed`;
+      }
+    });
+  })();
+  // ==================== END AREAS ====================
+
   $('#btnLogout').addEventListener('click', logout);
 });
 
@@ -236,7 +328,6 @@ onSnapshot(
     const tbody = document.getElementById('reviewTableBody');
     if (!tbody) return;
 
-    // ดึงมาเรียงเองตาม createdAt (fallback ถ้าไม่มี field)
     const items = [];
     snap.forEach(d => items.push({ id: d.id, ...d.data() }));
     items.sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); // เก่าสุดก่อน
@@ -301,99 +392,3 @@ onSnapshot(
     });
   }
 );
-
-// --- AREAS (พื้นที่ให้บริการ) ---
-(() => {
-  const list = document.getElementById('areaListAdmin');
-  const addBtn = document.getElementById('areaAdd');
-  const nameInp = document.getElementById('areaName');
-  const provInp = document.getElementById('areaProv');
-  const geoInp  = document.getElementById('areaGeo');
-  const mapIframe = document.getElementById('adminMap');
-
-  // ให้เช็คเฉพาะปุ่ม เพื่อให้ "เพิ่มพื้นที่" ทำงานแน่ ๆ แม้ไม่มี list
-  if (!addBtn) return;
-
-  // ===== Realtime list =====
-  onSnapshot(collection(db, 'areas'), (snap) => {
-    if (!list) return;
-    const items = [];
-    snap.forEach(d => items.push({ id: d.id, ...d.data() }));
-    // เรียงเก่า→ใหม่ (ต้องการใหม่อยู่บน ให้ .reverse() ได้)
-    items.sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0));
-
-    list.innerHTML = items.map(a => `
-      <li class="list-group-item d-flex justify-content-between align-items-center" data-id="${a.id}">
-        <div>
-          <div class="fw-semibold">${a.name || '-'}</div>
-          <div class="small text-muted">${a.province || ''}</div>
-        </div>
-        <div class="btn-group btn-group-sm">
-          <button class="btn btn-outline-primary" data-act="map">ดูแผนที่</button>
-          <button class="btn btn-outline-danger" data-act="del">ลบ</button>
-        </div>
-      </li>
-    `).join('');
-  });
-
-  // ===== เพิ่มพื้นที่ (มีสถานะ/แจ้งผล) =====
-  addBtn.addEventListener('click', async () => {
-    const name = (nameInp?.value || '').trim();
-    const province = (provInp?.value || '').trim();
-    const geoStr = (geoInp?.value || '').trim();
-
-    if (!name) { alert('กรุณากรอกชื่อพื้นที่'); return; }
-
-    // แปลง GeoJSON ถ้ามี
-    let geo = null;
-    if (geoStr) {
-      try { geo = JSON.parse(geoStr); }
-      catch { alert('รูปแบบ GeoJSON ไม่ถูกต้อง'); return; }
-    }
-
-    addBtn.disabled = true;
-    const old = addBtn.textContent;
-    addBtn.textContent = 'กำลังบันทึก...';
-
-    try {
-      await addDoc(collection(db, 'areas'), {
-        name, province, ...(geo ? { geo } : {}),
-        createdAt: serverTimestamp()
-      });
-
-      // เคลียร์ฟอร์ม + แจ้งผล
-      if (nameInp) nameInp.value = '';
-      if (provInp) provInp.value = '';
-      if (geoInp)  geoInp.value  = '';
-      alert('เพิ่มพื้นที่เรียบร้อย'); // รายการจะขึ้นอัตโนมัติจาก onSnapshot
-    } catch (err) {
-      console.error(err);
-      alert('เพิ่มไม่สำเร็จ: ' + (err?.code || err?.message || err));
-    } finally {
-      addBtn.disabled = false;
-      addBtn.textContent = old;
-    }
-  });
-
-  // ===== คลิกรายการ (ดูแผนที่ / ลบ) =====
-  list?.addEventListener('click', async (e) => {
-    const btn = e.target.closest('button[data-act]');
-    if (!btn) return;
-
-    const li = btn.closest('li');
-    const id = li?.dataset?.id;
-    const act = btn.dataset.act;
-
-    if (act === 'del' && id) {
-      if (confirm('ลบพื้นที่นี้?')) await deleteDoc(doc(db, 'areas', id));
-      return;
-    }
-
-    if (act === 'map') {
-      const title = li.querySelector('.fw-semibold')?.textContent || '';
-      const prov  = li.querySelector('.small')?.textContent || '';
-      const q = encodeURIComponent(`${title} ${prov}`);
-      if (mapIframe) mapIframe.src = `https://www.google.com/maps?q=${q}&output=embed`;
-    }
-  });
-})(); // ปิด IIFE ให้ครบ
