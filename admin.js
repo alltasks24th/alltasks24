@@ -158,74 +158,49 @@ requireAdmin(async (user, role)=>{
   $('#btnLogout').addEventListener('click', logout);
 });
 
-// === BOOKINGS — realtime list (7 cols: name | service | phone | detail | date | status | actions) ===
-onSnapshot(
-  query(collection(db, 'bookings'), orderBy('createdAt', 'desc')),
-  snap => {
-    const tbody = document.getElementById('bookTableBody');
-    if (!tbody) return;
+// === BOOKINGS — realtime list ===
+onSnapshot(query(collection(db,'bookings'), orderBy('createdAt','desc')), snap=>{
+  const tbody = $('#bookTableBody'); if (!tbody) return;
+  tbody.innerHTML = '';
 
-    tbody.innerHTML = '';
-    snap.forEach(d => {
-      const b = d.data() || {};
+  snap.forEach(d=>{
+    const b = d.data() || {};
+    const extra = (b.note ?? b.detail ?? b.details ?? '').toString().trim();
 
-      const prettyDate = (() => {
-        if (b.date) return String(b.date) + (b.time ? ` ${b.time}` : '');
-        const dt = b.createdAt?.toDate?.() ? b.createdAt.toDate() : null;
-        return dt
-          ? dt.toLocaleDateString('th-TH') + ' ' +
-            dt.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
-          : '-';
-      })();
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr data-id="${d.id}">
+        <td>${b.name || '-'}</td>
+        <td>${b.service || '-'}</td>
+        <td>${b.phone || '-'}</td>
+        <td class="small text-wrap" style="max-width:360px;white-space:pre-line">
+          ${extra || '-'}
+        </td>
+        <td>${(b.date || '-')} ${(b.time || '')}</td>
+        <td>
+          <span class="badge ${ b.status==='done' ? 'text-bg-success'
+                                 : b.status==='confirmed' ? 'text-bg-primary'
+                                 : 'text-bg-secondary' }">
+            ${b.status || 'pending'}
+          </span>
+        </td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-primary" data-action="status" data-s="confirmed">ยืนยัน</button>
+          <button class="btn btn-sm btn-outline-success" data-action="status" data-s="done">เสร็จสิ้น</button>
+          <button class="btn btn-sm btn-outline-danger" data-action="del">ลบ</button>
+        </td>
+      </tr>
+    `);
+  });
 
-      const details = (b.details ?? b.detail ?? '-').toString();
-
-      tbody.insertAdjacentHTML('beforeend', `
-        <tr data-id="${d.id}">
-          <td>${b.name || '-'}</td>
-          <td>
-            <div class="fw-semibold">${b.service || '-'}</div>
-            <div class="small text-muted">${b.area || ''}</div>
-          </td>
-          <td>${b.phone || '-'}</td>
-          <td class="small text-wrap" style="max-width:420px;white-space:pre-line;">${details}</td>
-          <td>${prettyDate}</td>
-          <td>
-            <span class="badge ${
-              b.status === 'done' ? 'text-bg-success'
-              : b.status === 'confirmed' ? 'text-bg-primary'
-              : 'text-bg-secondary'
-            }">${b.status || 'pending'}</span>
-          </td>
-          <td class="text-end">
-            <button class="btn btn-sm btn-outline-primary" data-action="status" data-s="confirmed">ยืนยัน</button>
-            <button class="btn btn-sm btn-outline-success" data-action="status" data-s="done">เสร็จสิ้น</button>
-            <button class="btn btn-sm btn-outline-danger" data-action="del">ลบ</button>
-          </td>
-        </tr>
-      `);
-    });
-
-    // เปลี่ยนสถานะ
-    tbody.querySelectorAll('button[data-action="status"]').forEach(btn => {
-      btn.onclick = async e => {
-        const tr = e.target.closest('tr');
-        const id = tr?.dataset?.id;
-        const s = e.target.dataset.s;
-        if (id) await updateDoc(doc(db, 'bookings', id), { status: s });
-      };
-    });
-
-    // ลบ
-    tbody.querySelectorAll('button[data-action="del"]').forEach(btn => {
-      btn.onclick = async e => {
-        const tr = e.target.closest('tr');
-        const id = tr?.dataset?.id;
-        if (id && confirm('ลบรายการนี้?')) await deleteDoc(doc(db, 'bookings', id));
-      };
-    });
-  }
-);
+  tbody.querySelectorAll('button[data-action="status"]').forEach(btn => btn.onclick = async (e)=>{
+    const tr = e.target.closest('tr'); const id = tr?.dataset?.id; const s = e.target.dataset.s;
+    if (id) await updateDoc(doc(db,'bookings', id), { status: s });
+  });
+  tbody.querySelectorAll('button[data-action="del"]').forEach(btn => btn.onclick = async (e)=>{
+    const tr = e.target.closest('tr'); const id = tr?.dataset?.id;
+    if (id && confirm('ลบรายการนี้?')) await deleteDoc(doc(db,'bookings', id));
+  });
+});
 
 // === TICKETS — show detail + newest first ===
 onSnapshot(
