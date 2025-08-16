@@ -88,54 +88,84 @@ function bindRealtime(){
     snap.forEach(a=>{ const d=a.data(); ul.insertAdjacentHTML('beforeend', `<li class="list-group-item d-flex justify-content-between"><span>${d.name||''}</span><span class="text-muted small">${d.province||''}</span></li>`); });
   });
 
-// Reviews (approved only) — no composite index needed
-onSnapshot(
-  query(collection(db,'reviews'), where('approved','==', true)),
-  snap => {
-    const wrap = document.getElementById('reviewList');
-    if (!wrap) return;
-    wrap.innerHTML = '';
+  // ===== Reviews (approved only) =====
+  onSnapshot(
+    query(collection(db,'reviews'), where('approved','==', true)),
+    snap => {
+      // โหมดหน้าแรก: #reviewList (กำหนด data-limit ได้, ถ้าไม่ใส่จะ default 6)
+      const homeWrap = document.getElementById('reviewList');
+      // โหมดหน้ารีวิวทั้งหมด: #reviewAllList + ปุ่ม #loadMoreReviews (ไม่จำเป็นต้องมี)
+      const allWrap  = document.getElementById('reviewAllList');
 
-    // เก็บลงอาเรย์แล้ว sort ตามเวลา (เก่า→ใหม่)
-    const list = [];
-    snap.forEach(docu => {
-      const r = docu.data() || {};
-      const ts = r.createdAt?.toDate?.()
-        ? r.createdAt.toDate().getTime()
-        : (r.createdAt ? new Date(r.createdAt).getTime() : 0);
-      list.push({ ...r, __ts: ts });
-    });
-    list.sort((a,b) => a.__ts - b.__ts);
+      if (!homeWrap && !allWrap) return;
 
-    // คำนวณค่าเฉลี่ย
-    let avg = 0;
-    if (list.length) avg = list.reduce((s, x) => s + Number(x.rating || 0), 0) / list.length;
-    const avgEl = document.getElementById('avg');
-    if (avgEl) {
-      avgEl.textContent = list.length
-        ? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${list.length} รีวิว`
-        : 'ยังไม่มีรีวิวที่อนุมัติ';
+      // รวมรีวิวแล้ว sort ใหม่ (ใหม่อยู่บน)
+      const list = [];
+      snap.forEach(docu => {
+        const r = docu.data() || {};
+        const ts = r.createdAt?.toDate?.()
+          ? r.createdAt.toDate().getTime()
+          : (r.createdAt ? new Date(r.createdAt).getTime() : 0);
+        list.push({ ...r, __ts: ts });
+      });
+      list.sort((a,b) => b.__ts - a.__ts);
+
+      // ====== โหมดหน้ารีวิวทั้งหมด ======
+      if (allWrap) {
+        const pageSize = Number(allWrap.dataset.pageSize || 12);
+        let page = 1;
+
+        function renderPage(){
+          const end = page * pageSize;
+          const slice = list.slice(0, end);
+          allWrap.innerHTML = slice.map(renderReviewCard).join('');
+          const avgEl = document.getElementById('avgAll');
+          if (avgEl) {
+            const avg = slice.length ? slice.reduce((s,x)=> s + Number(x.rating||0), 0)/slice.length : 0;
+            avgEl.textContent = slice.length
+              ? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${slice.length} รีวิว`
+              : 'ยังไม่มีรีวิว';
+          }
+          const moreBtn = document.getElementById('loadMoreReviews');
+          if (moreBtn) {
+            if (slice.length >= list.length) { moreBtn.style.display = 'none'; }
+            else { moreBtn.style.display = ''; }
+          }
+        }
+
+        // ปุ่มโหลดเพิ่ม (ถ้ามี)
+        const moreBtn = document.getElementById('loadMoreReviews');
+        if (moreBtn && !moreBtn._bound) {
+          moreBtn._bound = true;
+          moreBtn.addEventListener('click', ()=>{ page++; renderPage(); });
+        }
+
+        renderPage();
+        return;
+      }
+
+      // ====== โหมดหน้าแรก ======
+      const limit = Number(homeWrap.dataset.limit || 6);
+      const subset = list.slice(0, limit);
+      homeWrap.innerHTML = subset.map(renderReviewCard).join('');
+
+      const avgEl = document.getElementById('avg');
+      if (avgEl) {
+        const avg = subset.length ? subset.reduce((s,x)=> s + Number(x.rating||0), 0)/subset.length : 0;
+        avgEl.textContent = subset.length
+          ? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${subset.length} รีวิว`
+          : 'ยังไม่มีรีวิวที่อนุมัติ';
+      }
+
+      // ตั้งค่าปุ่ม “ดูรีวิวทั้งหมด” (ถ้ามีปุ่ม/ลิงก์)
+      const moreLink = document.getElementById('btnReviewMore');
+      if (moreLink) {
+        moreLink.style.display = list.length > limit ? '' : 'none';
+        // ปล่อย href ให้ใส่ใน HTML ได้ตามต้องการ (เช่น reviews.html)
+      }
     }
-
-    // เรนเดอร์รายการ
-    list.forEach(r => {
-      wrap.insertAdjacentHTML('beforeend', `
-        <div class="col-md-6">
-          <div class="card card-clean h-100">
-            ${r.imageUrl ? `<img src="${r.imageUrl}" class="svc-thumb" alt="รีวิว">` : ''}
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <strong>${r.name || 'ผู้ใช้'}</strong>
-                <span class="badge text-bg-success">${'★'.repeat(r.rating||0)}${'☆'.repeat(5-(r.rating||0))}</span>
-              </div>
-              <p class="mb-0 mt-2 text-muted" style="white-space:pre-line">${r.text || ''}</p>
-            </div>
-          </div>
-        </div>
-      `);
-    });
-  }
-);
+  );
+  // ===== END Reviews =====
 
   onSnapshot(collection(db,'faqs'), snap=>{
     const acc = document.getElementById('faqAccordion'); if(!acc) return; acc.innerHTML='';
@@ -147,6 +177,24 @@ onSnapshot(
       </div>`);
     });
   });
+}
+
+function renderReviewCard(r){
+  const stars = '★'.repeat(r.rating||0) + '☆'.repeat(5-(r.rating||0));
+  return `
+    <div class="col-md-6">
+      <div class="card card-clean h-100">
+        ${r.imageUrl ? `<img src="${r.imageUrl}" class="svc-thumb" alt="รีวิว">` : ''}
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <strong>${r.name || 'ผู้ใช้'}</strong>
+            <span class="badge text-bg-success">${stars}</span>
+          </div>
+          <p class="mb-0 mt-2 text-muted" style="white-space:pre-line">${r.text || ''}</p>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function setupSearch(){
