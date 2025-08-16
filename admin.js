@@ -263,3 +263,41 @@ onSnapshot(
     });
   }
 );
+
+// === REVIEWS — approved list ===
+onSnapshot(
+  query(collection(db,'reviews'), where('approved','==', true)),
+  snap => {
+    const tbody = document.getElementById('reviewApprovedTableBody');
+    if (!tbody) return;
+
+    const items = [];
+    snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+    // เรียงใหม่ -> ล่าสุดอยู่บน
+    items.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+
+    tbody.innerHTML = items.map(r => `
+      <tr data-id="${r.id}">
+        <td>${r.name || 'ผู้ใช้'}</td>
+        <td>${r.rating ?? '-'}</td>
+        <td>${r.text || ''}</td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-secondary btn-unapprove">ยกเลิกอนุมัติ</button>
+          <button class="btn btn-sm btn-outline-danger btn-del">ลบ</button>
+        </td>
+      </tr>
+    `).join('');
+
+    // ปุ่มยกเลิกอนุมัติ
+    tbody.querySelectorAll('.btn-unapprove').forEach(b => b.onclick = async e => {
+      const id = e.target.closest('tr')?.dataset?.id;
+      if (id) await updateDoc(doc(db,'reviews', id), { approved: false });
+    });
+
+    // ปุ่มลบ
+    tbody.querySelectorAll('.btn-del').forEach(b => b.onclick = async e => {
+      const id = e.target.closest('tr')?.dataset?.id;
+      if (id && confirm('ลบรีวิวนี้?')) await deleteDoc(doc(db,'reviews', id));
+    });
+  }
+);
