@@ -103,17 +103,6 @@ requireAdmin(async (user, role)=>{
     bootstrap.Modal.getInstance(document.getElementById('bannerModal')).hide();
   });
 
-  onSnapshot(query(collection(db,'reviews'), where('approved','==',false), orderBy('createdAt','asc')), snap=>{
-    const tbody=$('#reviewTableBody'); tbody.innerHTML='';
-    snap.forEach(d=>{
-      const r=d.data();
-      tbody.insertAdjacentHTML('beforeend', `<tr data-id="${d.id}"><td>${r.name||'ผู้ใช้'}</td><td>${r.rating||'-'}</td><td>${r.text||''}</td>
-      <td class="text-end"><button class="btn btn-sm btn-success btn-approve">อนุมัติ</button> <button class="btn btn-sm btn-outline-danger btn-del">ลบ</button></td></tr>`);
-    });
-    tbody.querySelectorAll('.btn-approve').forEach(b=> b.addEventListener('click', async e=>{ const id=e.target.closest('tr').dataset.id; await updateDoc(doc(db,'reviews',id), {approved:true}); }));
-    tbody.querySelectorAll('.btn-del').forEach(b=> b.addEventListener('click', async e=>{ const id=e.target.closest('tr').dataset.id; if(confirm('ลบรีวิวนี้?')) await deleteDoc(doc(db,'reviews',id)); }));
-  });
-
   const sRef=doc(db,'settings','public');
   $('#saveSettings').addEventListener('click', async ()=>{
     const data={ siteName:$('#setSite').value, phone:$('#setPhone').value, line:$('#setLine').value, facebook:$('#setFb').value,
@@ -240,3 +229,37 @@ document.addEventListener('click', async (e) => {
   const id = btn.closest('tr')?.dataset?.id;
   if (id) await updateDoc(doc(db,'tickets', id), { status: 'closed' });
 });
+
+onSnapshot(
+  query(collection(db,'reviews'), where('approved','==', false)),
+  snap => {
+    const tbody = document.getElementById('reviewTableBody');
+    if (!tbody) return;
+
+    // ดึงมาเรียงเองตาม createdAt (fallback ถ้าไม่มี field)
+    const items = [];
+    snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+    items.sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); // เก่าสุดก่อน
+
+    tbody.innerHTML = items.map(r => `
+      <tr data-id="${r.id}">
+        <td>${r.name || 'ผู้ใช้'}</td>
+        <td>${r.rating ?? '-'}</td>
+        <td>${r.text || ''}</td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-success btn-approve">อนุมัติ</button>
+          <button class="btn btn-sm btn-outline-danger btn-del">ลบ</button>
+        </td>
+      </tr>
+    `).join('');
+
+    tbody.querySelectorAll('.btn-approve').forEach(b => b.onclick = async e => {
+      const id = e.target.closest('tr')?.dataset?.id;
+      if (id) await updateDoc(doc(db,'reviews', id), { approved: true });
+    });
+    tbody.querySelectorAll('.btn-del').forEach(b => b.onclick = async e => {
+      const id = e.target.closest('tr')?.dataset?.id;
+      if (id && confirm('ลบรีวิวนี้?')) await deleteDoc(doc(db,'reviews', id));
+    });
+  }
+);
