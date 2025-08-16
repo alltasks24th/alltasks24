@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>รีวิวลูกค้าทั้งหมด</title>
+  <link href="/styles.css" rel="stylesheet">
+  <!-- ใส่ลิงก์ bootstrap ของโปรเจกต์คุณเหมือนหน้า index.html -->
+</head>
+<body>
+  <!-- ส่วนหัว/เมนู คัดลอกจาก index ได้เลย -->
+
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-end mb-2">
+      <h3 class="mb-0">รีวิวลูกค้าทั้งหมด</h3>
+      <div id="reviewsStats" class="text-muted small"></div>
+    </div>
+
+    <div id="reviewsPageList" class="row g-3"></div>
+
+    <div class="text-center mt-3">
+      <button id="reviewsLoadMore" class="btn btn-outline-primary d-none">โหลดเพิ่ม</button>
+    </div>
+  </div>
+
+  <!-- สคริปต์ firebase/init ของคุณ -->
+  <script type="module" src="/public.js"></script>
+</body>
+</html>
