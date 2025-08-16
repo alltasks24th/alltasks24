@@ -114,16 +114,6 @@ requireAdmin(async (user, role)=>{
     tbody.querySelectorAll('.btn-del').forEach(b=> b.addEventListener('click', async e=>{ const id=e.target.closest('tr').dataset.id; if(confirm('ลบรีวิวนี้?')) await deleteDoc(doc(db,'reviews',id)); }));
   });
 
-  onSnapshot(collection(db,'tickets'), snap=>{
-    const tbody=$('#ticketTableBody'); tbody.innerHTML='';
-    snap.forEach(d=>{
-      const t=d.data();
-      tbody.insertAdjacentHTML('beforeend', `<tr data-id="${d.id}"><td>${t.email||'-'}</td><td>${t.subject||'-'}</td><td>${t.status||'open'}</td>
-      <td class="text-end"><button class="btn btn-sm btn-outline-primary btn-close">ปิด</button></td></tr>`);
-    });
-    tbody.querySelectorAll('.btn-close').forEach(b=> b.addEventListener('click', async e=>{ const id=e.target.closest('tr').dataset.id; await updateDoc(doc(db,'tickets',id), {status:'closed'}); }));
-  });
-
   const sRef=doc(db,'settings','public');
   $('#saveSettings').addEventListener('click', async ()=>{
     const data={ siteName:$('#setSite').value, phone:$('#setPhone').value, line:$('#setLine').value, facebook:$('#setFb').value,
@@ -214,12 +204,13 @@ onSnapshot(
 
     snap.forEach(d => {
       const t = d.data();
+      const fullDetail = (t.detail ?? t.details ?? t.message ?? '').toString();
       tbody.insertAdjacentHTML('beforeend', `
         <tr data-id="${d.id}">
           <td>${t.email || '-'}</td>
           <td>
             <div class="fw-semibold">${t.subject || '-'}</div>
-            <div class="small text-muted">${(t.detail || '').toString().replace(/\n/g,'<br>')}</div>
+            <div class="small text-muted" style="white-space:pre-line">${fullDetail}</div>
           </td>
           <td>${t.status || 'open'}</td>
           <td class="text-end">
