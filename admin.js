@@ -103,7 +103,7 @@ requireAdmin(async (user, role)=>{
     bootstrap.Modal.getInstance(document.getElementById('bannerModal')).hide();
   });
 
-  onSnapshot(query(collection(db,'reviews'), where('approved','==',false)), snap=>{
+  onSnapshot(query(collection(db,'reviews'), where('approved','==',false), orderBy('createdAt','asc')), snap=>{
     const tbody=$('#reviewTableBody'); tbody.innerHTML='';
     snap.forEach(d=>{
       const r=d.data();
@@ -114,28 +114,17 @@ requireAdmin(async (user, role)=>{
     tbody.querySelectorAll('.btn-del').forEach(b=> b.addEventListener('click', async e=>{ const id=e.target.closest('tr').dataset.id; if(confirm('ลบรีวิวนี้?')) await deleteDoc(doc(db,'reviews',id)); }));
   });
 
-  onSnapshot(query(collection(db,'tickets'), orderBy('createdAt','desc')), snap=>{
-  const tbody=$('#ticketTableBody'); if(!tbody) return;
-  tbody.innerHTML='';
-  snap.forEach(d=>{
-    const t=d.data();
-    tbody.insertAdjacentHTML('beforeend', `
-      <tr data-id="${d.id}">
-        <td>${t.email||'-'}</td>
-        <td>
-          <div class="fw-semibold">${t.subject||'-'}</div>
-          <div class="small text-muted">${(t.detail||'').toString().replace(/
-/g,'<br>')}</div>
-        </td>
-        <td>${t.status||'open'}</td>
-        <td class="text-end"><button class="btn btn-sm btn-outline-primary btn-close">ปิด</button></td>
-      </tr>`);
+  onSnapshot(collection(db,'tickets'), snap=>{
+    const tbody=$('#ticketTableBody'); tbody.innerHTML='';
+    snap.forEach(d=>{
+      const t=d.data();
+      tbody.insertAdjacentHTML('beforeend', `<tr data-id="${d.id}"><td>${t.email||'-'}</td><td>${t.subject||'-'}</td><td>${t.status||'open'}</td>
+      <td class="text-end"><button class="btn btn-sm btn-outline-primary btn-close">ปิด</button></td></tr>`);
+    });
+    tbody.querySelectorAll('.btn-close').forEach(b=> b.addEventListener('click', async e=>{ const id=e.target.closest('tr').dataset.id; await updateDoc(doc(db,'tickets',id), {status:'closed'}); }));
   });
-  tbody.querySelectorAll('.btn-close').forEach(b=> b.addEventListener('click', async e=>{
-    const id=e.target.closest('tr')?.dataset?.id; if(id) await updateDoc(doc(db,'tickets',id), {status:'closed'});
-  }));
-});
-const sRef=doc(db,'settings','public');
+
+  const sRef=doc(db,'settings','public');
   $('#saveSettings').addEventListener('click', async ()=>{
     const data={ siteName:$('#setSite').value, phone:$('#setPhone').value, line:$('#setLine').value, facebook:$('#setFb').value,
     hero:$('#setHero').value, mediaPolicy:$('#setPolicy').value, mapUrl:$('#setMap').value, updatedAt: serverTimestamp() };
