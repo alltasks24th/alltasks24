@@ -104,3 +104,82 @@ h1,h2,h3,h4{font-weight:700}
 
 /* เลือกข้อความ (highlight) ให้ตัดกับพื้นหลัง */
 ::selection{background:rgba(57,255,20,.35);color:#fff}
+
+/* === Contrast Patch v2 (Neon-Green Midnight) === */
+:root{
+  --text:#e9eefb;
+  --text-soft:#cbd6f5;
+  --muted:#b7c3e3;            /* ทำให้สีจางอ่านง่ายขึ้น */
+  --neon:#39FF14;
+}
+
+/* ตัวอักษรจาง/คำอธิบาย */
+.text-muted,.form-text,.small,small,
+.text-secondary,.text-white-50,.text-black-50{color:var(--muted)!important}
+
+/* ป้ายกำกับ/เช็คบ็อกซ์ */
+label,.form-label,.form-check-label{color:var(--text)}
+
+/* กล่องฟอร์ม/Select */
+.form-control,.form-select,.form-control-neon{
+  background:#0d142b;color:var(--text);
+  border:1px solid rgba(57,255,20,.25)
+}
+.form-control:focus,.form-select:focus,.form-control-neon:focus{
+  color:#fff;border-color:var(--neon);
+  box-shadow:0 0 0 .25rem rgba(57,255,20,.18)
+}
+
+/* Placeholder ทุกชนิด (รวม textarea) */
+.form-control::placeholder,
+textarea.form-control::placeholder,
+.form-control-neon::placeholder,
+textarea.form-control-neon::placeholder{
+  color:var(--muted);opacity:1
+}
+
+/* disabled ให้อ่านได้ ไม่ซีดเกินไป */
+.form-control:disabled,.form-select:disabled,.btn:disabled{
+  background:#111a35;color:#8fa3cc;opacity:1
+}
+
+/* input-group */
+.input-group-text{
+  background:#0d142b;color:var(--text-soft);
+  border:1px solid rgba(57,255,20,.25)
+}
+
+/* การ์ด/ข้อความในการ์ด */
+.card,.card-neon{color:#e9eefb}
+.card .card-title{color:#fff}
+.card .card-subtitle,.card .card-text{color:var(--text-soft)}
+
+/* ลิสต์ */
+.list-group .list-group-item{
+  background:#0f152a;color:#e9eefb;border-color:#1c2446
+}
+.list-group-item .small,.list-group-item small{color:var(--muted)!important}
+
+/* Badge ให้คอนทราสต์ดีบน Dark */
+.badge{background:var(--neon);color:#07120b}
+.badge.text-bg-success{background:var(--neon)!important;color:#07120b!important}
+
+/* ลิงก์ */
+a,.link-light{color:#bfe3ff}
+a:hover,.link-light:hover{color:var(--neon)}
+
+/* Footer */
+footer,.site-footer,.footer{color:var(--muted)}
+footer a,.site-footer a,.footer a{color:#cbe2ff}
+footer a:hover{color:var(--neon)}
+
+/* ปุ่มลิงก์ */
+.btn-link,button.btn-link{color:#cbe2ff}
+.btn-link:hover{color:var(--neon);text-decoration:underline}
+
+/* FAQ/Accordion ให้สว่าง */
+.accordion-button,.accordion-button.collapsed{color:#e9eefb}
+.accordion-button::after{filter:invert(1) brightness(1.2)}
+
+/* ย่อหน้าเด่น */
+.lead{color:#dfe6ff}
