@@ -203,3 +203,39 @@ onSnapshot(query(collection(db,'bookings'), orderBy('createdAt','desc')), snap=>
     if(id && confirm('ลบรายการนี้?')) await deleteDoc(doc(db,'bookings', id));
   });
 });
+
+// === TICKETS — show detail + newest first ===
+onSnapshot(
+  query(collection(db,'tickets'), orderBy('createdAt','desc')),
+  snap => {
+    const tbody = document.getElementById('ticketTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    snap.forEach(d => {
+      const t = d.data();
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr data-id="${d.id}">
+          <td>${t.email || '-'}</td>
+          <td>
+            <div class="fw-semibold">${t.subject || '-'}</div>
+            <div class="small text-muted">${(t.detail || '').toString().replace(/\n/g,'<br>')}</div>
+          </td>
+          <td>${t.status || 'open'}</td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-primary" data-action="close">ปิด</button>
+          </td>
+        </tr>
+      `);
+    });
+
+    // ปุ่มปิดงาน
+    tbody.querySelectorAll('button[data-action="close"]').forEach(btn => {
+      btn.onclick = async (e) => {
+        const tr = e.target.closest('tr');
+        const id = tr?.dataset?.id;
+        if (id) await updateDoc(doc(db,'tickets', id), { status: 'closed' });
+      };
+    });
+  }
+);
