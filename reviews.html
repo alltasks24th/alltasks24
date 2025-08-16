@@ -74,12 +74,12 @@
       getCountFromServer
     } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-    // ตั้งค่าพื้นฐาน
     const list = document.getElementById('reviewAllList');
     const prevBtn = document.getElementById('pagePrev');
     const nextBtn = document.getElementById('pageNext');
     const indicator = document.getElementById('pageIndicator');
     const avgAll = document.getElementById('avgAll');
+
     const PAGE_SIZE = Number(list?.dataset.pageSize || 6);
     let page = 1;
     const cursors = []; // เก็บ doc สุดท้ายของแต่ละหน้า
@@ -88,22 +88,11 @@
     const y = document.getElementById('yearNow');
     if (y) y.textContent = new Date().getFullYear();
 
-    // นับจำนวนรีวิวที่อนุมัติแล้ว (ไวกว่าโหลดทุกเอกสาร)
-    (async () => {
-      try {
-        const qc = query(collection(db, 'reviews'), where('approved', '==', true));
-        const cnt = await getCountFromServer(qc);
-        if (avgAll) avgAll.textContent = `ทั้งหมด ${cnt.data().count} รีวิว`;
-      } catch (e) {
-        // เงียบไว้ก็ได้ เพื่อไม่ให้กวนผู้ใช้
-      }
-    })();
-
-    // โหลดหนึ่งหน้า
+    // โหลดหนึ่งหน้า (แสดงรีวิวให้เร็วสุดด้วย skeleton ก่อน)
     async function loadPage(pageIndex){
       if (!list) return;
 
-      // สร้าง skeleton ให้เห็นเร็ว
+      // skeleton ให้ผู้ใช้เห็นทันที
       list.innerHTML = Array.from({length: PAGE_SIZE}).map(()=>`
         <div class="col-md-6">
           <div class="placeholder-glow p-3 bg-white rounded-3 shadow-sm">
@@ -114,21 +103,20 @@
       `).join('');
       if (indicator) indicator.textContent = 'กำลังโหลด…';
 
-      // สร้างคิวรี
+      // คิวรีรีวิว (ล่าสุดก่อน)
       let q = query(
         collection(db, 'reviews'),
         where('approved','==', true),
         orderBy('createdAt','desc'),
         limit(PAGE_SIZE)
       );
-      const startCursor = cursors[pageIndex - 2]; // cursor ของหน้าก่อนหน้า
+      const startCursor = cursors[pageIndex - 2];
       if (pageIndex > 1 && startCursor) {
         q = query(q, startAfter(startCursor));
       }
 
       const snap = await getDocs(q);
 
-      // เรนเดอร์ผล
       const frag = document.createDocumentFragment();
       snap.forEach(docSnap=>{
         const r = docSnap.data() || {};
@@ -158,7 +146,7 @@
       list.innerHTML = '';
       list.appendChild(frag);
 
-      // อัปเดต cursor หน้าปัจจุบัน (doc สุดท้ายของหน้าที่เพิ่งโหลด)
+      // เก็บ cursor ของหน้าที่โหลด
       const last = snap.docs[snap.docs.length - 1] || null;
       if (last) cursors[pageIndex - 1] = last;
 
@@ -168,16 +156,55 @@
       if (nextBtn) nextBtn.disabled = (snap.size < PAGE_SIZE); // หมดแล้ว
     }
 
-    // ปุ่มก่อนหน้า/ถัดไป
-    prevBtn?.addEventListener('click', () => {
-      if (page > 1) { page--; loadPage(page); }
-    });
-    nextBtn?.addEventListener('click', () => {
-      if (!nextBtn.disabled) { page++; loadPage(page); }
-    });
+    // นับจำนวน + คำนวณค่าเฉลี่ย "ภายหลังจากเรนเดอร์หน้าแรกแล้ว"
+    async function updateAverageLater(){
+      try {
+        // ขึ้นข้อความเบื้องต้นเร็วๆ ไม่บล็อค UI
+        if (avgAll) avgAll.textContent = 'กำลังคำนวณค่าเฉลี่ย…';
 
-    // โหลดหน้าแรก
-    loadPage(1);
+        // ดึงจำนวนรีวิวอนุมัติแล้ว (เร็ว)
+        const qc = query(collection(db, 'reviews'), where('approved', '==', true));
+        const cntSnap = await getCountFromServer(qc);
+        const total = cntSnap.data().count || 0;
+
+        // ค่อยๆ กวาดรวมคะแนนเป็น batch (ไม่บล็อคการแสดงผล)
+        let sum = 0, counted = 0, last = null;
+        while (true) {
+          let q = query(
+            collection(db,'reviews'),
+            where('approved','==',true),
+            orderBy('createdAt','desc'),
+            limit(100)
+          );
+          if (last) q = query(q, startAfter(last));
+          const snap = await getDocs(q);
+          snap.forEach(d=>{
+            const r = d.data() || {};
+            const rt = Number(r.rating || 0);
+            if (!Number.isNaN(rt) && rt > 0) { sum += rt; counted++; }
+          });
+          if (snap.size < 100) break;
+          last = snap.docs[snap.docs.length-1];
+        }
+
+        const avg = counted ? (sum / counted) : 0;
+        if (avgAll) avgAll.textContent = `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${total} รีวิว`;
+      } catch {
+        // ไม่ต้องแจ้ง error เพื่อไม่ให้กวนผู้ใช้
+        if (avgAll) avgAll.textContent = '';
+      }
+    }
+
+    // ปุ่มก่อนหน้า/ถัดไป
+    prevBtn?.addEventListener('click', () => { if (page > 1) { page--; loadPage(page); }});
+    nextBtn?.addEventListener('click', () => { if (!nextBtn.disabled) { page++; loadPage(page); }});
+
+    // ลำดับการทำงาน: 1) แสดงรีวิวหน้าแรกก่อน  2) แล้วค่อยคำนวณค่าเฉลี่ยเบื้องหลัง
+    (async () => {
+      await loadPage(1);
+      // ให้ browser วาดหน้าเสร็จแล้วค่อยเริ่มงานหนัก
+      setTimeout(updateAverageLater, 0);
+    })();
   </script>
 </body>
 </html>
