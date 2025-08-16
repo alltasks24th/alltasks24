@@ -1,19 +1,14 @@
-// auth.js — เข้าสู่ระบบ
-import { auth } from './firebase-init.js';
-import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
-
-const form = document.getElementById('loginForm');
-const msg  = document.getElementById('loginMsg');
-form.addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(form).entries());
+// assets/js/auth.js — login page
+import { adminSignIn } from './firebase-init.js';
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+const loginMsg = document.getElementById('loginMsg');
+document.getElementById('btnLogin').addEventListener('click', async ()=>{
+  loginMsg.textContent = '';
   try{
-    await setPersistence(auth, browserLocalPersistence);
-    await signInWithEmailAndPassword(auth, data.email, data.password);
-    location.href='admin.html';
-  }catch(err){
-    console.error(err);
-    msg.textContent = 'เข้าสู่ระบบไม่สำเร็จ: ' + (err.code || err.message);
-    alert(msg.textContent);
+    await adminSignIn(email.value.trim(), password.value.trim());
+    window.location.href = 'admin.html';
+  }catch(e){
+    loginMsg.textContent = e?.message || 'เข้าสู่ระบบไม่สำเร็จ';
   }
 });

@@ -1,4 +1,4 @@
-// public.js — ฝั่งผู้ใช้ (realtime + chat r6 เปิดเฉพาะเมื่อกดปุ่ม)
+// assets/js/public.js — ฝั่งผู้ใช้ (realtime + chat)
 import { auth, db, ensureAnonAuth } from './firebase-init.js';
 import {
   collection, doc, getDoc, getDocs, addDoc, onSnapshot,
@@ -23,11 +23,13 @@ init();
 
 async function loadSettings(){
   const s = await getDoc(settingsRef);
-  const data = s.exists()? s.data(): { phone:'0800000000', line:'@yourline', facebook:'https://facebook.com/', mapUrl:'https://www.google.com/maps?q=Bangkok&output=embed' };
-  const m = el('#mapEmbed'); if(m) m.src = data.mapUrl||'';
-  const call = el('#fabCall'); if(call) call.href = `tel:${data.phone||''}`;
-  const line = el('#fabLine'); if(line) line.href = `https://line.me/R/ti/p/${(data.line||'').replace('@','')}`;
-  const fb = el('#fabFb'); if(fb) fb.href = data.facebook||'#';
+  const data = s.exists()? s.data(): { phone:'0800000000', line:'@yourline', facebook:'https://facebook.com/', mapUrl:'https://www.google.com/maps?q=Bangkok&output=embed', heroText:'พร้อมบริการ 24 ชั่วโมง' };
+  el('#heroText').textContent = data.heroText || 'พร้อมบริการ 24 ชั่วโมง';
+  el('#mapEmbed').src = data.mapUrl || '';
+  el('#fabCall').href = `tel:${data.phone||''}`;
+  el('#fabLine').href = `https://line.me/R/ti/p/${(data.line||'').replace('@','')}`;
+  el('#fabFb').href = data.facebook||'#';
+  const pt = document.getElementById('policyText'); if(pt) pt.textContent = data.policyText || 'เนื้อหาทั้งหมดเป็นทรัพย์สินของบริษัท';
 }
 
 function bindRealtime(){
@@ -38,7 +40,7 @@ function bindRealtime(){
       const b=d.data();
       wrap.insertAdjacentHTML('beforeend', `<div class="carousel-item ${i===0?'active':''}">
         <img src="${b.imageUrl||''}" class="d-block w-100" alt="">
-        <div class="carousel-caption text-start bg-black bg-opacity-25 rounded-3 p-3">
+        <div class="carousel-caption text-start bg-dark bg-opacity-50 rounded-3 p-3">
           <h3 class="fw-bold">${b.title||''}</h3><p class="mb-0">${b.subtitle||''}</p>
         </div></div>`);
       i++;
@@ -50,20 +52,20 @@ function bindRealtime(){
     const list = el('#promo-cards'); if(!list) return; list.innerHTML='';
     let count=0, now=new Date();
     snap.forEach(docu=>{
-      const p=docu.data();
+      const p=docu.data(); 
       const start = p.start?.toDate?.() ? p.start.toDate() : (p.start? new Date(p.start): new Date(0));
       const end   = p.end?.toDate?.()   ? p.end.toDate()   : (p.end? new Date(p.end): new Date(0));
       if(now>=start && now<=end){
         count++;
         list.insertAdjacentHTML('beforeend', `<div class="col-md-4">
-          <div class="card h-100">
+          <div class="card card-neon h-100">
             <img src="${p.imageUrl||'assets/img/promo.png'}" class="card-img-top" alt="">
             <div class="card-body"><h5 class="card-title">${p.title||'โปรโมชัน'}</h5><p class="card-text">${p.description||''}</p></div>
             <div class="card-footer small text-muted">ถึง ${end.toLocaleDateString('th-TH')}</div>
           </div></div>`);
       }
     });
-    const lbl = el('#promo-range-label'); if(lbl) lbl.textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})` : 'ยังไม่มีโปรโมชันที่ใช้งาน';
+    el('#promo-range-label').textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})` : 'ยังไม่มีโปรโมชันที่ใช้งาน';
   });
 
   // Services
@@ -72,8 +74,8 @@ function bindRealtime(){
     snap.forEach(s=>{
       const d=s.data();
       wrap.insertAdjacentHTML('beforeend', `<div class="col-md-4">
-        <div class="card h-100">
-          <img src="${d.imageUrl||'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1400&auto=format&fit=crop'}" class="card-img-top" alt="">
+        <div class="card card-neon h-100">
+          <img src="${d.imageUrl||'assets/img/service.jpg'}" class="card-img-top" alt="">
           <div class="card-body">
             <div class="text-muted small">${d.category||''}</div>
             <h5 class="card-title">${d.name||''}</h5>
@@ -94,12 +96,12 @@ function bindRealtime(){
     const wrap = el('#reviewList'); if(!wrap) return; wrap.innerHTML='';
     const list=[]; snap.forEach(r=>list.push(r.data()));
     let avg=0; if(list.length) avg=list.reduce((a,b)=>a+Number(b.rating||0),0)/list.length;
-    const avgEl = el('#avgRating'); if(avgEl) avgEl.textContent = list.length? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${list.length} รีวิว` : 'ยังไม่มีรีวิวที่อนุมัติ';
+    el('#avgRating').textContent = list.length? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${list.length} รีวิว` : 'ยังไม่มีรีวิวที่อนุมัติ';
     list.forEach(r=>{
-      wrap.insertAdjacentHTML('beforeend', `<div class="col-md-6"><div class="card h-100">
+      wrap.insertAdjacentHTML('beforeend', `<div class="col-md-6"><div class="card card-neon h-100">
         ${r.imageUrl?`<img src="${r.imageUrl}" class="card-img-top" alt="รีวิว">`:''}
         <div class="card-body">
-          <div class="d-flex justify-content-between"><strong>${r.name||'ผู้ใช้'}</strong><span class="badge text-bg-success">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></div>
+          <div class="d-flex justify-content-between"><strong>${r.name||'ผู้ใช้'}</strong><span class="badge bg-neon-dark text-neon">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></div>
           <p class="mb-0 mt-2">${r.text||''}</p>
         </div></div></div>`);
     });
@@ -128,7 +130,7 @@ function setupSearch(){
     const sList=[]; sSnap.forEach(d=>sList.push(d.data())); const aList=[]; aSnap.forEach(d=>aList.push(d.data()));
     const sMatch = sList.filter(s=> !text || [s.name,s.category,s.description].join(' ').toLowerCase().includes(text));
     const aMatch = aList.filter(a=> !area || [a.name,a.province].join(' ').toLowerCase().includes(area));
-    el('#searchResults').innerHTML = `<div class="alert alert-info">พบบริการ ${sMatch.length} และพื้นที่ ${aMatch.length}</div>`;
+    el('#searchResults').innerHTML = `<div class="alert alert-dark">พบบริการ ${sMatch.length} รายการ และพื้นที่ ${aMatch.length} รายการ</div>`;
   });
 }
 
@@ -173,18 +175,17 @@ async function setupChat(user){
 
   if(!widget || !fab || !body || !input || !send || !toggleBtn){ return; }
 
-  // เริ่มต้น: ซ่อนกล่องเสมอ (ไม่เด้งเอง)
-  widget.classList.remove('minimized');
-  widget.classList.remove('open'); // ให้แน่ใจว่าเริ่มปิด
+  // เริ่มต้น: ซ่อนกล่องเสมอ
+  widget.classList.remove('open');
 
   function openChat(open){
     widget.classList.toggle('open', open);
-    if(open){ badge && (badge.style.display='none'); resetUnreadUser(); }
+    if(open){ if(badge) badge.style.display='none'; resetUnreadUser(); }
   }
   fab.addEventListener('click', ()=> openChat(!widget.classList.contains('open')));
-  toggleBtn.addEventListener('click', ()=> openChat(false)); // ปุ่มปิด
+  toggleBtn.addEventListener('click', ()=> openChat(false)); // ปิด
 
-  // สร้าง thread ครั้งแรก (ไม่บังคับต้อง login)
+  // สร้าง thread ครั้งแรก (ไม่บังคับต้อง login แบบอีเมล — anonymous ก็พอ)
   let createdNow = false;
   if(!currentThreadId){
     const t = await addDoc(collection(db,'chatThreads'), { 
@@ -194,18 +195,18 @@ async function setupChat(user){
       uid: user?.uid||null,
       sessionId,
       unreadAdmin: 0,
-      unreadUser: 1 // ต้อนรับ 1 ข้อความ
+      unreadUser: 0
     });
     currentThreadId = t.id; localStorage.setItem('chatThreadIdV2', currentThreadId);
     createdNow = true;
   }
 
-  // ฟังข้อความเรียลไทม์
+  // ฟังข้อความ
   onSnapshot(query(collection(db,'chatThreads', currentThreadId, 'messages'), orderBy('createdAt','asc')), snap=>{
     body.innerHTML=''; snap.forEach(m=>{ const d=m.data(); body.insertAdjacentHTML('beforeend', `<div class="chat-msg ${d.sender}">${d.text}</div>`); body.scrollTop = body.scrollHeight; });
   });
 
-  // ฟังตัวเลขค้างอ่าน (แสดงเฉพาะตอนปิดกล่อง)
+  // ฟัง badge ค้างอ่าน
   onSnapshot(doc(db,'chatThreads', currentThreadId), snap=>{
     const d=snap.data()||{}; const n = Number(d.unreadUser||0);
     if(!widget.classList.contains('open') && n>0){ if(badge){ badge.textContent=String(n); badge.style.display='inline-block'; } }
@@ -222,11 +223,7 @@ async function setupChat(user){
   send.addEventListener('click', sendMsg);
   input.addEventListener('keypress', e=>{ if(e.key==='Enter') sendMsg(); });
 
-  // ส่งข้อความต้อนรับครั้งเดียวตอนสร้าง thread (ไม่มี auto-reply ต่อไป)
-  if(createdNow){
-    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text: 'ยินดีให้บริการ 24 ชั่วโมง ฝากข้อความไว้ได้เลยครับ', createdAt: serverTimestamp() });
-  }
-
+  // (ไม่ส่งข้อความอัตโนมัติ)
   async function resetUnreadUser(){
     if(!currentThreadId) return;
     await updateDoc(doc(db,'chatThreads', currentThreadId), { unreadUser: 0 });
