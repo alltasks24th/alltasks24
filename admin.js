@@ -3,7 +3,7 @@ import { db } from './firebase-init.js';
 import { requireAdmin, logout } from './auth.js';
 import {
   collection, doc, addDoc, updateDoc, deleteDoc, getDoc, getDocs, onSnapshot,
-  query, orderBy, serverTimestamp, Timestamp, where, increment
+  query, orderBy, serverTimestamp, Timestamp, where, increment, setDoc // <-- เพิ่ม setDoc
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
 const $ = (s, r=document)=> r.querySelector(s);
@@ -169,6 +169,7 @@ requireAdmin(async (user, role)=>{
           </div>
           <div class="btn-group btn-group-sm">
             <button class="btn btn-outline-primary" data-act="map">ดูแผนที่</button>
+            <button class="btn btn-outline-success" data-act="default">ใช้แผนที่นี้</button> <!-- เพิ่มปุ่ม -->
             <button class="btn btn-outline-danger" data-act="del">ลบ</button>
           </div>
         </li>
@@ -212,7 +213,7 @@ requireAdmin(async (user, role)=>{
       }
     });
 
-    // Click list (map / delete)
+    // Click list (map / set default / delete)
     list?.addEventListener('click', async (e) => {
       const btn = e.target.closest('button[data-act]');
       if (!btn) return;
@@ -221,16 +222,26 @@ requireAdmin(async (user, role)=>{
       const id = li?.dataset?.id;
       const act = btn.dataset.act;
 
-      if (act === 'del' && id) {
-        if (confirm('ลบพื้นที่นี้?')) await deleteDoc(doc(db, 'serviceAreas', id));
-        return;
-      }
-
       if (act === 'map') {
         const title = li.querySelector('.fw-semibold')?.textContent || '';
         const prov  = li.querySelector('.small')?.textContent || '';
         const q = encodeURIComponent(`${title} ${prov}`);
         if (mapIframe) mapIframe.src = `https://www.google.com/maps?q=${q}&output=embed`;
+        return;
+      }
+
+      if (act === 'default') {
+        const title = li.querySelector('.fw-semibold')?.textContent || '';
+        const prov  = li.querySelector('.small')?.textContent || '';
+        const url = `https://www.google.com/maps?q=${encodeURIComponent(`${title} ${prov}`)}&output=embed`;
+        await setDoc(doc(db, 'settings', 'public'), { mapUrl: url, updatedAt: serverTimestamp() }, { merge: true });
+        alert('อัปเดตแผนที่หน้าเว็บแล้ว');
+        return;
+      }
+
+      if (act === 'del' && id) {
+        if (confirm('ลบพื้นที่นี้?')) await deleteDoc(doc(db, 'serviceAreas', id));
+        return;
       }
     });
   })();
