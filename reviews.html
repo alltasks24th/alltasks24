@@ -1,146 +1,52 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>รีวิวลูกค้าทั้งหมด — alltasks24.online</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>รีวิวลูกค้าทั้งหมด • alltasks24.online</title>
 
-  <!-- Bootstrap (ใช้เหมือนหน้าเดิม) -->
+  <!-- Bootstrap + สไตล์เดิมของคุณ -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- ใช้สไตล์เดิมของโปรเจกต์ -->
-  <link href="./styles.css" rel="stylesheet">
-
-  <style>
-    /* เติมนิดเดียวให้หน้าดูสวยขึ้น แต่ยังใช้ธีมเดิม */
-    .page-wrap { min-height: 100dvh; background: var(--bs-body-bg); }
-    .section-head { border-bottom: 1px solid rgba(0,0,0,.05); }
-    .review-card .rating-badge{ letter-spacing:.1em }
-    .review-card .text{ white-space: pre-line }
-  </style>
+  <link href="/styles.css" rel="stylesheet">
 </head>
 <body class="bg-body-tertiary">
-  <!-- Header เรียบ ๆ ให้เข้าธีมเดิม -->
-  <header class="section-head bg-white shadow-sm">
-    <div class="container py-3 d-flex align-items-center justify-content-between">
-      <a href="./" class="text-decoration-none fw-semibold">alltasks24.online</a>
-      <a href="./" class="btn btn-outline-secondary btn-sm">กลับหน้าแรก</a>
+
+  <!-- แถบนำทางเรียบๆ (ให้โทนเดียวกับหน้าแรก) -->
+  <nav class="navbar bg-white shadow-sm sticky-top">
+    <div class="container-xxl">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <i class="bi bi-chat-dots"></i>
+        <span class="fw-semibold">alltasks24.online</span>
+      </a>
+      <a class="btn btn-outline-secondary btn-sm" href="/">← กลับหน้าแรก</a>
     </div>
-  </header>
+  </nav>
 
-  <main class="page-wrap">
-    <div class="container py-4 py-md-5">
-      <div class="d-flex align-items-center justify-content-between mb-3 mb-md-4">
-        <h2 class="mb-0">รีวิวลูกค้าทั้งหมด</h2>
-        <span class="text-muted small" id="reviewCountHint"></span>
-      </div>
+  <main class="container-xxl py-4">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <h1 class="h4 mb-0">รีวิวลูกค้าทั้งหมด</h1>
+      <!-- public.js จะเติมข้อความค่าเฉลี่ยให้เอง -->
+      <div id="avgAll" class="text-muted small"></div>
+    </div>
 
-      <!-- กริดรีวิว -->
-      <div id="reviewsAll" class="row g-3 g-md-4"></div>
+    <!-- กริดรายการรีวิว: public.js จะเรนเดอร์ให้ -->
+    <div id="reviewAllList"
+         class="row row-cols-1 row-cols-md-2 g-3"
+         data-page-size="12"></div>
 
-      <!-- ปุ่มโหลดเพิ่ม -->
-      <div class="d-grid mt-3">
-        <button id="loadMoreReviews" class="btn btn-outline-primary">
-          โหลดเพิ่ม
-        </button>
-      </div>
+    <!-- ปุ่มโหลดเพิ่ม (ซ่อนเองเมื่อโหลดครบ) -->
+    <div class="text-center mt-3">
+      <button id="loadMoreReviews" class="btn btn-outline-primary">โหลดเพิ่ม</button>
     </div>
   </main>
 
-  <!-- Bootstrap JS -->
+  <footer class="text-center text-muted small py-4">
+    © <span id="yearNow"></span> alltasks24.online
+  </footer>
+
+  <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- รีวิวทั้งหมด: ใช้ Firebase เดิมของโปรเจกต์ (ไม่แก้ไฟล์อื่น) -->
-  <script type="module">
-    import { db } from './firebase-init.js';
-    import {
-      collection, query, where, orderBy, limit, getDocs, startAfter, getCountFromServer
-    } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
-
-    // ตั้งค่า
-    const PAGE_SIZE = 12;           // แสดงต่อครั้ง
-    const listEl    = document.getElementById('reviewsAll');
-    const moreBtn   = document.getElementById('loadMoreReviews');
-    const countHint = document.getElementById('reviewCountHint');
-
-    let lastCursor = null;
-    let loaded = 0;
-    let totalApproved = 0;
-
-    // นับจำนวนรีวิวที่อนุมัติแล้ว (เพื่อโชว์จำนวนรวม)
-    (async () => {
-      const qCount = query(collection(db,'reviews'), where('approved','==',true));
-      const snapCount = await getCountFromServer(qCount);
-      totalApproved = snapCount.data().count || 0;
-      countHint.textContent = totalApproved ? `ทั้งหมด ${totalApproved.toLocaleString('th-TH')} รีวิว` : '';
-    })();
-
-    function starsBadge(n=0){
-      const full = '★★★★★'.slice(0, Math.max(0, Math.min(5, n|0)));
-      const rest = '☆☆☆☆☆'.slice(full.length);
-      // ใช้ badge สีเขียวเหมือนหน้าแรก
-      return `<span class="badge text-bg-success rating-badge">${full}${rest}</span>`;
-    }
-
-    function reviewCard(item){
-      const name   = item.name || 'ผู้ใช้';
-      const rating = item.rating ?? 0;
-      const text   = item.text || '';
-      const dt     = item.createdAt?.toDate ? item.createdAt.toDate() : null;
-      const when   = dt ? dt.toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric'}) : '';
-
-      return `
-      <div class="col-12 col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm review-card">
-          <div class="card-body">
-            <div class="d-flex align-items-center justify-content-between">
-              <div class="fw-semibold">${name}</div>
-              ${starsBadge(rating)}
-            </div>
-            <div class="text mt-2 text-body">${text}</div>
-            ${when ? `<div class="small text-muted mt-2">${when}</div>` : ''}
-          </div>
-        </div>
-      </div>`;
-    }
-
-    async function loadMore(){
-      moreBtn.disabled = true;
-      moreBtn.textContent = 'กำลังโหลด...';
-
-      let q = query(
-        collection(db,'reviews'),
-        where('approved','==',true),
-        orderBy('createdAt','desc'),
-        limit(PAGE_SIZE)
-      );
-      if (lastCursor) q = query(
-        collection(db,'reviews'),
-        where('approved','==',true),
-        orderBy('createdAt','desc'),
-        startAfter(lastCursor),
-        limit(PAGE_SIZE)
-      );
-
-      const snap = await getDocs(q);
-      if (!snap.empty){
-        lastCursor = snap.docs[snap.docs.length - 1];
-        const html = snap.docs.map(d => reviewCard(d.data())).join('');
-        listEl.insertAdjacentHTML('beforeend', html);
-        loaded += snap.size;
-      }
-
-      if (loaded >= totalApproved || snap.size < PAGE_SIZE){
-        moreBtn.textContent = 'โหลดครบแล้ว';
-        moreBtn.disabled = true;
-      }else{
-        moreBtn.textContent = 'โหลดเพิ่ม';
-        moreBtn.disabled = false;
-      }
-    }
-
-    // เริ่มต้น
-    loadMore();
-    moreBtn.addEventListener('click', loadMore);
-  </script>
+  <script type="module" src="/firebase-init.js"></script>
+  <script type="module" src="/public.js"></script>
 </body>
 </html>
