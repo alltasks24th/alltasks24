@@ -1,191 +1,246 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>หลังบ้าน — alltasks24.online</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/css/styles.css" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>หลังบ้าน — Grape & Indigo</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+.sidebar{min-width:260px;max-width:260px;background:#fff;border-right:1px solid var(--border);min-height:100vh;position:sticky;top:0}
+.sidebar .brand{color:var(--primary)}
+.nav-pills .nav-link.active{background:var(--primary)}
+.stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
+.header{background:#fff;border-bottom:1px solid var(--border)}
+</style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg bg-white border-bottom">
-  <div class="container">
-    <a class="navbar-brand fw-bold" href="#">หลังบ้าน alltasks24</a>
-    <div class="ms-auto d-flex gap-2">
-      <span id="roleBadge" class="badge text-bg-secondary">กำลังตรวจสอบสิทธิ์…</span>
-      <button id="btnLogout" class="btn btn-outline-danger btn-sm"><i class="bi bi-box-arrow-right me-1"></i>ออกจากระบบ</button>
+<nav class="navbar navbar-light bg-white border-bottom sticky-top">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h5">alltasks24 — Admin</span>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge text-bg-warning">รีวิวใหม่ <span id="countNewReviews">0</span></span>
+      <button id="btnLogout" class="btn btn-outline-primary btn-sm"><i class="bi bi-box-arrow-right me-1"></i>ออกจากระบบ</button>
     </div>
   </div>
 </nav>
-
-<main class="container py-4">
-  <div class="alert alert-warning d-flex align-items-center gap-2" id="firstRun" style="display:none">
-    <i class="bi bi-exclamation-triangle"></i>
-    <div>
-      <div class="fw-bold">ตั้งค่าครั้งแรก</div>
-      <div class="small">ยังไม่มีผู้ใช้ (owner/admin) ในระบบ คลิกปุ่มนี้เพื่อบันทึกสิทธิ์ให้ UID ของคุณ</div>
+<div class="d-flex">
+  <aside class="sidebar p-3 d-none d-md-block">
+    <div class="nav nav-pills flex-column gap-1" role="tablist">
+      <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-dashboard"><i class="bi bi-speedometer2 me-2"></i>แดชบอร์ด</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-services"><i class="bi bi-grid me-2"></i>บริการ</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-areas"><i class="bi bi-geo-alt me-2"></i>พื้นที่</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-bookings"><i class="bi bi-calendar-check me-2"></i>การจอง</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-tickets"><i class="bi bi-inbox me-2"></i>คำขอ/แจ้งปัญหา</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-reviews"><i class="bi bi-chat-quote me-2"></i>รีวิว</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-users"><i class="bi bi-people me-2"></i>ผู้ใช้/บทบาท</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-promos"><i class="bi bi-ticket-perforated me-2"></i>โปรโมชัน</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-banners"><i class="bi bi-images me-2"></i>แบนเนอร์</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-2"></i>FAQ</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-settings"><i class="bi bi-gear me-2"></i>ตั้งค่า</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chat"><i class="bi bi-chat-dots me-2"></i>แชทสด</button>
     </div>
-    <button id="btnBootstrapOwner" class="btn btn-sm btn-primary ms-auto">ตั้งฉันเป็น Owner</button>
-  </div>
+  </aside>
+  <div class="flex-grow-1 p-3">
+    <div class="tab-content">
 
-  <ul class="nav nav-pills mb-3" id="adminTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tabDash" type="button">แดชบอร์ด</button>
-    </li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabServices">บริการ</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabAreas">พื้นที่</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabBookings">การจอง</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabQuotes">คำขอ/ปัญหา</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabReviews">รีวิว</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabUsers">ผู้ใช้</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabPromos">โปรโมชัน</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabBanners">แบนเนอร์</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabFAQ">FAQ</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabSettings">ตั้งค่า</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabChats">แชทสด</button></li>
-  </ul>
-
-  <div class="tab-content">
-    <!-- Dashboard -->
-    <div class="tab-pane fade show active" id="tabDash">
-      <div class="row g-3">
-        <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">คำขอจอง</div><div id="statBookings" class="stat-value">0</div></div></div></div>
-        <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">รีวิวใหม่</div><div id="statReviews" class="stat-value">0</div></div></div></div>
-        <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">คำขอ/ปัญหา</div><div id="statQuotes" class="stat-value">0</div></div></div></div>
-        <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">ผู้ใช้งาน</div><div id="statUsers" class="stat-value">0</div></div></div></div>
-      </div>
-    </div>
-
-    <!-- Services -->
-    <div class="tab-pane fade" id="tabServices">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">บริการ + หมวดหมู่</h5>
-        <button class="btn btn-sm btn-primary" id="btnAddService"><i class="bi bi-plus-circle"></i> เพิ่ม</button>
-      </div>
-      <div id="serviceTable"></div>
-    </div>
-
-    <!-- Areas -->
-    <div class="tab-pane fade" id="tabAreas">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">พื้นที่ให้บริการ</h5>
-        <button class="btn btn-sm btn-primary" id="btnAddArea"><i class="bi bi-plus-circle"></i> เพิ่ม</button>
-      </div>
-      <div id="areaTable"></div>
-    </div>
-
-    <!-- Bookings -->
-    <div class="tab-pane fade" id="tabBookings">
-      <h5>การจองงาน/นัดหมาย</h5>
-      <div id="bookingTable"></div>
-    </div>
-
-    <!-- Quotes -->
-    <div class="tab-pane fade" id="tabQuotes">
-      <h5>คำขอใบเสนอราคา / แจ้งปัญหา</h5>
-      <div id="quoteTable"></div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="tab-pane fade" id="tabReviews">
-      <h5>รีวิว (อนุมัติ/ลบ)</h5>
-      <div id="reviewTable"></div>
-    </div>
-
-    <!-- Users & Roles -->
-    <div class="tab-pane fade" id="tabUsers">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">ผู้ใช้ / บทบาท</h5>
-        <button class="btn btn-sm btn-primary" id="btnAddUser"><i class="bi bi-person-plus"></i> เพิ่ม</button>
-      </div>
-      <div id="userTable"></div>
-    </div>
-
-    <!-- Promotions -->
-    <div class="tab-pane fade" id="tabPromos">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">โปรโมชัน</h5>
-        <button class="btn btn-sm btn-primary" id="btnAddPromo"><i class="bi bi-plus-circle"></i> เพิ่ม</button>
-      </div>
-      <div id="promoTable"></div>
-    </div>
-
-    <!-- Banners -->
-    <div class="tab-pane fade" id="tabBanners">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">แบนเนอร์สไลด์</h5>
-        <button class="btn btn-sm btn-primary" id="btnAddBanner"><i class="bi bi-plus-circle"></i> เพิ่ม</button>
-      </div>
-      <div id="bannerTable"></div>
-    </div>
-
-    <!-- FAQ -->
-    <div class="tab-pane fade" id="tabFAQ">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">คำถามที่พบบ่อย</h5>
-        <button class="btn btn-sm btn-primary" id="btnAddFaq"><i class="bi bi-plus-circle"></i> เพิ่ม</button>
-      </div>
-      <div id="faqTable"></div>
-    </div>
-
-    <!-- Settings -->
-    <div class="tab-pane fade" id="tabSettings">
-      <h5>ตั้งค่าทั่วไปของเว็บไซต์</h5>
-      <form id="settingsForm" class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">ชื่อเว็บไซต์</label>
-          <input name="siteName" class="form-control" placeholder="รับจ้างสารพัด 24 ชั่วโมง">
+      <div class="tab-pane fade show active" id="tab-dashboard">
+        <div class="row g-3 mb-3">
+          <div class="col-md-3"><div class="stat"><div class="text-muted">คำขอจอง</div><div class="h4 mb-0" id="countBookings">0</div></div></div>
+          <div class="col-md-3"><div class="stat"><div class="text-muted">ผู้ใช้งาน (roles)</div><div class="h4 mb-0" id="countUsers">0</div></div></div>
+          <div class="col-md-3"><div class="stat"><div class="text-muted">โปรโมชัน</div><div class="h4 mb-0" id="countPromos">0</div></div></div>
         </div>
-        <div class="col-md-6">
-          <label class="form-label">Hero Text</label>
-          <input name="heroText" class="form-control" placeholder="จ้างง่าย ทำไว โปร่งใส">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">เบอร์โทร</label>
-          <input name="phone" class="form-control" placeholder="080-xxx-xxxx">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">LINE</label>
-          <input name="line" class="form-control" placeholder="@yourline">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Facebook URL</label>
-          <input name="facebook" class="form-control" placeholder="https://facebook.com/yourpage">
-        </div>
-        <div class="col-12">
-          <label class="form-label">Google Maps Embed URL</label>
-          <input name="mapUrl" class="form-control" placeholder="https://www.google.com/maps?q=Bangkok&output=embed">
-        </div>
-        <div class="col-12">
-          <label class="form-label">นโยบายสื่อ/รูปภาพ</label>
-          <textarea name="mediaPolicy" class="form-control" rows="3" placeholder="ใช้รูปจากลิงก์หรือในโฟลเดอร์เท่านั้น..."></textarea>
-        </div>
-        <div class="col-12">
-          <button class="btn btn-primary" type="submit">บันทึก</button>
-          <span id="settingsMsg" class="small text-muted ms-2"></span>
-        </div>
-      </form>
-    </div>
-
-    <!-- Live Chats -->
-    <div class="tab-pane fade" id="tabChats">
-      <h5>ห้องแชททั้งหมด</h5>
-      <div id="chatThreadList" class="list-group"></div>
-      <hr>
-      <div id="chatRoom" style="display:none">
-        <h6 id="chatRoomTitle" class="mb-2">ห้องแชท</h6>
-        <div id="chatRoomBody" class="chat-admin-body"></div>
-        <div class="d-flex gap-2 mt-2">
-          <input id="chatReply" class="form-control" placeholder="พิมพ์ข้อความตอบกลับ...">
-          <button id="chatReplySend" class="btn btn-primary">ส่ง</button>
+        <div class="card card-clean p-3">
+          <div class="fw-bold mb-2">ภาพรวม</div>
+          <p class="text-muted mb-0">แดชบอร์ดตัวอย่าง (เรียลไทม์จาก Firestore)</p>
         </div>
       </div>
+
+      <div class="tab-pane fade" id="tab-services">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">จัดการบริการ</h5>
+          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#svcModal"><i class="bi bi-plus-lg me-1"></i>เพิ่มบริการ</button>
+        </div>
+        <table class="table table-hover align-middle">
+          <thead><tr><th>ชื่อบริการ</th><th>หมวดหมู่</th><th>ภาพ</th><th class="text-end">จัดการ</th></tr></thead>
+          <tbody id="svcTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="tab-pane fade" id="tab-areas">
+        <div class="row g-3">
+          <div class="col-lg-8">
+            <div class="card card-clean p-2">
+              <div class="ratio ratio-16x9"><iframe id="adminMap" src="https://www.google.com/maps?q=Bangkok&output=embed"></iframe></div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card card-clean p-3">
+              <h6>พื้นที่ให้บริการ</h6>
+              <ul class="list-group" id="areaListAdmin"></ul>
+              <div class="mt-3">
+                <input id="areaName" class="form-control mb-2" placeholder="ชื่อพื้นที่">
+                <input id="areaProv" class="form-control mb-2" placeholder="จังหวัด">
+                <textarea id="areaGeo" class="form-control mb-2" rows="2" placeholder='GeoJSON Polygon (ไม่บังคับ)'></textarea>
+                <button id="areaAdd" class="btn btn-primary btn-sm">เพิ่มพื้นที่</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab-bookings">
+        <h5>การจองงาน/นัดหมาย</h5>
+        <table class="table table-hover align-middle">
+          <thead><tr><th>ชื่อลูกค้า</th><th>บริการ</th><th>วันที่</th><th>สถานะ</th><th class="text-end">จัดการ</th></tr></thead>
+          <tbody id="bookTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="tab-pane fade" id="tab-tickets">
+        <h5>คำขอใบเสนอราคา / แจ้งปัญหา</h5>
+        <table class="table table-hover"><thead><tr><th>อีเมล</th><th>หัวข้อ</th><th>สถานะ</th><th class="text-end">จัดการ</th></tr></thead>
+        <tbody id="ticketTableBody"></tbody></table>
+      </div>
+
+      <div class="tab-pane fade" id="tab-reviews">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">จัดการรีวิว (รออนุมัติ)</h5>
+        </div>
+        <table class="table table-hover align-middle">
+          <thead><tr><th>ผู้ใช้</th><th>คะแนน</th><th>ข้อความ</th><th class="text-end">อนุมัติ</th></tr></thead>
+        <tbody id="reviewTableBody"></tbody></table>
+      </div>
+
+      <div class="tab-pane fade" id="tab-users">
+        <h5>ผู้ใช้ / บทบาท</h5>
+        <div class="alert alert-info small">จัดการผ่านคอลเลกชัน <code>roles/{uid}</code> role = owner/admin/viewer</div>
+      </div>
+
+      <div class="tab-pane fade" id="tab-promos">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">โปรโมชัน</h5>
+          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#promoModal"><i class="bi bi-plus-lg me-1"></i>เพิ่มโปรโมชัน</button>
+        </div>
+        <table class="table table-hover"><thead><tr><th>ชื่อ</th><th>ช่วงเวลา</th><th>คำอธิบาย</th><th class="text-end">จัดการ</th></tr></thead>
+        <tbody id="promoTableBody"></tbody></table>
+      </div>
+
+      <div class="tab-pane fade" id="tab-banners">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">แบนเนอร์สไลด์ (Carousel)</h5>
+          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#bannerModal"><i class="bi bi-plus-lg me-1"></i>เพิ่มสไลด์</button>
+        </div>
+        <table class="table table-hover"><thead><tr><th>หัวเรื่อง</th><th>คำอธิบาย</th><th>ภาพ</th><th class="text-end">จัดการ</th></tr></thead>
+        <tbody id="bannerTableBody"></tbody></table>
+      </div>
+
+      <div class="tab-pane fade" id="tab-faq">
+        <h5>คำถามที่พบบ่อย (FAQ)</h5>
+        <div class="card card-clean p-3">
+          <div class="d-flex gap-2 mb-2">
+            <input class="form-control" id="faqQ" placeholder="คำถาม">
+            <input class="form-control" id="faqA" placeholder="คำตอบ">
+            <button class="btn btn-primary" id="faqAdd">เพิ่ม</button>
+          </div>
+          <ul class="list-group" id="faqList"></ul>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab-settings">
+        <h5>ตั้งค่าทั่วไปของเว็บไซต์</h5>
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label">ชื่อเว็บ</label><input id="setSite" class="form-control" value="alltasks24.online"></div>
+          <div class="col-md-6"><label class="form-label">หมายเลขโทรศัพท์</label><input id="setPhone" class="form-control" value="080-000-0000"></div>
+          <div class="col-md-6"><label class="form-label">LINE</label><input id="setLine" class="form-control" value="@yourline"></div>
+          <div class="col-md-6"><label class="form-label">Facebook</label><input id="setFb" class="form-control" value="https://facebook.com/"></div>
+          <div class="col-12"><label class="form-label">Hero Text</label><input id="setHero" class="form-control" value="รับจ้างสารพัด 24 ชั่วโมง"></div>
+          <div class="col-12"><label class="form-label">URL แผนที่ (Embed)</label><input id="setMap" class="form-control" placeholder="https://www.google.com/maps?..."></div>
+          <div class="col-12"><label class="form-label">นโยบายสื่อ</label><textarea id="setPolicy" class="form-control" rows="3">เนื้อหาตัวอย่างนโยบาย</textarea></div>
+          <div class="col-12"><button class="btn btn-primary mt-2" id="saveSettings">บันทึก</button></div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab-chat">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="card card-clean">
+              <div class="card-header">ห้องสนทนา</div>
+              <div class="list-group list-group-flush" id="threadList" style="max-height:60vh;overflow:auto"></div>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="card card-clean">
+              <div class="card-header">ข้อความ</div>
+              <div id="chatMsgs" style="height:50vh;overflow:auto" class="p-2"></div>
+              <div class="card-footer d-flex gap-2">
+                <input id="adminMsg" class="form-control" placeholder="พิมพ์ข้อความ...">
+                <button id="adminSend" class="btn btn-primary">ส่ง</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
-</main>
+</div>
+
+<div class="modal fade" id="svcModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">บริการ</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input id="svcId" type="hidden">
+        <label class="form-label">ชื่อบริการ</label><input id="svcName" class="form-control">
+        <label class="form-label mt-2">หมวดหมู่</label><input id="svcCat" class="form-control">
+        <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="svcImg" class="form-control">
+        <label class="form-label mt-2">รายละเอียด</label><textarea id="svcDesc" rows="3" class="form-control"></textarea>
+      </div>
+      <div class="modal-footer"><button id="svcSave" class="btn btn-primary">บันทึก</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="promoModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">โปรโมชัน</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input id="promoId" type="hidden">
+        <label class="form-label">ชื่อ</label><input id="promoTitle" class="form-control">
+        <label class="form-label mt-2">คำอธิบาย</label><textarea id="promoDesc" class="form-control"></textarea>
+        <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="promoImg" class="form-control">
+        <div class="row mt-2">
+          <div class="col"><label class="form-label">เริ่ม</label><input id="promoStart" type="date" class="form-control"></div>
+          <div class="col"><label class="form-label">สิ้นสุด</label><input id="promoEnd" type="date" class="form-control"></div>
+        </div>
+      </div>
+      <div class="modal-footer"><button id="promoSave" class="btn btn-primary">บันทึก</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="bannerModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">แบนเนอร์</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input id="banId" type="hidden">
+        <label class="form-label">หัวเรื่อง</label><input id="banTitle" class="form-control">
+        <label class="form-label mt-2">คำอธิบาย</label><input id="banSub" class="form-control">
+        <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="banImg" class="form-control">
+      </div>
+      <div class="modal-footer"><button id="banSave" class="btn btn-primary">บันทึก</button></div>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script type="module" src="assets/js/admin.js"></script>
+<script type="module" src="firebase-init.js"></script>
+<script type="module" src="auth.js"></script>
+<script type="module" src="admin.js"></script>
 </body>
 </html>

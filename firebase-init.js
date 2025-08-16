@@ -1,10 +1,9 @@
-// firebase-init.js — ตั้งค่า Firebase (v9 modular)
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js';
-import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, signInAnonymously, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
-import { getFirestore, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-// *** ใช้ค่าจากผู้ใช้ ***
+// firebase-init.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, setPersistence, browserLocalPersistence, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyCTaUmv6VZNczMFvznNm01M__g7k2v6a3E",
   authDomain: "alltasks24-f75ec.firebaseapp.com",
@@ -16,17 +15,14 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
-export const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const ts = serverTimestamp;
+
+setPersistence(auth, browserLocalPersistence);
 
 export async function ensureAnonAuth(){
-  await setPersistence(auth, browserLocalPersistence);
   if(!auth.currentUser){
-    try{ await signInAnonymously(auth); }catch(e){ console.error(e); }
+    await signInAnonymously(auth);
   }
-  return new Promise(res=>onAuthStateChanged(auth, u=>res(u)));
+  return new Promise(res=> onAuthStateChanged(auth, u=> u && res(u)));
 }
-
-export async function logout(){ try{ await signOut(auth); }catch(e){ console.error(e); } }
