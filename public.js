@@ -89,82 +89,107 @@ function bindRealtime(){
   });
 
   // ===== Reviews (approved only) =====
-  onSnapshot(
-    query(collection(db,'reviews'), where('approved','==', true)),
-    snap => {
-      // โหมดหน้าแรก: #reviewList (กำหนด data-limit ได้, ถ้าไม่ใส่จะ default 6)
-      const homeWrap = document.getElementById('reviewList');
-      // โหมดหน้ารีวิวทั้งหมด: #reviewAllList + ปุ่ม #loadMoreReviews (ไม่จำเป็นต้องมี)
-      const allWrap  = document.getElementById('reviewAllList');
+  (function(){
+    // --- Quick paint: ใช้ cache เพนท์ก่อน แล้วค่อยรอ onSnapshot ---
+    const CACHE_KEY = 'cacheReviewsV1';
+    const homeWrap = document.getElementById('reviewList');
+    const allWrap  = document.getElementById('reviewAllList');
 
+    // helper: แปลง document -> object พร้อม timestamp สำหรับ sort
+    const normalize = (r) => {
+      const ts = r.createdAt?.toDate?.()
+        ? r.createdAt.toDate().getTime()
+        : (r.createdAt ? new Date(r.createdAt).getTime() : 0);
+      return { ...r, __ts: ts };
+    };
+
+    // เรนเดอร์การ์ดรีวิว (ทั้งหน้าแรก/หน้ารวม)
+    function paint(list, {initial=false}={}){
       if (!homeWrap && !allWrap) return;
 
-      // รวมรีวิวแล้ว sort ใหม่ (ใหม่อยู่บน)
-      const list = [];
-      snap.forEach(docu => {
-        const r = docu.data() || {};
-        const ts = r.createdAt?.toDate?.()
-          ? r.createdAt.toDate().getTime()
-          : (r.createdAt ? new Date(r.createdAt).getTime() : 0);
-        list.push({ ...r, __ts: ts });
-      });
-      list.sort((a,b) => b.__ts - a.__ts);
-
-      // ====== โหมดหน้ารีวิวทั้งหมด ======
-      if (allWrap) {
+      // ----- หน้ารีวิวทั้งหมด -----
+      if (allWrap){
         const pageSize = Number(allWrap.dataset.pageSize || 12);
-        let page = 1;
+        const curPage  = Number(allWrap.dataset.page || 1);
+        const slice = list.slice(0, curPage * pageSize);
+        allWrap.innerHTML = slice.map(renderReviewCard).join('');
 
-        function renderPage(){
-          const end = page * pageSize;
-          const slice = list.slice(0, end);
-          allWrap.innerHTML = slice.map(renderReviewCard).join('');
-          const avgEl = document.getElementById('avgAll');
-          if (avgEl) {
-            const avg = slice.length ? slice.reduce((s,x)=> s + Number(x.rating||0), 0)/slice.length : 0;
-            avgEl.textContent = slice.length
-              ? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${slice.length} รีวิว`
-              : 'ยังไม่มีรีวิว';
-          }
-          const moreBtn = document.getElementById('loadMoreReviews');
-          if (moreBtn) {
-            if (slice.length >= list.length) { moreBtn.style.display = 'none'; }
-            else { moreBtn.style.display = ''; }
-          }
+        // คำนวณค่าเฉลี่ย “ทีหลัง” เพื่อให้การ์ดขึ้นก่อน
+        if (!initial){
+          requestAnimationFrame(()=>{
+            const avgEl = document.getElementById('avgAll');
+            if (avgEl){
+              const avg = slice.length ? slice.reduce((s,x)=> s + Number(x.rating||0), 0)/slice.length : 0;
+              avgEl.textContent = slice.length
+                ? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${slice.length} รีวิว`
+                : 'ยังไม่มีรีวิว';
+            }
+          });
         }
 
-        // ปุ่มโหลดเพิ่ม (ถ้ามี)
         const moreBtn = document.getElementById('loadMoreReviews');
-        if (moreBtn && !moreBtn._bound) {
-          moreBtn._bound = true;
-          moreBtn.addEventListener('click', ()=>{ page++; renderPage(); });
+        if (moreBtn){
+          moreBtn.style.display = slice.length >= list.length ? 'none' : '';
+          if (!moreBtn._bound){
+            moreBtn._bound = true;
+            moreBtn.addEventListener('click', ()=>{
+              const p = Number(allWrap.dataset.page || 1) + 1;
+              allWrap.dataset.page = String(p);
+              paint(list, {initial}); // re-render หน้าใหม่
+            });
+          }
         }
-
-        renderPage();
         return;
       }
 
-      // ====== โหมดหน้าแรก ======
-      const limit = Number(homeWrap.dataset.limit || 6);
-      const subset = list.slice(0, limit);
-      homeWrap.innerHTML = subset.map(renderReviewCard).join('');
+      // ----- หน้าแรก (โชว์ล่าสุดตาม limit) -----
+      if (homeWrap){
+        const limit = Number(homeWrap.dataset.limit || 6);
+        const subset = list.slice(0, limit);
+        homeWrap.innerHTML = subset.map(renderReviewCard).join('');
 
-      const avgEl = document.getElementById('avg');
-      if (avgEl) {
-        const avg = subset.length ? subset.reduce((s,x)=> s + Number(x.rating||0), 0)/subset.length : 0;
-        avgEl.textContent = subset.length
-          ? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${subset.length} รีวิว`
-          : 'ยังไม่มีรีวิวที่อนุมัติ';
-      }
+        if (!initial){
+          requestAnimationFrame(()=>{
+            const avgEl = document.getElementById('avg');
+            if (avgEl){
+              const avg = subset.length ? subset.reduce((s,x)=> s + Number(x.rating||0), 0)/subset.length : 0;
+              avgEl.textContent = subset.length
+                ? `คะแนนเฉลี่ย ${avg.toFixed(1)}/5 จาก ${subset.length} รีวิว`
+                : 'ยังไม่มีรีวิวที่อนุมัติ';
+            }
+          });
+        }
 
-      // ตั้งค่าปุ่ม “ดูรีวิวทั้งหมด” (ถ้ามีปุ่ม/ลิงก์)
-      const moreLink = document.getElementById('btnReviewMore');
-      if (moreLink) {
-        moreLink.style.display = list.length > limit ? '' : 'none';
-        // ปล่อย href ให้ใส่ใน HTML ได้ตามต้องการ (เช่น reviews.html)
+        const moreLink = document.getElementById('btnReviewMore');
+        if (moreLink){ moreLink.style.display = list.length > limit ? '' : 'none'; }
       }
     }
-  );
+
+    // 1) ลองเพนท์จาก cache ก่อน (เร็ว)
+    try{
+      const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
+      if (cached.length){ paint(cached, {initial:true}); }
+    }catch(_){/* ignore */}
+
+    // 2) onSnapshot จริง (เรียงจากเซิร์ฟเวอร์ให้เลย)
+    onSnapshot(
+      query(collection(db,'reviews'),
+        where('approved','==', true),
+        orderBy('createdAt','desc') // ให้เรียงจากใหม่ไปเก่า
+      ),
+      snap => {
+        const list = [];
+        snap.forEach(docu => list.push(normalize(docu.data() || {})));
+
+        // เซฟ cache (จำกัดไว้ 60 อันพอ)
+        try{
+          localStorage.setItem(CACHE_KEY, JSON.stringify(list.slice(0,60)));
+        }catch(_){/* ignore */}
+
+        paint(list, {initial:false});
+      }
+    );
+  })();
   // ===== END Reviews =====
 
   onSnapshot(collection(db,'faqs'), snap=>{
