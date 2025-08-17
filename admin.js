@@ -29,11 +29,7 @@ requireAdmin(async (user, role)=>{
     }));
     tbody.querySelectorAll('.btn-edit').forEach(btn=> btn.addEventListener('click', async e=>{
       const id = e.target.closest('tr').dataset.id; const snap=await getDoc(doc(db,'services', id)); const v=snap.data();
-      $('#svcId').value=id; $('#svcName').value=v.name||''; $('#svcCat').value=v.category||''; $('#svcImg').value=v.imageUrl||''; $('#svcDesc').value = v.description || '';
-      if (document.getElementById('svcDetail'))  document.getElementById('svcDetail').value  = v.detail || '';
-      if (document.getElementById('svcTags'))    document.getElementById('svcTags').value    = (Array.isArray(v.tags)? v.tags.join(', ') : (v.tags||''));
-      if (document.getElementById('svcGallery')) document.getElementById('svcGallery').value = (Array.isArray(v.gallery)? v.gallery.join('
-') : (v.gallery||''));
+      $('#svcId').value=id; $('#svcName').value=v.name||''; $('#svcCat').value=v.category||''; $('#svcImg').value=v.imageUrl||''; $('#svcDesc').value=v.description||'';
       new bootstrap.Modal(document.getElementById('svcModal')).show();
     }));
   });
