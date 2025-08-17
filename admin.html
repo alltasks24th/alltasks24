@@ -222,6 +222,21 @@
         <label class="form-label mt-2">หมวดหมู่</label><input id="svcCat" class="form-control">
         <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="svcImg" class="form-control">
         <label class="form-label mt-2">รายละเอียด</label><textarea id="svcDesc" rows="3" class="form-control"></textarea>
+    <div class="mt-3">
+      <label for="svcDetail" class="form-label">รายละเอียดเต็ม (แสดงในป๊อปอัป)</label>
+      <textarea id="svcDetail" class="form-control" rows="4" placeholder="รายละเอียดบริการแบบเต็ม (รองรับบรรทัดใหม่)"></textarea>
+    </div>
+    <div class="mt-3">
+      <label for="svcTags" class="form-label">ป้ายกำกับ (Tags)</label>
+      <input id="svcTags" type="text" class="form-control" placeholder="เช่น ล้างแอร์, ฉุกเฉิน, รับประกัน">
+      <div class="form-text">คั่นด้วยเครื่องหมายจุลภาค ( , )</div>
+    </div>
+    <div class="mt-3">
+      <label for="svcGallery" class="form-label">รูปผลงาน (Gallery)</label>
+      <textarea id="svcGallery" class="form-control" rows="3" placeholder="วางลิงก์รูปภาพ 1 บรรทัดต่อ 1 รูป หรือคั่นด้วย ,"></textarea>
+      <div class="form-text">ไม่เกี่ยวกับรูปหน้าบริการหลัก</div>
+    </div>
+    
       </div>
       <div class="modal-footer"><button id="svcSave" class="btn btn-primary">บันทึก</button></div>
     </div>
