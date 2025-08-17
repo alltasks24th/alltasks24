@@ -5,50 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>รีวิวลูกค้าทั้งหมด • alltasks24.online</title>
 
-  <!-- Bootstrap + Icons + ฟอนต์ ให้เหมือนหน้าแรก -->
+  <!-- Bootstrap + Icons + Font (ให้โทนเหมือนหน้าแรก) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <!-- ใช้สไตล์เดียวกับหน้าแรก -->
   <link rel="stylesheet" href="assets/styles.css">
+
+  <style>
+    /* แต่งหน้ารีวิวให้สวยขึ้นเล็กน้อย โดยไม่ไปทับของเดิม */
+    .review-hero {
+      background: linear-gradient(135deg, rgba(103,80,164,.1), rgba(59,18,94,.1));
+      border-bottom: 1px solid rgba(0,0,0,.05);
+    }
+    .review-card {
+      transition: transform .15s ease, box-shadow .15s ease;
+      border: 1px solid rgba(0,0,0,.05);
+      border-radius: 1rem;
+    }
+    .review-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08);
+    }
+    .review-name { font-weight: 600; }
+    .review-stars { letter-spacing: .15rem; }
+    .review-date { color: rgba(0,0,0,.55); }
+    .placeholder-line { display:block; height: .9rem; }
+  </style>
 </head>
 <body class="bg-body-tertiary">
 
-  <!-- Navbar โทนเดียวกับหน้าแรก -->
-  <nav class="navbar navbar-expand-lg sticky-top bg-white shadow-sm">
-    <div class="container">
-      <a class="navbar-brand fw-bold" style="color:var(--primary)" href="/">alltasks24.online</a>
-      <div class="ms-auto">
-        <a class="btn btn-outline-primary btn-sm" href="/">
-          <i class="bi bi-arrow-left me-1"></i> กลับหน้าแรก
-        </a>
-      </div>
+  <!-- Hero / Navbar -->
+  <header class="review-hero py-4 sticky-top bg-white bg-opacity-75 backdrop-blur shadow-sm">
+    <div class="container d-flex align-items-center justify-content-between">
+      <a class="navbar-brand fw-bold text-decoration-none" style="color:var(--primary)" href="/">alltasks24.online</a>
+      <a class="btn btn-outline-primary btn-sm" href="/"><i class="bi bi-arrow-left me-1"></i> กลับหน้าแรก</a>
     </div>
-  </nav>
+  </header>
 
   <main class="py-4">
     <div class="container">
       <div class="d-flex justify-content-between align-items-end mb-3">
         <h1 class="h4 mb-0">รีวิวลูกค้าทั้งหมด</h1>
-        <!-- ค่าเฉลี่ยจะถูกเติมโดย public.js หลังจากเรนเดอร์รีวิวแล้ว -->
+        <!-- ค่าคะแนนเฉลี่ยจะเติม "หลังจาก" ดึงรายการสำเร็จ เพื่อไม่บล็อกการแสดงผล -->
         <div id="avgAll" class="text-muted small"></div>
       </div>
 
-      <!-- กริดรีวิว: public.js จะเรนเดอร์การ์ดลงตรงนี้แบบ realtime -->
-      <div id="reviewAllList" class="row g-3" data-page-size="12"></div>
+      <!-- รายการรีวิว (เรนเดอร์ที่นี่) -->
+      <div id="reviewAllList" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3"></div>
 
-      <!-- ปุ่มโหลดเพิ่ม (public.js จะซ่อนไว้ถ้าไม่จำเป็น) -->
-      <div class="text-center mt-3">
-        <button id="loadMoreReviews" class="btn btn-outline-primary">
-          <i class="bi bi-arrow-down-circle me-1"></i> โหลดเพิ่ม
-        </button>
+      <!-- ควบคุมการแบ่งหน้า -->
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="small text-muted" id="pageInfo"></div>
+        <div class="d-flex gap-2">
+          <button id="btnPrev" class="btn btn-outline-primary btn-sm" disabled>
+            <i class="bi bi-chevron-left"></i> ก่อนหน้า
+          </button>
+          <button id="btnNext" class="btn btn-outline-primary btn-sm" disabled>
+            ถัดไป <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
       </div>
     </div>
   </main>
 
-  <!-- Footer โทนเดียวกับหน้าแรก -->
-  <footer class="site-footer py-4">
+  <footer class="site-footer py-4 mt-4">
     <div class="container d-flex justify-content-between align-items-center">
       <small>© <span id="yearNow">2025</span> alltasks24.online</small>
       <div class="d-flex gap-3">
@@ -60,8 +82,140 @@
 
   <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- ใช้โมดูลเดียวกับหน้าแรก (ปล่อยให้ public.js จัดการโหลดรีวิวแบบ realtime) -->
-  <script type="module" src="firebase-init.js?v=2"></script>
-  <script type="module" src="public.js?v=2"></script>
+  <script type="module">
+    import { db } from './firebase-init.js';
+    import {
+      collection, query, where, orderBy, limit,
+      startAfter, endBefore, limitToLast, getDocs, getCountFromServer
+    } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    // ===== CONFIG =====
+    const PAGE_SIZE = 6;
+    const list   = document.getElementById('reviewAllList');
+    const avgEl  = document.getElementById('avgAll');
+    const pageEl = document.getElementById('pageInfo');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const yearEl = document.getElementById('yearNow');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    const baseQ = () => query(
+      collection(db, 'reviews'),
+      where('approved', '==', true),
+      orderBy('createdAt', 'desc')
+    );
+
+    // ===== CURSORS =====
+    let lastDoc = null;
+    let currentFirst = null;
+    const firstStack = [];
+    let page = 1;
+    let total = 0;
+
+    // ===== HELPERS =====
+    function starify(n) {
+      const r = Number(n || 0);
+      return '★'.repeat(Math.max(0, Math.min(5, r))) + '☆'.repeat(Math.max(0, 5 - r));
+    }
+    function fmtDate(t) {
+      try {
+        const d = t?.toDate ? t.toDate() : (t ? new Date(t) : null);
+        if (!d || isNaN(d)) return '';
+        return d.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch { return ''; }
+    }
+    function card(r) {
+      const name   = r.name || 'ผู้ใช้';
+      const text   = r.text || '';
+      const rating = r.rating ?? 0;
+      const when   = fmtDate(r.createdAt);
+      return `
+        <div class="col">
+          <div class="review-card h-100 p-3 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <div class="review-name">${name}</div>
+              <div class="badge text-bg-success review-stars">${starify(rating)}</div>
+            </div>
+            <div class="review-date small mb-2"><i class="bi bi-calendar-event me-1"></i>${when}</div>
+            <div class="text-muted small" style="white-space:pre-line">${text}</div>
+          </div>
+        </div>
+      `;
+    }
+    function showSkeleton() {
+      list.innerHTML = Array.from({length: PAGE_SIZE}).map(() => `
+        <div class="col">
+          <div class="review-card h-100 p-3 bg-white">
+            <span class="placeholder col-6 placeholder-line"></span>
+            <span class="placeholder col-3 placeholder-line mt-2"></span>
+            <span class="placeholder col-10 placeholder-line mt-3"></span>
+            <span class="placeholder col-8 placeholder-line mt-1"></span>
+          </div>
+        </div>
+      `).join('');
+    }
+    function updatePagerState(snapSize) {
+      btnPrev.disabled = firstStack.length === 0;
+      btnNext.disabled = snapSize < PAGE_SIZE;
+      const shown = Math.min(page * PAGE_SIZE, total || page * PAGE_SIZE);
+      pageEl.textContent = total ? `หน้าที่ ${page} • แสดง ${shown}/${total}` : `หน้าที่ ${page}`;
+    }
+
+    // ===== LOAD =====
+    async function loadTotal() {
+      try {
+        const c = await getCountFromServer(baseQ());
+        total = c.data().count || 0;
+      } catch {}
+    }
+    async function loadPage(direction='init') {
+      showSkeleton();
+      try {
+        let q = query(baseQ(), limit(PAGE_SIZE));
+        if (direction === 'next' && lastDoc) {
+          if (currentFirst) firstStack.push(currentFirst);
+          q = query(baseQ(), startAfter(lastDoc), limit(PAGE_SIZE));
+          page++;
+        }
+        if (direction === 'prev' && currentFirst) {
+          const target = firstStack.pop();
+          q = query(baseQ(), endBefore(target || currentFirst), limitToLast(PAGE_SIZE));
+          page = Math.max(1, page - 1);
+        }
+
+        const snap = await getDocs(q);
+        currentFirst = snap.docs[0] || null;
+        lastDoc      = snap.docs[snap.docs.length - 1] || null;
+
+        const rows = [];
+        snap.forEach(d => rows.push(card(d.data() || {})));
+        list.innerHTML = rows.join('') || '<div class="text-center text-muted">ยังไม่มีรีวิว</div>';
+        updatePagerState(snap.size);
+      } catch (err) {
+        console.error(err);
+        list.innerHTML = '<div class="text-danger small text-center">โหลดรีวิวไม่สำเร็จ</div>';
+        btnPrev.disabled = true; btnNext.disabled = true;
+      }
+    }
+
+    // events
+    btnNext.addEventListener('click', () => loadPage('next'));
+    btnPrev.addEventListener('click', () => loadPage('prev'));
+
+    // start
+    await loadTotal();
+    await loadPage();
+
+    // compute average "หลังจาก" แสดงรีวิวแล้ว เพื่อความไว
+    try {
+      const snap = await getDocs(query(baseQ(), limit(100)));
+      let sum=0, count=0;
+      snap.forEach(d => {
+        const r = d.data() || {};
+        if (typeof r.rating === 'number') { sum+=r.rating; count++; }
+      });
+      if (count) avgEl.textContent = `คะแนนเฉลี่ย ${(sum/count).toFixed(1)}/5 จาก ${count} รีวิว`;
+    } catch {}
+  </script>
 </body>
 </html>
