@@ -212,6 +212,7 @@
   </div>
 </div>
 
+<!-- โมดัล: บริการ (เพิ่มฟิลด์ แกลเลอรี + แท็ก) -->
 <div class="modal fade" id="svcModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -220,8 +221,17 @@
         <input id="svcId" type="hidden">
         <label class="form-label">ชื่อบริการ</label><input id="svcName" class="form-control">
         <label class="form-label mt-2">หมวดหมู่</label><input id="svcCat" class="form-control">
-        <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="svcImg" class="form-control">
-        <label class="form-label mt-2">รายละเอียด</label><textarea id="svcDesc" rows="3" class="form-control"></textarea>
+        <label class="form-label mt-2">ภาพปก (ลิงก์เดียว)</label><input id="svcImg" class="form-control">
+        <label class="form-label mt-2">รายละเอียด (ใช้แสดงในหน้า “ดูรายละเอียด”)</label>
+        <textarea id="svcDesc" rows="3" class="form-control"></textarea>
+
+        <!-- ✅ ใหม่: แกลเลอรีภาพหลายรูป (คั่นด้วย ,) -->
+        <label class="form-label mt-3">แกลเลอรีภาพ (ลิงก์หลายรายการ คั่นด้วย , )</label>
+        <textarea id="svcGallery" rows="2" class="form-control" placeholder="https://...jpg, https://...png"></textarea>
+
+        <!-- ✅ ใหม่: ป้ายกำกับ/แท็ก (คั่นด้วย ,) -->
+        <label class="form-label mt-2">ป้ายกำกับ (คั่นด้วย , )</label>
+        <input id="svcTags" class="form-control" placeholder="ด่วน, ทำความสะอาด, ลุยหน้างาน">
       </div>
       <div class="modal-footer"><button id="svcSave" class="btn btn-primary">บันทึก</button></div>
     </div>
