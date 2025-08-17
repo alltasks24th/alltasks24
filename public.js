@@ -90,7 +90,7 @@ function bindRealtime(){
 
   // ===== Reviews (approved only) =====
   (function(){
-    // --- Quick paint: ใช้ cache เพนท์ก่อน แล้วค่อยรอ onSnapshot ---
+    // --- Quick paint: ใช้ cache เพนท์ก่อน แล้วค่อยรอข้อมูลจริง ---
     const CACHE_KEY = 'cacheReviewsV1';
     const homeWrap = document.getElementById('reviewList');
     const allWrap  = document.getElementById('reviewAllList');
@@ -171,22 +171,75 @@ function bindRealtime(){
       if (cached.length){ paint(cached, {initial:true}); }
     }catch(_){/* ignore */}
 
-    // 2) onSnapshot จริง (เรียงจากเซิร์ฟเวอร์ให้เลย)
+    // ---- Query หลักของรีวิว (ต้องมี index: approved + createdAt desc) ----
+    const qMain = query(
+      collection(db,'reviews'),
+      where('approved','==', true),
+      orderBy('createdAt','desc')
+    );
+
+    // 2) โหลดครั้งเดียวแบบ try/catch (กัน error index) แล้วเพนท์ก่อน
+    (async ()=>{
+      try {
+        const snap = await getDocs(qMain);           // << โหลดรอบแรกแบบครั้งเดียว
+        const list = [];
+        snap.forEach(d => list.push(normalize(d.data() || {})));
+
+        // เก็บ cache (จำกัด 60)
+        try{ localStorage.setItem(CACHE_KEY, JSON.stringify(list.slice(0,60))); }catch(_){}
+        paint(list, {initial:false});
+      } catch (err) {
+        console.error(err);
+        const container = allWrap || homeWrap;
+        if (container) {
+          const msg = document.createElement('div');
+          msg.className = 'text-danger small text-center my-2';
+          msg.textContent = 'โหลดรีวิวไม่สำเร็จ (จะลองวิธีสำรอง)';
+          container.parentElement?.insertBefore(msg, container);
+        }
+
+        // Fallback: ตัด orderBy ออก แล้ว sort ฝั่ง client ชั่วคราว
+        try {
+          const snap2 = await getDocs(
+            query(collection(db,'reviews'), where('approved','==', true))
+          );
+          const list2 = [];
+          snap2.forEach(d => list2.push(normalize(d.data() || {})));
+          list2.sort((a,b)=> b.__ts - a.__ts);
+
+          try{ localStorage.setItem(CACHE_KEY, JSON.stringify(list2.slice(0,60))); }catch(_){}
+          paint(list2, {initial:false});
+        } catch (err2) {
+          console.error(err2);
+          const container2 = allWrap || homeWrap;
+          if (container2) {
+            const msg2 = document.createElement('div');
+            msg2.className = 'text-danger small text-center my-2';
+            msg2.textContent = 'โหลดรีวิวล้มเหลว กรุณารีเฟรชหน้าหรือแจ้งแอดมิน';
+            container2.parentElement?.insertBefore(msg2, container2);
+          }
+        }
+      }
+    })();
+
+    // 3) ติด onSnapshot แบบมี error handler (เผื่ออนาคต error)
     onSnapshot(
-      query(collection(db,'reviews'),
-        where('approved','==', true),
-        orderBy('createdAt','desc') // ให้เรียงจากใหม่ไปเก่า
-      ),
+      qMain,
       snap => {
         const list = [];
         snap.forEach(docu => list.push(normalize(docu.data() || {})));
-
-        // เซฟ cache (จำกัดไว้ 60 อันพอ)
-        try{
-          localStorage.setItem(CACHE_KEY, JSON.stringify(list.slice(0,60)));
-        }catch(_){/* ignore */}
-
+        try{ localStorage.setItem(CACHE_KEY, JSON.stringify(list.slice(0,60))); }catch(_){}
         paint(list, {initial:false});
+      },
+      err => {
+        console.error(err);
+        const container = allWrap || homeWrap;
+        if (container) {
+          const warn = document.createElement('div');
+          warn.className = 'text-danger small text-center my-2';
+          warn.textContent = 'อัปเดตรีลไทม์ผิดพลาด กำลังใช้ข้อมูลล่าสุดที่แคชไว้';
+          container.parentElement?.insertBefore(warn, container);
+        }
       }
     );
   })();
