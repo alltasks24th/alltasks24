@@ -196,7 +196,7 @@ function bindRealtime(){
 
       // ----- หน้าแรก (โชว์ล่าสุดตาม limit) -----
       if (homeWrap){
-        const limit = Number(homeWrap.dataset.limit || 6);
+        const limit = Number(homeWrap.dataset.limit || 3);
         const subset = list.slice(0, limit);
         homeWrap.innerHTML = subset.map(renderReviewCard).join('');
 
