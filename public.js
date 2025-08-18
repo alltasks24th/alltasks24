@@ -138,7 +138,8 @@ function bindRealtime(){
           </div>
         </div>
       </div>`);
-  });
+      shown++;
+});
     shown++;
 });;
 
