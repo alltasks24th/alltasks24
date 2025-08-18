@@ -5,9 +5,6 @@ import {
   query, where, orderBy, serverTimestamp, increment, updateDoc
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 import { $ } from './utils.js';
-// หน้าแรกอยากโชว์กี่บริการ (ปรับเลขเดียวจบ)
-const SERVICES_LIMIT_HOME = 3;
-
 
 const settingsRef = doc(db, 'settings', 'public');
 let currentThreadId = localStorage.getItem('chatThreadIdV2') || null;
@@ -72,10 +69,8 @@ function bindRealtime(){
   let mods = document.getElementById('service-modals');
   if(!mods){ mods = document.createElement('div'); mods.id='service-modals'; document.body.appendChild(mods); }
   wrap.innerHTML=''; mods.innerHTML='';
-  let shown = 0;
 
   snap.forEach(s=>{
-    if (shown >= SERVICES_LIMIT_HOME) return;
     const d=s.data()||{};
     const id = s.id;
     const name = d.name||'';
@@ -551,9 +546,6 @@ function renderServiceCard(svc) {
 
 // Patch the rendering loop
 async function loadServices() {
-  const wrapEl = document.getElementById('service-cards');
-  if (!wrapEl) return;
-  if (wrapEl.children && wrapEl.children.length > 0) return; // already rendered; skip
   const q = query(collection(db,'services'), orderBy('createdAt','desc'));
   const qs = await getDocs(q);
   const cards = [];
