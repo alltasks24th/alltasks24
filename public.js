@@ -65,23 +65,75 @@ function bindRealtime(){
   });
 
   onSnapshot(collection(db,'services'), snap=>{
-    const wrap = document.getElementById('service-cards'); if(!wrap) return; wrap.innerHTML='';
-    snap.forEach(s=>{
-      const d=s.data();
-      wrap.insertAdjacentHTML('beforeend', `<div class="col-md-4">
-        <div class="card card-clean h-100">
-          <img src="${d.imageUrl||'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1400&auto=format&fit=crop'}" class="svc-thumb" alt="">
-          <div class="card-body">
-            <div class="d-flex align-items-center gap-2 mb-2">
-              <div class="svc-icon"><i class="bi bi-stars"></i></div>
-              <h5 class="mb-0">${d.name||''}</h5>
-            </div>
-            <div class="text-muted small mb-1">${d.category||''}</div>
-            <p class="text-muted">${d.description||''}</p>
+  const wrap = document.getElementById('service-cards'); if(!wrap) return;
+  let mods = document.getElementById('service-modals');
+  if(!mods){ mods = document.createElement('div'); mods.id='service-modals'; document.body.appendChild(mods); }
+  wrap.innerHTML=''; mods.innerHTML='';
+
+  snap.forEach(s=>{
+    const d=s.data()||{};
+    const id = s.id;
+    const name = d.name||'';
+    const category = d.category||'';
+    const desc = d.description||'';
+    const cover = d.imageUrl||'https://images.unsplash.com/photo-1487014679447-9f8336841d58?q=80&w=1400&auto=format&fit=crop';
+    const tags = Array.isArray(d.tags)?d.tags:[];
+    const gallery = Array.isArray(d.gallery)?d.gallery:[];
+
+    // การ์ดบริการ + ป้ายกำกับ + ปุ่มดูรายละเอียด
+    wrap.insertAdjacentHTML('beforeend', `<div class="col-md-4">
+      <div class="card card-clean h-100">
+        ${cover?`<img src="${cover}" class="svc-thumb" alt="">`:``}
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="svc-icon"><i class="bi bi-stars"></i></div>
+            <h5 class="mb-0">${name}</h5>
           </div>
-        </div></div>`);
-    });
+          <div class="text-muted small mb-1">${category}</div>
+          <div class="mb-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('')}</div>
+          <p class="text-muted flex-grow-1">${desc}</p>
+          <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#svc-${id}">ดูรายละเอียด</button>
+        </div>
+      </div>
+    </div>`);
+
+    // Modal + แกลเลอรี (สไลด์)
+    const hasGallery = gallery.length>0;
+    mods.insertAdjacentHTML('beforeend', `
+      <div class="modal fade" id="svc-${id}" tabindex="-1" aria-labelledby="svc-label-${id}" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 id="svc-label-${id}" class="modal-title">${name}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+            </div>
+            <div class="modal-body">
+              ${hasGallery?`
+                <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    ${gallery.map((u,i)=>`
+                      <div class="carousel-item ${i===0?'active':''}">
+                        <img src="${u}" class="d-block w-100" alt="ผลงาน">
+                      </div>`).join('')}
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">ก่อนหน้า</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">ถัดไป</span>
+                  </button>
+                </div>`:``}
+              <div class="text-muted small mb-2">${category}</div>
+              <p style="white-space:pre-line">${desc}</p>
+              ${tags.length?`<div class="mt-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('')}</div>`:``}
+            </div>
+          </div>
+        </div>
+      </div>`);
   });
+});;
 
   onSnapshot(collection(db,'serviceAreas'), snap=>{
     const ul = document.getElementById('area-list'); if(!ul) return; ul.innerHTML='';
@@ -439,115 +491,85 @@ async function setupChat(user){
 }
 
 
-// === ADD-ONLY: detail modal/tags gallery addon ===
-(function(){
-  const norm = s => (s||'').replace(/\s+/g,' ').trim().toLowerCase();
-  function ensureHost(){
-    let el = document.getElementById('service-modals');
-    if(!el){ el = document.createElement('div'); el.id='service-modals'; document.body.appendChild(el); }
-    return el;
-  }
-  const titleOf = card => (card.querySelector('h5')?.textContent || card.querySelector('.card-title')?.textContent || card.querySelector('h4')?.textContent || card.querySelector('h3')?.textContent || '').trim();
-  function ensureTags(body, tags){
-    if(!Array.isArray(tags) || !tags.length) return;
-    let holder = body.querySelector('[data-addon="tags"]');
-    if(!holder){
-      holder = document.createElement('div');
-      holder.setAttribute('data-addon','tags');
-      holder.className = 'mb-2';
-      const p = body.querySelector('p, .card-text');
-      if(p) body.insertBefore(holder, p); else body.appendChild(holder);
-    }
-    holder.innerHTML = tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('');
-  }
-  function ensureBtn(card, id){
-    if(card.querySelector('[data-addon="detail-btn"]')) return;
-    const body = card.querySelector('.card-body') || card;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'btn btn-primary mt-2';
-    btn.setAttribute('data-addon','detail-btn');
-    btn.setAttribute('data-bs-toggle','modal');
-    btn.setAttribute('data-bs-target',`#svc-${id}`);
-    btn.textContent = 'ดูรายละเอียด';
-    body.appendChild(btn);
-  }
-  function upsertModal(svc){
-    const { id, name, category, description, tags=[], gallery=[] } = svc;
-    const hasGal = Array.isArray(gallery) && gallery.length>0;
-    const gal = hasGal ? `
-      <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
+// ==== Service Modal Rendering (append-only) ====
+function renderServiceModal(svc) {
+  const modalId = 'svc-modal-' + svc.id;
+  const gallerySlides = (svc.gallery && svc.gallery.length) ? svc.gallery.map((url,idx)=>`
+        <div class="carousel-item ${idx===0?'active':''}">
+          <img src="${url}" class="d-block w-100 rounded" alt="ผลงาน ${idx+1}">
+        </div>`).join('') : '<div class="text-muted p-3">ไม่มีรูปผลงาน</div>';
+  const galleryHtml = (svc.gallery && svc.gallery.length) ? `
+      <div id="${modalId}-carousel" class="carousel slide mb-3">
         <div class="carousel-inner">
-          ${gallery.map((u,i)=>`
-            <div class="carousel-item ${i===0?'active':''}">
-              <img src="${u}" class="d-block w-100" alt="ผลงาน">
-            </div>`).join('')}
+          ${gallerySlides}
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
+        <button class="carousel-control-prev" type="button" data-bs-target="#${modalId}-carousel" data-bs-slide="prev">
           <span class="carousel-control-prev-icon"></span>
-          <span class="visually-hidden">ก่อนหน้า</span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
+        <button class="carousel-control-next" type="button" data-bs-target="#${modalId}-carousel" data-bs-slide="next">
           <span class="carousel-control-next-icon"></span>
-          <span class="visually-hidden">ถัดไป</span>
         </button>
       </div>` : '';
-    const tagHtml = tags.length ? `<div class="mt-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('')}</div>` : '';
-    const html = `
-      <div class="modal fade" id="svc-${id}" tabindex="-1" aria-labelledby="svc-label-${id}" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 id="svc-label-${id}" class="modal-title">${name||''}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
-            </div>
-            <div class="modal-body">
-              ${gal}
-              <div class="text-muted small mb-2">${category||''}</div>
-              <p style="white-space:pre-line">${description||''}</p>
-              ${tagHtml}
-            </div>
-          </div>
+
+  return `
+  <div class="modal fade" id="${modalId}" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">${svc.name||''}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-      </div>`;
-    const host = ensureHost();
-    const exist = document.getElementById(`svc-${id}`);
-    if(exist) exist.outerHTML = html; else host.insertAdjacentHTML('beforeend', html);
-  }
-  function enhance(){
-    const wrap = document.getElementById('service-cards');
-    if(!wrap) return;
-    onSnapshot(collection(db,'services'), snap=>{
-      const byName = new Map();
-      snap.forEach(d=>{
-        const v = d.data()||{};
-        const item = {
-          id: d.id,
-          name: v.name||'',
-          category: v.category||'',
-          description: v.description||'',
-          tags: Array.isArray(v.tags)?v.tags:[],
-          gallery: Array.isArray(v.gallery)?v.gallery:[]
-        };
-        byName.set(norm(item.name), item);
-      });
-      wrap.querySelectorAll('.card').forEach(card=>{
-        const key = norm(titleOf(card));
-        const svc = byName.get(key);
-        if(!svc) return;
-        const body = card.querySelector('.card-body') || card;
-        ensureTags(body, svc.tags);
-        upsertModal(svc);
-        ensureBtn(card, svc.id);
-      });
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', enhance); else enhance();
-  document.addEventListener('click', (e)=>{
-    const btn = e.target.closest('[data-bs-toggle="modal"][data-bs-target^="#svc-"]');
-    if(!btn) return;
-    const sel = btn.getAttribute('data-bs-target');
-    const el = document.querySelector(sel);
-    if(el && window.bootstrap?.Modal) window.bootstrap.Modal.getOrCreateInstance(el).show();
+        <div class="modal-body">
+          <p>${svc.description||''}</p>
+          ${svc.tags && svc.tags.length ? `<p><span class="badge bg-secondary me-1">${svc.tags.join('</span> <span class="badge bg-secondary me-1">')}</span></p>` : ''}
+          ${galleryHtml}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderServiceCard(svc) {
+  const modalId = 'svc-modal-' + svc.id;
+  return `
+    <div class="col-md-4 mb-3">
+      <div class="card h-100">
+        <img src="${svc.image||'https://via.placeholder.com/400x200?text=Service'}" class="card-img-top" alt="${svc.name||''}">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">${svc.name||''}</h5>
+          <p class="card-text text-truncate">${svc.description||''}</p>
+          <button class="btn btn-primary mt-auto" data-bs-toggle="modal" data-bs-target="#${modalId}">ดูรายละเอียด</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// Patch the rendering loop
+async function loadServices() {
+  const q = query(collection(db,'services'), orderBy('createdAt','desc'));
+  const qs = await getDocs(q);
+  const cards = [];
+  const modals = [];
+  qs.forEach(docSnap=>{
+    const svc = Object.assign({id:docSnap.id}, docSnap.data());
+    cards.push(renderServiceCard(svc));
+    modals.push(renderServiceModal(svc));
   });
-})();
+  document.getElementById('service-cards').innerHTML = cards.join('\n');
+  const modalsWrap = document.getElementById('service-modals');
+  if(modalsWrap) modalsWrap.innerHTML = modals.join('\n');
+}
+
+document.addEventListener('DOMContentLoaded', loadServices);
+// ==== End Service Modal Rendering ====
+
+
+
+// เปิดโมดอลแบบโปรแกรมมิง เผื่อ data API ไม่ hook
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-bs-toggle="modal"][data-bs-target^="#svc-"]');
+  if (!btn) return;
+  const sel = btn.getAttribute('data-bs-target');
+  const el = document.querySelector(sel);
+  if (el && window.bootstrap?.Modal) window.bootstrap.Modal.getOrCreateInstance(el).show();
+});
