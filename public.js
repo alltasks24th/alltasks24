@@ -573,3 +573,51 @@ document.addEventListener('click', (e) => {
   const el = document.querySelector(sel);
   if (el && window.bootstrap?.Modal) window.bootstrap.Modal.getOrCreateInstance(el).show();
 });
+
+/* === FIX: force-show modal + raise z-index (ADD-ONLY) === */
+(function () {
+  // 1) กันกรณี data-API ไม่ hook: บังคับ show ด้วยโปรแกรมทุกครั้งที่กดปุ่ม
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-bs-toggle="modal"][data-bs-target^="#svc-"]');
+    if (!btn) return;
+    const sel = btn.getAttribute('data-bs-target');
+    const el = document.querySelector(sel);
+    if (el && window.bootstrap?.Modal) {
+      window.bootstrap.Modal.getOrCreateInstance(el).show();
+      // ถ้ามีแกลเลอรี ให้ ensure carousel พร้อม
+      const car = el.querySelector('.carousel');
+      if (car && window.bootstrap?.Carousel) {
+        window.bootstrap.Carousel.getOrCreateInstance(car, { interval: 4000 });
+      }
+    }
+  }, true); // ใช้ capture ให้ทำงานก่อนตัวอื่น
+
+  // 2) ป้องกัน modal โดนทับ/โดนคลิป: อัด z-index และลด z-index floating ต่าง ๆ ระหว่างเปิด
+  const style = document.createElement('style');
+  style.innerHTML = `
+    .modal{ z-index:1400 !important; }
+    .modal-backdrop{ z-index:1300 !important; }
+    body.modal-open .fab-dock,
+    body.modal-open .chat-widget,
+    body.modal-open .position-fixed,
+    body.modal-open [data-fab],
+    body.modal-open .offcanvas{ z-index:10 !important; }
+  `;
+  document.head.appendChild(style);
+
+  // 3) เผื่อบางธีมใช้ transform/overflow บน wrapper: ย้าย modal ให้อยู่ใต้ <body> เสมอเมื่อถูกสร้าง
+  const moveToBody = (m) => {
+    if (!m || m.parentElement === document.body) return;
+    document.body.appendChild(m);
+  };
+  // เวลา snapshot เรนเดอร์เสร็จแล้ว มี modal ใหม่ ให้ย้ายออกมาที่ body
+  const obs = new MutationObserver((list) => {
+    for (const mu of list) {
+      mu.addedNodes?.forEach(n => {
+        if (n.nodeType === 1 && n.matches?.('.modal[id^="svc-"]')) moveToBody(n);
+        if (n.nodeType === 1) n.querySelectorAll?.('.modal[id^="svc-"]').forEach(moveToBody);
+      });
+    }
+  });
+  obs.observe(document.documentElement, { childList: true, subtree: true });
+})();
