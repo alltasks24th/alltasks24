@@ -77,7 +77,7 @@ function bindRealtime(){
     const name = d.name || '';
     const category = d.category || '';
     const desc = d.description || '';
-    const cover = d.imageUrl || 'https://images.unsplash.com/photo-1487014679447-9f8336841d58?q=80&w=1400&auto=format&fit=crop';
+    const cover = d.imageUrl || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1400&auto=format&fit=crop';
     const tags = Array.isArray(d.tags) ? d.tags : [];
     const gallery = Array.isArray(d.gallery) ? d.gallery : [];
 
