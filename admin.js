@@ -30,20 +30,11 @@ requireAdmin(async (user, role)=>{
     tbody.querySelectorAll('.btn-edit').forEach(btn=> btn.addEventListener('click', async e=>{
       const id = e.target.closest('tr').dataset.id; const snap=await getDoc(doc(db,'services', id)); const v=snap.data();
       $('#svcId').value=id; $('#svcName').value=v.name||''; $('#svcCat').value=v.category||''; $('#svcImg').value=v.imageUrl||''; $('#svcDesc').value=v.description||'';
-try{
-  document.getElementById('svcTags').value = Array.isArray(v.tags)?v.tags.join(', '):(v.tags||'');
-  document.getElementById('svcGallery').value = Array.isArray(v.gallery)?v.gallery.join('\n'):(v.gallery||'');
-}catch(e){}
       new bootstrap.Modal(document.getElementById('svcModal')).show();
     }));
   });
   $('#svcSave').addEventListener('click', async ()=>{
-  const tags=(document.getElementById('svcTags')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);
-  const gallery=(document.getElementById('svcGallery')?.value||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-
-    const id=$('#svcId').value; const data={ name:$('#svcName').value, category:$('#svcCat').value, imageUrl:$('#svcImg').value, description:$('#svcDesc').value,
-    tags: tags,
-    gallery: gallery, updatedAt: serverTimestamp() };
+    const id=$('#svcId').value; const data={ name:$('#svcName').value, category:$('#svcCat').value, imageUrl:$('#svcImg').value, description:$('#svcDesc').value, updatedAt: serverTimestamp() };
     if(id){ await updateDoc(doc(db,'services',id), data); } else { data.createdAt=serverTimestamp(); await addDoc(collection(db,'services'), data); }
     bootstrap.Modal.getInstance(document.getElementById('svcModal')).hide();
   });
