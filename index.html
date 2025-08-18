@@ -267,6 +267,48 @@
   </div>
 </div>
 
+<!-- Service Detail Modal -->
+<div class="modal fade" id="serviceDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title" id="svcTitle">รายละเอียดบริการ</h5>
+          <div class="text-muted small" id="svcCategory"></div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <p id="svcDetail" class="mb-3"></p>
+
+        <!-- Tags -->
+        <div id="svcTags" class="d-flex flex-wrap gap-2 mb-3"></div>
+
+        <!-- Works carousel -->
+        <div id="svcCarouselWrap" class="mb-2" hidden>
+          <div id="svcCarousel" class="carousel slide" data-bs-ride="false">
+            <div class="carousel-inner" id="svcCarouselInner"></div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#svcCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">ก่อนหน้า</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#svcCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">ถัดไป</span>
+            </button>
+          </div>
+          <div class="text-muted small mt-1">สไลด์ดูรูปผลงาน</div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+      </div>
+    </div>
+  </div>
+</div>
+  
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="firebase-init.js"></script>
 <script type="module" src="public.js"></script>
