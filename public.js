@@ -448,3 +448,54 @@ async function setupChat(user){
     await updateDoc(doc(db,'chatThreads', currentThreadId), { unreadUser: 0 });
   }
 }
+
+// ---- Service detail modal ----
+async function openServiceDetail(id) {
+  try {
+    const snap = await getDoc(doc(db, 'services', id));
+    if (!snap.exists()) throw new Error('Service not found');
+    const d = snap.data() || {};
+
+    // title / category / detail (ยาว)
+    document.getElementById('svcTitle').textContent = d.name || 'รายละเอียดบริการ';
+    document.getElementById('svcCategory').textContent = d.category || '';
+    document.getElementById('svcDetail').textContent = d.detail || d.longDescription || d.description || '';
+
+    // tags (array of string)
+    const tagsWrap = document.getElementById('svcTags');
+    const tags = Array.isArray(d.tags) ? d.tags : [];
+    tagsWrap.innerHTML = tags.map(t => `<span class="badge rounded-pill text-bg-secondary">${t}</span>`).join('');
+
+    // works (array of image urls) -> carousel
+    const works = Array.isArray(d.works) ? d.works.filter(Boolean) : [];
+    const carWrap = document.getElementById('svcCarouselWrap');
+    const inner = document.getElementById('svcCarouselInner');
+    if (works.length) {
+      inner.innerHTML = works.map((url, i) => `
+        <div class="carousel-item ${i === 0 ? 'active' : ''}">
+          <img class="d-block w-100" src="${url}" alt="work-${i+1}">
+        </div>
+      `).join('');
+      carWrap.hidden = false;
+    } else {
+      inner.innerHTML = '';
+      carWrap.hidden = true;
+    }
+
+    // show modal
+    const modalEl = document.getElementById('serviceDetailModal');
+    const m = bootstrap.Modal.getOrCreateInstance(modalEl);
+    m.show();
+  } catch (err) {
+    console.error(err);
+    alert('ไม่สามารถเปิดรายละเอียดบริการได้');
+  }
+}
+
+// event delegation for "ดูรายละเอียด"
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.svc-detail');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  if (id) openServiceDetail(id);
+});
