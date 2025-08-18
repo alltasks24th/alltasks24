@@ -65,83 +65,23 @@ function bindRealtime(){
   });
 
   onSnapshot(collection(db,'services'), snap=>{
-  const wrap = document.getElementById('service-cards');
-  const mods = document.getElementById('service-modals');
-  if(!wrap) return;
-  wrap.innerHTML='';
-  if (mods) mods.innerHTML='';
-
-  snap.forEach(s=>{
-    const d = s.data() || {};
-    const id = s.id;
-    const name = d.name || '';
-    const category = d.category || '';
-    const desc = d.description || '';
-    const cover = d.imageUrl || 'https://images.unsplash.com/photo-1487014679447-9f8336841d58?q=80&w=1400&auto=format&fit=crop';
-    const tags = Array.isArray(d.tags) ? d.tags : [];
-    const gallery = Array.isArray(d.gallery) ? d.gallery : [];
-
-    // Card with tags and detail button
-    wrap.insertAdjacentHTML('beforeend', `
-      <div class="col-md-4">
+    const wrap = document.getElementById('service-cards'); if(!wrap) return; wrap.innerHTML='';
+    snap.forEach(s=>{
+      const d=s.data();
+      wrap.insertAdjacentHTML('beforeend', `<div class="col-md-4">
         <div class="card card-clean h-100">
-          ${cover ? `<img src="${cover}" class="svc-thumb" alt="">` : ``}
-          <div class="card-body d-flex flex-column">
+          <img src="${d.imageUrl||'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1400&auto=format&fit=crop'}" class="svc-thumb" alt="">
+          <div class="card-body">
             <div class="d-flex align-items-center gap-2 mb-2">
               <div class="svc-icon"><i class="bi bi-stars"></i></div>
-              <h5 class="mb-0">${name}</h5>
+              <h5 class="mb-0">${d.name||''}</h5>
             </div>
-            <div class="text-muted small mb-1">${category}</div>
-            <div class="mb-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('')}</div>
-            <p class="text-muted flex-grow-1">${desc}</p>
-            <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#svc-${id}">ดูรายละเอียด</button>
+            <div class="text-muted small mb-1">${d.category||''}</div>
+            <p class="text-muted">${d.description||''}</p>
           </div>
-        </div>
-      </div>
-    `);
-
-    // Modal with optional gallery carousel
-    if (mods) {
-      const hasGallery = gallery.length > 0;
-      mods.insertAdjacentHTML('beforeend', `
-        <div class="modal fade" id="svc-${id}" tabindex="-1" aria-labelledby="svc-label-${id}" aria-hidden="true">
-          <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 id="svc-label-${id}" class="modal-title">${name}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
-              </div>
-              <div class="modal-body">
-                ${hasGallery ? `
-                  <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                      ${gallery.map((img,i)=>`
-                        <div class="carousel-item ${i===0?'active':''}">
-                          <img src="${img}" class="d-block w-100" alt="ผลงาน">
-                        </div>
-                      `).join('')}
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
-                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">ก่อนหน้า</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
-                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">ถัดไป</span>
-                    </button>
-                  </div>
-                ` : ``}
-                <div class="text-muted small mb-2">${category}</div>
-                <p style="white-space:pre-line">${desc}</p>
-                ${tags.length ? `<div class="mt-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('')}</div>` : ``}
-              </div>
-            </div>
-          </div>
-        </div>
-      `);
-    }
+        </div></div>`);
+    });
   });
-});});
 
   onSnapshot(collection(db,'serviceAreas'), snap=>{
     const ul = document.getElementById('area-list'); if(!ul) return; ul.innerHTML='';
