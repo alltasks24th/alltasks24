@@ -31,7 +31,7 @@ requireAdmin(async (user, role)=>{
       const id = e.target.closest('tr').dataset.id; const snap=await getDoc(doc(db,'services', id)); const v=snap.data();
       $('#svcId').value=id; $('#svcName').value=v.name||''; $('#svcCat').value=v.category||''; $('#svcImg').value=v.imageUrl||''; $('#svcDesc').value=v.description||'';
       // added: fill tags & gallery
-      try { 
+      try {
         document.getElementById('svcTags').value = Array.isArray(v.tags) ? v.tags.join(', ') : (v.tags || '');
         document.getElementById('svcGallery').value = Array.isArray(v.gallery) ? v.gallery.join('\n') : (v.gallery || '');
       } catch(e) {}
