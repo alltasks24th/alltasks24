@@ -437,3 +437,126 @@ async function setupChat(user){
     await updateDoc(doc(db,'chatThreads', currentThreadId), { unreadUser: 0 });
   }
 }
+
+// === ADD-ONLY: เสริมปุ่ม + ป๊อปอัป + สไลด์ + ป้ายกำกับ
+(function(){
+  const norm = s => (s||'').replace(/\s+/g,' ').trim().toLowerCase();
+
+  function ensureHost(){ 
+    let el = document.getElementById('service-modals'); 
+    if(!el){ el = document.createElement('div'); el.id = 'service-modals'; document.body.appendChild(el); }
+    return el; 
+  }
+
+  const pickTitle = card =>
+    (card.querySelector('h5')?.textContent ||
+     card.querySelector('.card-title')?.textContent ||
+     card.querySelector('h4')?.textContent ||
+     card.querySelector('h3')?.textContent || '').trim();
+
+  const pickCat = card =>
+    (card.querySelector('.text-muted')?.textContent ||
+     card.querySelector('.svc-cat')?.textContent || '').trim();
+
+  function ensureTags(body, tags){
+    if(!Array.isArray(tags) || !tags.length) return;
+    let holder = body.querySelector('[data-addon="tags"]');
+    if(!holder){
+      holder = document.createElement('div');
+      holder.setAttribute('data-addon','tags');
+      holder.className = 'mb-2';
+      const p = body.querySelector('p, .card-text');
+      if(p) body.insertBefore(holder, p); else body.appendChild(holder);
+    }
+    holder.innerHTML = tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('');
+  }
+
+  function ensureBtn(card, id){
+    if(card.querySelector('[data-addon="detail-btn"]')) return;
+    const b = card.querySelector('.card-body') || card;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-primary mt-2';
+    btn.setAttribute('data-addon','detail-btn');
+    btn.setAttribute('data-bs-toggle','modal');
+    btn.setAttribute('data-bs-target',`#svc-${id}`);
+    btn.textContent = 'ดูรายละเอียด';
+    b.appendChild(btn);
+  }
+
+  function upsertModal(svc){
+    const { id, name, category, description, tags=[], gallery=[] } = svc;
+    const has = Array.isArray(gallery) && gallery.length>0;
+    const gal = has ? `
+      <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          ${gallery.map((u,i)=>`
+            <div class="carousel-item ${i===0?'active':''}">
+              <img src="${u}" class="d-block w-100" alt="ผลงาน">
+            </div>`).join('')}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+          <span class="visually-hidden">ก่อนหน้า</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+          <span class="visually-hidden">ถัดไป</span>
+        </button>
+      </div>` : '';
+    const tHtml = tags.length ? `<div class="mt-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('')}</div>` : '';
+
+    const html = `
+      <div class="modal fade" id="svc-${id}" tabindex="-1" aria-labelledby="svc-label-${id}" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 id="svc-label-${id}" class="modal-title">${name||''}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+            </div>
+            <div class="modal-body">
+              ${gal}
+              <div class="text-muted small mb-2">${category||''}</div>
+              <p style="white-space:pre-line">${description||''}</p>
+              ${tHtml}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    const h = ensureHost();
+    const exist = document.getElementById(`svc-${id}`);
+    if(exist) exist.outerHTML = html; else h.insertAdjacentHTML('beforeend', html);
+  }
+
+  function run(){
+    const wrap = document.getElementById('service-cards'); if(!wrap) return;
+    onSnapshot(collection(db,'services'), snap=>{
+      const byKey = new Map();
+      snap.forEach(d=>{
+        const v = d.data()||{};
+        const item = {
+          id: d.id,
+          name: v.name||'',
+          category: v.category||'',
+          description: v.description||'',
+          tags: Array.isArray(v.tags)?v.tags:[],
+          gallery: Array.isArray(v.gallery)?v.gallery:[]
+        };
+        byKey.set(norm(item.name)+'|'+norm(item.category), item);
+      });
+
+      wrap.querySelectorAll('.card').forEach(card=>{
+        const key = norm(pickTitle(card))+'|'+norm(pickCat(card));
+        const svc = byKey.get(key);
+        if(!svc) return;
+        const body = card.querySelector('.card-body') || card;
+        ensureTags(body, svc.tags);
+        upsertModal(svc);
+        ensureBtn(card, svc.id);
+      });
+    });
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+})();
