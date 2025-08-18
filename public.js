@@ -437,3 +437,76 @@ async function setupChat(user){
     await updateDoc(doc(db,'chatThreads', currentThreadId), { unreadUser: 0 });
   }
 }
+
+
+// ==== Service Modal Rendering (append-only) ====
+function renderServiceModal(svc) {
+  const modalId = 'svc-modal-' + svc.id;
+  const gallerySlides = (svc.gallery && svc.gallery.length) ? svc.gallery.map((url,idx)=>`
+        <div class="carousel-item ${idx===0?'active':''}">
+          <img src="${url}" class="d-block w-100 rounded" alt="ผลงาน ${idx+1}">
+        </div>`).join('') : '<div class="text-muted p-3">ไม่มีรูปผลงาน</div>';
+  const galleryHtml = (svc.gallery && svc.gallery.length) ? `
+      <div id="${modalId}-carousel" class="carousel slide mb-3">
+        <div class="carousel-inner">
+          ${gallerySlides}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#${modalId}-carousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#${modalId}-carousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+      </div>` : '';
+
+  return `
+  <div class="modal fade" id="${modalId}" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">${svc.name||''}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>${svc.description||''}</p>
+          ${svc.tags && svc.tags.length ? `<p><span class="badge bg-secondary me-1">${svc.tags.join('</span> <span class="badge bg-secondary me-1">')}</span></p>` : ''}
+          ${galleryHtml}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderServiceCard(svc) {
+  const modalId = 'svc-modal-' + svc.id;
+  return `
+    <div class="col-md-4 mb-3">
+      <div class="card h-100">
+        <img src="${svc.image||'https://via.placeholder.com/400x200?text=Service'}" class="card-img-top" alt="${svc.name||''}">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">${svc.name||''}</h5>
+          <p class="card-text text-truncate">${svc.description||''}</p>
+          <button class="btn btn-primary mt-auto" data-bs-toggle="modal" data-bs-target="#${modalId}">ดูรายละเอียด</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// Patch the rendering loop
+async function loadServices() {
+  const q = query(collection(db,'services'), orderBy('createdAt','desc'));
+  const qs = await getDocs(q);
+  const cards = [];
+  const modals = [];
+  qs.forEach(docSnap=>{
+    const svc = Object.assign({id:docSnap.id}, docSnap.data());
+    cards.push(renderServiceCard(svc));
+    modals.push(renderServiceModal(svc));
+  });
+  document.getElementById('service-cards').innerHTML = cards.join('\n');
+  const modalsWrap = document.getElementById('service-modals');
+  if(modalsWrap) modalsWrap.innerHTML = modals.join('\n');
+}
+
+document.addEventListener('DOMContentLoaded', loadServices);
+// ==== End Service Modal Rendering ====
