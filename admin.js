@@ -40,6 +40,9 @@ try {
     }));
   });
   $('#svcSave').addEventListener('click', async ()=>{
+  const tags=(document.getElementById('svcTags')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const gallery=(document.getElementById('svcGallery')?.value||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+
   // ADD-ONLY: normalize tags/gallery to arrays
   const tags = (document.getElementById('svcTags')?.value || '')
     .split(',').map(s=>s.trim()).filter(Boolean);

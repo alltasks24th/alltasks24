@@ -542,11 +542,11 @@ async function setupChat(user){
           tags: Array.isArray(v.tags)?v.tags:[],
           gallery: Array.isArray(v.gallery)?v.gallery:[]
         };
-        byKey.set(norm(item.name)+'|'+norm(item.category), item);
+        byKey.set(norm(item.name), item);
       });
 
       wrap.querySelectorAll('.card').forEach(card=>{
-        const key = norm(pickTitle(card))+'|'+norm(pickCat(card));
+        const key = norm(pickTitle(card));
         const svc = byKey.get(key);
         if(!svc) return;
         const body = card.querySelector('.card-body') || card;
