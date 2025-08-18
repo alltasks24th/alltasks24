@@ -64,25 +64,36 @@ function bindRealtime(){
     const lbl = document.getElementById('promo-range-label'); if(lbl) lbl.textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})` : 'ยังไม่มีโปรโมชันที่ใช้งาน';
   });
 
-  onSnapshot(collection(db,'services'), snap=>{
-    const wrap = document.getElementById('service-cards'); if(!wrap) return; wrap.innerHTML='';
-    snap.forEach(s=>{
-      const d=s.data();
-      wrap.insertAdjacentHTML('beforeend', `<div class="col-md-4">
+// Services — render + detail button
+onSnapshot(collection(db, 'services'), snap => {
+  const wrap = document.getElementById('service-cards');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  snap.forEach(s => {
+    const d = s.data() || {};
+    const id = s.id;
+    wrap.insertAdjacentHTML('beforeend', `
+      <div class="col-md-4">
         <div class="card card-clean h-100">
-          <img src="${d.imageUrl||'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1400&auto=format&fit=crop'}" class="svc-thumb" alt="">
+          <img src="${d.imageUrl || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1400&auto=format&fit=crop'}" class="svc-thumb" alt="">
           <div class="card-body">
             <div class="d-flex align-items-center gap-2 mb-2">
               <div class="svc-icon"><i class="bi bi-stars"></i></div>
-              <h5 class="mb-0">${d.name||''}</h5>
+              <h5 class="mb-0">${d.name || ''}</h5>
             </div>
-            <div class="text-muted small mb-1">${d.category||''}</div>
-            <p class="text-muted">${d.description||''}</p>
+            <div class="text-muted small mb-1">${d.category || ''}</div>
+            <p class="text-muted">${d.description || ''}</p>
+            <button class="btn btn-outline-primary btn-sm svc-detail" data-id="${id}">
+              ดูรายละเอียด
+            </button>
           </div>
-        </div></div>`);
-    });
+        </div>
+      </div>
+    `);
   });
-
+});
+  
   onSnapshot(collection(db,'serviceAreas'), snap=>{
     const ul = document.getElementById('area-list'); if(!ul) return; ul.innerHTML='';
     snap.forEach(a=>{ const d=a.data(); ul.insertAdjacentHTML('beforeend', `<li class="list-group-item d-flex justify-content-between"><span>${d.name||''}</span><span class="text-muted small">${d.province||''}</span></li>`); });
