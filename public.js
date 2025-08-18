@@ -64,36 +64,25 @@ function bindRealtime(){
     const lbl = document.getElementById('promo-range-label'); if(lbl) lbl.textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})` : 'ยังไม่มีโปรโมชันที่ใช้งาน';
   });
 
-// Services — render + detail button
-onSnapshot(collection(db, 'services'), snap => {
-  const wrap = document.getElementById('service-cards');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-
-  snap.forEach(s => {
-    const d = s.data() || {};
-    const id = s.id;
-    wrap.insertAdjacentHTML('beforeend', `
-      <div class="col-md-4">
+  onSnapshot(collection(db,'services'), snap=>{
+    const wrap = document.getElementById('service-cards'); if(!wrap) return; wrap.innerHTML='';
+    snap.forEach(s=>{
+      const d=s.data();
+      wrap.insertAdjacentHTML('beforeend', `<div class="col-md-4">
         <div class="card card-clean h-100">
-          <img src="${d.imageUrl || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1400&auto=format&fit=crop'}" class="svc-thumb" alt="">
+          <img src="${d.imageUrl||'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1400&auto=format&fit=crop'}" class="svc-thumb" alt="">
           <div class="card-body">
             <div class="d-flex align-items-center gap-2 mb-2">
               <div class="svc-icon"><i class="bi bi-stars"></i></div>
-              <h5 class="mb-0">${d.name || ''}</h5>
+              <h5 class="mb-0">${d.name||''}</h5>
             </div>
-            <div class="text-muted small mb-1">${d.category || ''}</div>
-            <p class="text-muted">${d.description || ''}</p>
-            <button class="btn btn-outline-primary btn-sm svc-detail" data-id="${id}">
-              ดูรายละเอียด
-            </button>
+            <div class="text-muted small mb-1">${d.category||''}</div>
+            <p class="text-muted">${d.description||''}</p>
           </div>
-        </div>
-      </div>
-    `);
+        </div></div>`);
+    });
   });
-});
-  
+
   onSnapshot(collection(db,'serviceAreas'), snap=>{
     const ul = document.getElementById('area-list'); if(!ul) return; ul.innerHTML='';
     snap.forEach(a=>{ const d=a.data(); ul.insertAdjacentHTML('beforeend', `<li class="list-group-item d-flex justify-content-between"><span>${d.name||''}</span><span class="text-muted small">${d.province||''}</span></li>`); });
@@ -448,54 +437,3 @@ async function setupChat(user){
     await updateDoc(doc(db,'chatThreads', currentThreadId), { unreadUser: 0 });
   }
 }
-
-// ---- Service detail modal ----
-async function openServiceDetail(id) {
-  try {
-    const snap = await getDoc(doc(db, 'services', id));
-    if (!snap.exists()) throw new Error('Service not found');
-    const d = snap.data() || {};
-
-    // title / category / detail (ยาว)
-    document.getElementById('svcTitle').textContent = d.name || 'รายละเอียดบริการ';
-    document.getElementById('svcCategory').textContent = d.category || '';
-    document.getElementById('svcDetail').textContent = d.detail || d.longDescription || d.description || '';
-
-    // tags (array of string)
-    const tagsWrap = document.getElementById('svcTags');
-    const tags = Array.isArray(d.tags) ? d.tags : [];
-    tagsWrap.innerHTML = tags.map(t => `<span class="badge rounded-pill text-bg-secondary">${t}</span>`).join('');
-
-    // works (array of image urls) -> carousel
-    const works = Array.isArray(d.works) ? d.works.filter(Boolean) : [];
-    const carWrap = document.getElementById('svcCarouselWrap');
-    const inner = document.getElementById('svcCarouselInner');
-    if (works.length) {
-      inner.innerHTML = works.map((url, i) => `
-        <div class="carousel-item ${i === 0 ? 'active' : ''}">
-          <img class="d-block w-100" src="${url}" alt="work-${i+1}">
-        </div>
-      `).join('');
-      carWrap.hidden = false;
-    } else {
-      inner.innerHTML = '';
-      carWrap.hidden = true;
-    }
-
-    // show modal
-    const modalEl = document.getElementById('serviceDetailModal');
-    const m = bootstrap.Modal.getOrCreateInstance(modalEl);
-    m.show();
-  } catch (err) {
-    console.error(err);
-    alert('ไม่สามารถเปิดรายละเอียดบริการได้');
-  }
-}
-
-// event delegation for "ดูรายละเอียด"
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest('.svc-detail');
-  if (!btn) return;
-  const id = btn.dataset.id;
-  if (id) openServiceDetail(id);
-});
