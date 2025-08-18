@@ -64,7 +64,8 @@ function bindRealtime(){
     const lbl = document.getElementById('promo-range-label'); if(lbl) lbl.textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})` : 'ยังไม่มีโปรโมชันที่ใช้งาน';
   });
 
-  onSnapshot(collection(db,'services'), snap=>{
+  /* LEGACY SERVICES RENDER — DISABLED START */
+onSnapshot(collection(db,'services'), snap=>{
     const wrap = document.getElementById('service-cards'); if(!wrap) return; wrap.innerHTML='';
     snap.forEach(s=>{
       const d=s.data();
@@ -81,7 +82,8 @@ function bindRealtime(){
           </div>
         </div></div>`);
     });
-  });
+  /* LEGACY SERVICES RENDER — DISABLED END */
+});
 
   onSnapshot(collection(db,'serviceAreas'), snap=>{
     const ul = document.getElementById('area-list'); if(!ul) return; ul.innerHTML='';
