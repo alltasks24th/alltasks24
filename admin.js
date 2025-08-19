@@ -532,7 +532,16 @@ document.getElementById('bannerModal')?.addEventListener('hidden.bs.modal', rese
   });
 
   document.getElementById('productForm')?.addEventListener('submit', async (e)=>{
-    e.preventDefault();
+  e.preventDefault();
+  try {
+    // ตรวจช่องจำเป็นเองอีกชั้น เพื่อให้มีข้อความชัดเจน
+    if (!F.name.value.trim()) { alert('กรุณากรอกชื่อสินค้า'); F.name.focus(); return; }
+    if (!F.price.value) { alert('กรุณากรอกราคา'); F.price.focus(); return; }
+
+    // ปิดปุ่มระหว่างบันทึก (กันกดซ้ำ)
+    F.btnSave.disabled = true;
+    F.btnSave.innerHTML = 'กำลังบันทึก...';
+
     const data = {
       name: F.name.value.trim(),
       desc: F.desc.value.trim(),
@@ -554,6 +563,7 @@ document.getElementById('bannerModal')?.addEventListener('hidden.bs.modal', rese
       isActive: F.isActive.checked,
       updatedAt: Timestamp.now()
     };
+
     if (!F.id.value){
       data.createdAt = Timestamp.now();
       const ref = await addDoc(collection(db,'products'), data);
@@ -561,8 +571,18 @@ document.getElementById('bannerModal')?.addEventListener('hidden.bs.modal', rese
     } else {
       await updateDoc(doc(collection(db,'products'), F.id.value), data);
     }
+
     alert('บันทึกแล้ว');
-  });
+    // อยากให้ฟอร์มพร้อมเพิ่มรายการใหม่ต่อได้เลย
+    fillForm(null);
+  } catch (err) {
+    console.error('[product save error]', err);
+    alert('บันทึกไม่สำเร็จ: ' + (err?.message || err));
+  } finally {
+    F.btnSave.disabled = false;
+    F.btnSave.textContent = 'บันทึก';
+  }
+});
 
   // ตาราง realtime เรียงตาม rank
   onSnapshot(query(collection(db,'products'), orderBy('rank','asc')), snap=>{
