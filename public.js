@@ -632,3 +632,58 @@ document.addEventListener('click', (e) => {
   });
   obs.observe(document.documentElement, { childList: true, subtree: true });
 })();
+
+// === SITE CONTACT (ตั้งค่าครั้งเดียว; เว้นว่างไว้ = ไม่แสดงปุ่มนั้น) ===
+window.SITE_PHONE = '098-000-0000';                 // เบอร์โทร
+window.SITE_LINE_URL = 'https://line.me/ti/p/xxxx';  // ลิงก์ LINE
+window.SITE_FB_URL   = 'https://www.facebook.com/yourpage'; // ลิงก์เพจ FB (ถ้าเว้นว่างจะกลายเป็นปุ่ม "แชร์")
+
+// === เพิ่มปุ่ม โทร / LINE / Facebook ในโมดอลบริการ (ADD-ONLY, ไม่แตะของเดิม) ===
+(function(){
+  function addContactButtons(modal){
+    if(!modal || modal.querySelector('[data-addon="contact-cta"]')) return;
+    const body = modal.querySelector('.modal-body'); if(!body) return;
+
+    const phone = window.SITE_PHONE || '';
+    const line  = window.SITE_LINE_URL || '';
+    const fb    = window.SITE_FB_URL || '';
+
+    let html = '';
+    if (phone) html += `<a href="tel:${phone}" class="btn btn-outline-success"><i class="bi bi-telephone"></i> โทร</a>`;
+    if (line)  html += `<a href="${line}" target="_blank" rel="noopener" class="btn btn-outline-success"><i class="bi bi-chat-dots"></i> LINE</a>`;
+    if (fb)    html += `<a href="${fb}" target="_blank" rel="noopener" class="btn btn-outline-primary"><i class="bi bi-facebook"></i> Facebook</a>`;
+    else       html += `<button type="button" class="btn btn-outline-primary" data-share="facebook"><i class="bi bi-facebook"></i> แชร์ Facebook</button>`;
+
+    const wrap = document.createElement('div');
+    wrap.setAttribute('data-addon','contact-cta');
+    wrap.className = 'd-flex flex-wrap gap-2 mt-3';
+    wrap.innerHTML = html;
+    body.appendChild(wrap);
+  }
+
+  // ใส่ปุ่มเมื่อโมดอลถูกเปิด (Bootstrap data-API)
+  document.addEventListener('shown.bs.modal', e=>{
+    const m = e.target;
+    if(m && /^svc-/.test(m.id)) addContactButtons(m);
+  });
+
+  // รองรับกรณีเพิ่มโมดอลแบบไดนามิก
+  const obs = new MutationObserver(list=>{
+    for (const mu of list){
+      mu.addedNodes && mu.addedNodes.forEach(n=>{
+        if(n.nodeType===1 && n.matches?.('.modal[id^="svc-"]')) addContactButtons(n);
+      });
+    }
+  });
+  obs.observe(document.body, {childList:true, subtree:true});
+
+  // ปุ่มแชร์ FB (กรณีไม่ตั้งลิงก์เพจ)
+  document.addEventListener('click', e=>{
+    const b = e.target.closest('[data-share="facebook"]');
+    if(!b) return;
+    e.preventDefault();
+    const u = encodeURIComponent(location.href);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${u}`,
+      '_blank','noopener,noreferrer,width=640,height=480');
+  });
+})();
