@@ -127,6 +127,91 @@
   .product-card { position: relative; }
   .sale-badge  { position:absolute; top:12px; left:12px; z-index:5; }
 </style>
+
+<script type="module">
+  import { db } from './firebase-init.js';
+  import {
+    collection, query, where, orderBy, limit, getDocs
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  const wrap     = document.getElementById('home-products');
+  const skeleton = document.getElementById('home-products-skeleton');
+  const empty    = document.getElementById('home-products-empty');
+  const error    = document.getElementById('home-products-error');
+
+  function badge(tags) {
+    if (!Array.isArray(tags) || !tags.length) return '';
+    return `<div class="d-flex flex-wrap gap-1 mb-2">
+      ${tags.slice(0,3).map(t=>`<span class="badge bg-light text-dark border">#${t}</span>`).join('')}
+    </div>`;
+  }
+
+  async function loadHomeProductsThree(){
+    try{
+      const q = query(
+        collection(db, 'products'),
+        where('isActive','==', true),
+        orderBy('featured','desc'),
+        orderBy('rank','desc'),
+        limit(3)
+      );
+      const snap = await getDocs(q);
+
+      // ซ่อนสเกลตันก่อน
+      skeleton.classList.add('d-none');
+
+      if (snap.empty){
+        empty.classList.remove('d-none');
+        return;
+      }
+
+      const frag = document.createDocumentFragment();
+
+      snap.forEach(doc=>{
+        const p = doc.data();
+
+        const price0 = Number(p.price || 0);
+        const saleB  = Number(p.sale  || 0);
+        const price  = Math.max(0, price0 - saleB);
+
+        const pct = price0 > 0 ? Math.round(((price0 - price) / price0) * 100) : 0;
+
+        const images = Array.isArray(p.images) ? p.images : [];
+        const cover  = p.cover || images[0] || 'assets/placeholder.jpg';
+
+        const col = document.createElement('div');
+        col.className = 'col-12 col-md-4';
+        col.innerHTML = `
+<div class="card product-card h-100 shadow-sm">
+  ${pct > 0 ? `<span class="badge text-bg-danger sale-badge">ลด ${pct}%</span>` : ''}
+  <img src="${cover}" class="card-img-top object-fit-cover" style="height:180px" alt="">
+  <div class="card-body">
+    <h5 class="card-title mb-1 line-clamp-2">${p.name || '-'}</h5>
+    <div class="small text-muted">${p.location || ''}</div>
+    <div class="my-2">
+      ${pct>0 ? `<span class="text-decoration-line-through text-muted me-1">฿${price0.toLocaleString()}</span>` : ''}
+      <strong class="text-danger">฿${price.toLocaleString()}</strong>
+    </div>
+    ${badge(p.tags)}
+    <a href="shop.html?id=${doc.id}" class="btn btn-primary w-100">ดูรายละเอียด</a>
+  </div>
+</div>`;
+        frag.appendChild(col);
+      });
+
+      wrap.appendChild(frag);
+      wrap.classList.remove('d-none');
+    }catch(e){
+      console.error(e);
+      skeleton.classList.add('d-none');
+      error.classList.remove('d-none');
+      error.textContent = 'โหลดข้อมูลไม่สำเร็จ';
+    }
+  }
+
+  // โหลดทันทีเมื่ออยู่หน้าแรก
+  if (wrap) loadHomeProductsThree();
+</script>
     
     <section id="map" class="mb-5">
       <h2 class="section-title mb-3">พื้นที่ให้บริการ + แผนที่</h2>
