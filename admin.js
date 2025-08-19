@@ -459,3 +459,20 @@ onSnapshot(
     });
   }
 );
+
+// รีเซ็ตฟอร์มแบนเนอร์ (ให้แน่ใจว่า banId ว่างเสมอเวลาจะ "เพิ่ม")
+function resetBannerForm(){
+  const $ = (s,r=document)=>r.querySelector(s);
+  $('#banId').value = '';
+  $('#banTitle').value = '';
+  $('#banSub').value = '';
+  $('#banImg').value = '';
+}
+
+// 1) กดปุ่ม "เพิ่มสไลด์" -> ล้างฟอร์มก่อนเปิดโมดอล
+document.querySelectorAll('#tab-banners [data-bs-target="#bannerModal"]').forEach(btn=>{
+  btn.addEventListener('click', resetBannerForm);
+});
+
+// 2) ปิดโมดอลเมื่อไหร่ -> ล้างทิ้งด้วย กันค่าค้าง
+document.getElementById('bannerModal')?.addEventListener('hidden.bs.modal', resetBannerForm);
