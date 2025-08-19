@@ -129,6 +129,18 @@
   .skeleton-card{height:280px; background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 37%,#f3f4f6 63%); background-size:400% 100%; animation:sk 1.2s infinite;}
   @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    // เรียกใช้ฟังก์ชันจาก public.js (หัวข้อข้อ 2)
+    await window.App.initFirebaseOnce();
+    window.App.renderHomeProducts('#home-products', {
+      limit: 3,          // โชว์ 3 ชิ้นบนหน้าแรก
+      onlyActive: true,  // เอาเฉพาะที่เปิดแสดง
+      onlyFeatured: true // ถ้าติ๊ก “แนะนำ” ในหลังบ้านจะถูกดึงก่อน
+    });
+  });
+</script>
     
     <section id="map" class="mb-5">
       <h2 class="section-title mb-3">พื้นที่ให้บริการ + แผนที่</h2>
