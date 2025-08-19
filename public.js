@@ -5,7 +5,7 @@ const SERVICES_LIMIT_HOME = 3;
 import { auth, db, ensureAnonAuth } from './firebase-init.js';
 import {
   collection, doc, getDoc, getDocs, addDoc, onSnapshot,
-  query, where, orderBy, serverTimestamp, increment, updateDoc, limit
+  query, where, orderBy, serverTimestamp, increment, updateDoc
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 import { $ } from './utils.js';
 
@@ -688,107 +688,108 @@ window.SITE_FB_URL   = 'https://www.facebook.com/share/16Qd9wh7h4/'; // ลิ�
   });
 })();
 
-// ===== HOME: เรนเดอร์สินค้า 3 ชิ้น (สคีมเดียวกับ shop: price + sale) =====
-function cardFromShopItem(d, id){
-  const price = Number(d.price || 0);
-  const sale  = Number(d.sale  || 0);
-  const hasSale = sale > 0 && sale < price;
-  const pct  = hasSale ? Math.round((1 - (sale/price)) * 100) : 0;
+/* ===== HOME: เรนเดอร์สินค้า 3 ชิ้น (ถัดจากบริการ) ===== */
+async function renderHomeProducts() {
+  const wrap = document.getElementById('product-cards');
+  const mods = document.getElementById('product-modals');
+  if (!wrap || !mods) return; // ถ้าไม่มี container ให้ข้าม
 
-  const imgs = Array.isArray(d.images) ? d.images : (d.images ? [d.images] : []);
-  const cover = imgs[0] || d.image || 'assets/img/placeholder-16x9.png';
+  try {
+    const snap = await getDocs(query(
+      collection(db, 'products'),
+      where('isActive','==', true),
+      where('featured','==', true),
+      orderBy('rank','asc')
+    ));
 
-  const flags = [];
-  if (d.featured) flags.push('แนะนำ');
-  if (d.hot)      flags.push('ฮิต');
-  if (d.isNew)    flags.push('ใหม่');
+    wrap.innerHTML = '';
+    mods.innerHTML = '';
 
-  const stockTxt = (d.stock===0) ? 'สินค้าหมด' : (d.stock>0 ? `คงเหลือ ${d.stock}` : '');
-  const startTxt = d.startAt ? `เริ่ม ${ (d.startAt?.toDate ? d.startAt.toDate():new Date(d.startAt)).toLocaleString('th-TH') }` : '';
+    const docs = snap.docs.slice(0, 3); // โชว์ 3 ชิ้นแรกตาม rank
+    docs.forEach(docSnap => {
+      const d = docSnap.data(); const id = docSnap.id;
 
-  return `
-  <div class="col-12 col-md-4">
-    <div class="card h-100 product-card shadow-sm">
-      <div class="position-relative">
-        ${pct>0 ? `<span class="badge bg-danger sale-badge">ลด ${pct}%</span>` : ``}
-        ${d.stock===0 ? `<span class="badge bg-secondary position-absolute" style="right:12px; top:12px; z-index:5;">สินค้าหมด</span>` : ``}
-        <img src="${cover}" class="card-img-top object-fit-cover" alt="${d.name||''}">
-      </div>
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">${d.name||'-'}</h5>
+      const toDate = (v)=> v?.toDate ? v.toDate() : (v ? new Date(v) : null);
+      const now = new Date();
+      const saleOn = (typeof d.salePrice === 'number')
+        && (!d.saleStart || toDate(d.saleStart) <= now)
+        && (!d.saleEnd   || now <= toDate(d.saleEnd))
+        && d.salePrice < d.price;
 
-        <div class="mb-2">
-          ${hasSale
-            ? `<span class="text-muted text-decoration-line-through me-2">${price.toLocaleString()}฿</span>
-               <span class="fw-bold text-danger">${sale.toLocaleString()}฿</span>`
-            : `<span class="fw-bold">${price.toLocaleString()}฿</span>`}
+      const percent = (saleOn && d.price) ? Math.round((1 - (d.salePrice / d.price)) * 100) : 0;
+      const chips = (d.tags||[]).slice(0,5)
+        .map(t=>`<span class="badge text-bg-light border me-1 mb-1">#${t}</span>`).join('');
+
+      // การ์ดสินค้า (โทนใกล้กับการ์ดบริการ)
+      wrap.insertAdjacentHTML('beforeend', `
+        <div class="col-md-4">
+          <div class="card h-100 shadow-sm position-relative">
+            ${saleOn ? `<span class="badge bg-danger position-absolute top-0 start-0 m-2">ลด ${percent}%</span>` : ``}
+            ${d.cover ? `
+              <div class="ratio ratio-16x9">
+                <img src="${d.cover}" class="w-100 h-100 object-fit-cover rounded-top" alt="">
+              </div>` : ``}
+            <div class="card-body d-flex flex-column">
+              <h5 class="mb-1">${d.name||''}</h5>
+              <div class="fw-semibold mb-1">
+                ${saleOn
+                  ? `<del class="text-muted me-1">฿${(d.price||0).toLocaleString()}</del>
+                     <span class="text-danger">฿${(d.salePrice||0).toLocaleString()}</span>`
+                  : `฿${(d.price||0).toLocaleString()}${d.unit?` / ${d.unit}`:''}`}
+              </div>
+              <div class="mb-2 d-flex flex-wrap">${chips}</div>
+              <p class="text-muted flex-grow-1 line-clamp-2">${d.desc||''}</p>
+              <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#prod-${id}">
+                ดูรายละเอียด
+              </button>
+            </div>
+          </div>
         </div>
+      `);
 
-        <div class="small mb-2">
-          ${flags.map(f=>`<span class="badge bg-warning text-dark me-1">#${f}</span>`).join('')}
-          ${Array.isArray(d.tags)? d.tags.slice(0,3).map(t=>`<span class="badge bg-secondary me-1">#${t}</span>`).join(''):''}
+      // โมดอลรายละเอียด + สไลด์รูป
+      const gal = Array.isArray(d.gallery) ? d.gallery : [];
+      mods.insertAdjacentHTML('beforeend', `
+        <div class="modal fade" id="prod-${id}" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">${d.name||''}</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                ${gal.length?`
+                <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    ${gal.map((u,i)=>`
+                      <div class="carousel-item ${i===0?'active':''}">
+                        <img src="${u}" class="d-block w-100 rounded" alt="">
+                      </div>`).join('')}
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                  </button>
+                </div>`:''}
+                <div class="fw-semibold mb-2">
+                  ราคา: ${saleOn
+                    ? `<del>฿${(d.price||0).toLocaleString()}</del> <span class="text-danger">฿${(d.salePrice||0).toLocaleString()}</span>`
+                    : `฿${(d.price||0).toLocaleString()}${d.unit?` / ${d.unit}`:''}`}
+                </div>
+                <div class="small text-muted mb-2">${(d.tags||[]).join(' · ')}</div>
+                <p style="white-space:pre-line">${d.desc||''}</p>
+              </div>
+            </div>
+          </div>
         </div>
-
-        ${stockTxt || startTxt ? `<div class="text-muted small mb-2">${[stockTxt,startTxt].filter(Boolean).join(' • ')}</div>` : ''}
-
-        <a href="product.html?id=${encodeURIComponent(id)}" class="btn btn-primary mt-auto w-100">ดูรายละเอียด</a>
-      </div>
-    </div>
-  </div>`;
-}
-
-async function renderHomeProducts(){
-  const wrap = document.getElementById("home-products");
-  const skel = document.getElementById("home-products-skeleton");
-  const empty= document.getElementById("home-products-empty");
-  const err  = document.getElementById("home-products-error");
-  if (!wrap) return;
-
-  try{
-    const qRef = query(
-      collection(db,"products"),
-      where("isActive","==", true),
-      orderBy("rank","asc"),
-      limit(3)
-    );
-    const snap = await getDocs(qRef);
-    const items = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-
-    if(items.length===0){
-      skel?.classList.add("d-none"); empty?.classList.remove("d-none"); return;
-    }
-    wrap.innerHTML = items.map(it => cardFromShopItem(it, it.id)).join("");
-    wrap.classList.remove("d-none");
-    skel?.classList.add("d-none");
-  }catch(e){
-    console.error(e);
-    skel?.classList.add("d-none");
-    err?.classList.remove("d-none");
+      `);
+    });
+  } catch (err) {
+    console.error('load products failed:', err);
   }
 }
-document.addEventListener("DOMContentLoaded", renderHomeProducts);
 
-
-  try{
-    let q = App.db.collection('products');
-    if (opts.onlyActive)   q = q.where('isActive','==', true);
-    if (opts.onlyFeatured) q = q.where('featured','==', true);
-
-    // เรียงตาม rank (ตัวเลขยิ่งน้อยยิ่งขึ้นก่อน) ถ้าไม่มี rank จะ fallback เป็น createdAt ล่าสุด
-    q = q.orderBy('rank','asc').limit(opts.limit||3);
-
-    const snap = await q.get();
-    const html = snap.empty
-      ? '<div class="text-center text-muted py-5">ยังไม่มีสินค้า</div>'
-      : snap.docs.map(App.renderProductCard).join('');
-
-    $wrap.innerHTML = html;
-    $skel?.classList.add('d-none');
-    $wrap.classList.remove('d-none');
-  }catch(err){
-    console.error(err);
-    $wrap.innerHTML = '<div class="text-danger text-center py-5">โหลดข้อมูลไม่สำเร็จ</div>';
-    $skel?.classList.add('d-none');
-    $wrap.classList.remove('d-none');
-  }
-};
+// ให้ทำงานเมื่อ DOM พร้อม (ไม่ไปรบกวนของเดิม)
+document.addEventListener('DOMContentLoaded', renderHomeProducts);
