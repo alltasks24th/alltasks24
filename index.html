@@ -97,27 +97,37 @@
       <div class="row g-3" id="service-cards"></div>
     </section>
 
-    <!-- ====== สินค้าแนะนำ (อยู่ 'ถัดจาก' บริการ) ====== -->
-    <section id="products" class="py-5 bg-light">
-      <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h3 class="mb-0">สินค้าแนะนำ</h3>
-          <a href="shop.html" class="text-decoration-none">ดูทั้งหมด</a>
-        </div>
+<!-- ===== สินค้าแนะนำ (ดึงจาก /products เหมือน shop) ===== -->
+<section id="products" class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="mb-0">สินค้าแนะนำ</h3>
+      <a href="shop.html" class="text-decoration-none">ดูทั้งหมด</a>
+    </div>
 
-    <!-- การ์ดสินค้า 3 ชิ้น จะถูกเรนเดอร์มาที่นี่ -->
-        <div id="product-cards" class="row g-3"></div>
-    <!-- โมดอลรายละเอียดสินค้า -->
-        <div id="product-modals"></div>
-      </div>
-    </section>
+    <!-- สเกเลตันขณะโหลด -->
+    <div id="home-products-skeleton" class="row g-3">
+      <div class="col-md-4"><div class="card card-clean h-100 skeleton-card"></div></div>
+      <div class="col-md-4"><div class="card card-clean h-100 skeleton-card"></div></div>
+      <div class="col-md-4"><div class="card card-clean h-100 skeleton-card"></div></div>
+    </div>
 
-<!-- สไตล์สั้นๆ ใช้ร่วมกับการ์ด -->
+    <!-- รายการสินค้าจริง -->
+    <div id="home-products" class="row g-3 d-none"></div>
+  </div>
+</section>
+
 <style>
-  .line-clamp-2{
-    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  /* ให้ริบบิ้น “ลด 100%” ไม่หายเมื่อมีรูป */
+  .product-card { position: relative; }
+  .sale-badge {
+    position: absolute; top: .5rem; left: .5rem; z-index: 5;
+    background:#ef4444; color:#fff; font-weight:700; border-radius:.5rem; padding:.15rem .5rem;
+    box-shadow:0 2px 6px rgba(0,0,0,.18);
   }
-  .object-fit-cover{ object-fit:cover; }
+  .tag-badge { font-size:.75rem; background:#f3f4f6; border-radius:.5rem; padding:.15rem .4rem; margin-right:.25rem; }
+  .skeleton-card{height:280px; background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 37%,#f3f4f6 63%); background-size:400% 100%; animation:sk 1.2s infinite;}
+  @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
 </style>
     
     <section id="map" class="mb-5">
