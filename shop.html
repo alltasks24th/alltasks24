@@ -15,30 +15,47 @@
   <style>
     /* ================= Theme Sync (เน้น override ให้ชนะทุกที่) ================ */
     :root{
-      /* ถ้า styles.css มีตัวแปรเองอยู่แล้วจะถูกใช้ก่อน อันนี้ทำหน้าที่เป็น fallback */
-      --bs-primary: #6c2bd9;
-      --bs-primary-rgb: 108,43,217;
-      --page-bg: var(--site-bg, #F6F3FF); /* โทนพื้นหลังหน้าแรก (ม่วงอ่อน) */
+      --bs-primary-rgb: 111,60,255; /* #6f3cff ให้ตรงกับหน้าแรก */
+    }
+    body{
+      background: linear-gradient(180deg, #f6f2ff 0%, #faf9ff 40%, #ffffff 100%);
+    }
+    .hidden{ display:none!important; }
+
+    /* การ์ด/ภาพ */
+    .card{
+      border:1px solid rgba(var(--bs-primary-rgb), .08);
+      box-shadow: 0 10px 30px rgba(111,60,255,.06);
+      border-radius: 16px;
+    }
+    .ratio > img{ object-fit: cover; }
+
+    /* แถบหัว */
+    .page-head{
+      background: linear-gradient(180deg, #f4eeff 0%, #f9f7ff 100%);
+      border-bottom: 1px solid rgba(var(--bs-primary-rgb), .08);
     }
 
-    /* พื้นหลังทั้งหน้า */
-    body{ background: var(--page-bg) !important; }
-
-    /* Navbar ให้เป็นขาว + เส้นคั่นอ่อน */
-    .navbar{ border-bottom:1px solid rgba(0,0,0,.06); background:#fff !important; }
-    .navbar-brand{ font-weight:600; }
-
-    /* ข้อความซ้ายบนหัวเพจให้เป็นสี primary ตามธีม */
-    header .subtle{
-      color: rgba(var(--bs-primary-rgb), .95) !important;
-      font-weight: 600;
+    /* คอนโทรล */
+    .form-control, .form-select{
+      border-color: rgba(var(--bs-primary-rgb), .25);
+      background: #fff;
+    }
+    .btn.btn-primary{
+      background: rgb(var(--bs-primary-rgb));
+      border-color: rgb(var(--bs-primary-rgb));
+      box-shadow: 0 6px 16px rgba(111,60,255,.25);
+    }
+    .btn.btn-outline-secondary{
+      border-color: rgba(var(--bs-primary-rgb), .25);
+      color: rgb(var(--bs-primary-rgb));
+    }
+    .btn.btn-outline-secondary:hover{
+      background: rgb(var(--bs-primary-rgb));
+      color: #fff;
     }
 
-    /* การ์ด/เงา/มุม */
-    .card{ border:0 !important; box-shadow: 0 6px 16px rgba(17, 24, 39, .06); border-radius: 1rem; }
-    .card img{ border-top-left-radius:1rem; border-top-right-radius:1rem; }
-
-    /* ชิปแท็ก */
+    /* ป้ายแท็กที่คลิกค้นหาได้ */
     .tag-chip{
       cursor:pointer;
       --bs-badge-color: var(--bs-primary);
@@ -47,7 +64,14 @@
     }
 
     /* ป้ายลดราคา */
-    .badge-sale{ background:#dc3545 !important; }
+    .badge-sale{ background:#dc3545 !important; z-index:2; }
+    /* แท็ก/ชิป สถานะ */
+    .chip{ font-size:.8rem; border:1px solid rgba(var(--bs-primary-rgb),.25); background:#fff; color:var(--bs-primary); }
+    .chip-gray{ color:#555; border-color:#e5e7eb; }
+    .chip-danger{ color:#dc3545; border-color:#f1aeb5; }
+    .stock-ok{ color:#198754; }     /* เขียว */
+    .stock-low{ color:#fd7e14; }    /* ส้ม */
+    .stock-out{ color:#dc3545; }    /* แดง */
 
     .line-clamp-2{
       display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
@@ -56,114 +80,59 @@
 
     /* ปุ่มหลักทั้งหมด (ให้เป็นม่วง + เงา) */
     .btn.btn-primary{
-      background: var(--bs-primary) !important;
-      border-color: var(--bs-primary) !important;
-      color:#fff !important;
-      border-radius:.75rem !important;
-      box-shadow: 0 6px 12px rgba(var(--bs-primary-rgb), .18) !important;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0)) ,
+        #6f3cff;
+      border: 1px solid rgba(111,60,255,.2);
     }
-    .btn.btn-primary:hover,
-    .btn.btn-primary:focus{
-      background: rgba(var(--bs-primary-rgb), .9) !important;
-      border-color: rgba(var(--bs-primary-rgb), .9) !important;
-      color:#fff !important;
-    }
-
-    /* ปุ่มกรอบม่วง */
-    .btn.btn-outline-primary{
-      color: var(--bs-primary) !important;
-      border-color: var(--bs-primary) !important;
-      border-radius:.75rem !important;
-      background:#fff !important;
-    }
-    .btn.btn-outline-primary:hover,
-    .btn.btn-outline-primary:focus{
-      background: var(--bs-primary) !important;
-      border-color: var(--bs-primary) !important;
-      color:#fff !important;
-    }
-
-    /* ปุ่มค้นหา/ล้าง ในกรอง */
-    .input-group .btn{ border-radius:.75rem !important; }
-
-    /* Pagination */
-    .pager-wrap{ gap:1rem; }
-    .pager-wrap .btn{ min-width:110px; }
-    .pager-wrap .btn:disabled{ opacity:.45 !important; box-shadow:none !important; }
-
-    /* Spinner ให้เป็นสีธีม */
-    .spinner-border{ color: var(--bs-primary) !important; }
-
-    /* Loader เต็มจอ */
-    .page-loader{
-      position:fixed; inset:0;
-      background:#ffffffcc; backdrop-filter:saturate(120%) blur(2px);
-      display:flex; align-items:center; justify-content:center;
-      z-index:2000;
-    }
-    .hidden{ display:none!important; }
+    .btn.btn-primary:hover{ filter: brightness(.96); }
   </style>
 </head>
 <body>
-
-  <!-- Header -->
-  <header class="py-4">
+  <header class="page-head py-3">
     <div class="container">
-      <div class="d-flex align-items-end justify-content-between">
-        <div>
-          <div class="subtle small mb-1">รับจ้างสารพัด 24 ชั่วโมง</div>
-          <h3 class="mb-0">สินค้าทั้งหมด</h3>
-        </div>
-        <a href="index.html#products" class="btn btn-outline-primary btn-sm">กลับหน้าหลัก</a>
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <a class="btn btn-outline-secondary btn-sm" href="./"><i class="bi bi-arrow-left"></i> กลับหน้าแรก</a>
+        <h1 class="h4 mb-0">สินค้าทั้งหมด</h1>
+        <div class="small text-muted ms-auto" id="resultInfo">-</div>
       </div>
-      <div id="resultInfo" class="text-muted mt-2">กำลังโหลด...</div>
+
+      <div class="row g-2 mt-2">
+        <div class="col-md-5">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input id="q" class="form-control" placeholder="ค้นหาจากชื่อ/แท็ก">
+            <button id="btnClear" class="btn btn-outline-secondary">ล้าง</button>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select id="sort" class="form-select">
+            <option value="rank-asc">เรียงลำดับ (rank)</option>
+            <option value="price-asc">ราคาต่ำไปสูง</option>
+            <option value="price-desc">ราคาสูงไปต่ำ</option>
+            <option value="latest-desc">มาใหม่ล่าสุด</option>
+          </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-center gap-3">
+          <div class="form-check">
+            <input id="onlyFeatured" class="form-check-input" type="checkbox">
+            <label class="form-check-label" for="onlyFeatured">เฉพาะแนะนำ</label>
+          </div>
+          <div class="ms-auto small text-muted">
+            หน้า <span id="pageInfo">-</span>
+          </div>
+          <div class="btn-group" role="group">
+            <button id="prev" class="btn btn-outline-secondary btn-sm">ก่อนหน้า</button>
+            <button id="next" class="btn btn-outline-secondary btn-sm">ถัดไป</button>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="container pb-5">
-
-    <!-- Filters -->
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="row g-2 align-items-center">
-          <div class="col-md-5">
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-search"></i></span>
-              <input id="q" class="form-control" placeholder="ค้นหา (ชื่อ/แท็ก)">
-              <button id="btnClear" class="btn btn-outline-primary">ล้าง</button>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <select id="sort" class="form-select">
-              <option value="rank-asc">เรียงตามลำดับ (แนะนำก่อน)</option>
-              <option value="price-asc">ราคาต่ำ → สูง</option>
-              <option value="price-desc">ราคาสูง → ต่ำ</option>
-              <option value="latest-desc">มาใหม่ล่าสุด</option>
-            </select>
-          </div>
-          <div class="col-md-4 d-flex align-items-center gap-3">
-            <div class="form-check">
-              <input id="onlyFeatured" class="form-check-input" type="checkbox">
-              <label class="form-check-label" for="onlyFeatured">เฉพาะแนะนำ</label>
-            </div>
-            <div class="ms-auto small text-muted" id="activeTags"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Grid -->
-    <div id="grid" class="row g-3"></div>
-
-    <!-- Pagination -->
-    <div class="d-flex justify-content-center align-items-center mt-4 pager-wrap">
-      <button id="prevPage" class="btn btn-primary">
-        <i class="bi bi-chevron-left"></i> ก่อนหน้า
-      </button>
-      <div class="text-muted" id="pageInfo"></div>
-      <button id="nextPage" class="btn btn-primary">
-        ถัดไป <i class="bi bi-chevron-right"></i>
-      </button>
+  <main class="py-4">
+    <div class="container">
+      <div id="grid" class="row g-3"></div>
     </div>
 
     <!-- Modals -->
@@ -187,25 +156,35 @@
 
     import { db, ensureAnonAuth } from './firebase-init.js?v=shop2';
     import {
-      collection, query, where, orderBy, getDocs
+      collection, query, where, orderBy, getDocs, doc, getDoc
     } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-    const $  = (s,r=document)=>r.querySelector(s);
-    const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+    // ติดต่อจาก settings/public
+    let CONTACT = { phone:'', line:'', facebook:'' };
+    async function loadSettings(){
+      try{
+        const s = await getDoc(doc(db,'settings','public'));
+        if (s.exists()){
+          const d = s.data()||{};
+          CONTACT.phone = d.phone||'';
+          CONTACT.line  = d.line||'';
+          CONTACT.facebook = d.facebook||'';
+        }
+      }catch(_){ /* ignore */ }
+    }
 
     const els = {
-      q: $('#q'),
-      sort: $('#sort'),
-      onlyFeatured: $('#onlyFeatured'),
-      btnClear: $('#btnClear'),
-      grid: $('#grid'),
-      modals: $('#modals'),
-      resultInfo: $('#resultInfo'),
-      pageInfo: $('#pageInfo'),
-      prev: $('#prevPage'),
-      next: $('#nextPage'),
-      loader: $('#pageLoader'),
-      activeTags: $('#activeTags')
+      q:  document.getElementById('q'),
+      sort: document.getElementById('sort'),
+      onlyFeatured: document.getElementById('onlyFeatured'),
+      btnClear: document.getElementById('btnClear'),
+      grid: document.getElementById('grid'),
+      modals: document.getElementById('modals'),
+      prev: document.getElementById('prev'),
+      next: document.getElementById('next'),
+      pageInfo: document.getElementById('pageInfo'),
+      resultInfo: document.getElementById('resultInfo'),
+      loader: document.getElementById('pageLoader')
     };
 
     const PAGE_SIZE = 12;
@@ -222,8 +201,8 @@
         && (!d.saleStart || toDate(d.saleStart) <= now)
         && (!d.saleEnd   || now <= toDate(d.saleEnd))
         && d.salePrice < d.price;
-      const percent = (active && d.price) ? Math.round((1 - (d.salePrice/d.price))*100) : 0;
-      return {active, percent};
+      const percent = (active && d.price) ? Math.round((1 - (d.salePrice/d.price)) * 100) : 0;
+      return { active, percent };
     }
 
     function fmtPrice(d){
@@ -233,6 +212,42 @@
                 <span class="text-danger">฿${(d.salePrice||0).toLocaleString()}</span>${d.unit?` / ${d.unit}`:''}`;
       }
       return `฿${(d.price||0).toLocaleString()}${d.unit?` / ${d.unit}`:''}`;
+    }
+
+    function fmtDT(v){
+      const d = toDate(v);
+      return d ? d.toLocaleString('th-TH', { dateStyle:'short', timeStyle:'short' }) : '';
+    }
+
+    function stockInfo(d){
+      const n = Number(d.stock ?? -1);
+      if (Number.isNaN(n) || n < 0) return ''; // ไม่ได้ตั้งค่า
+      if (n === 0) return `<span class="stock-out"><i class="bi bi-x-circle"></i> สินค้าหมด</span>`;
+      const cls = n <= 3 ? 'stock-low' : 'stock-ok';
+      return `<span class="${cls}"><i class="bi bi-box-seam"></i> คงเหลือ ${n.toLocaleString()}</span>`;
+    }
+
+    function flagChips(d){
+      const chips = [];
+      if (d.featured)     chips.push('<span class="badge chip rounded-pill me-1 mb-1">แนะนำ</span>');
+      if (d.isBestSeller) chips.push('<span class="badge chip-danger rounded-pill me-1 mb-1">ฮิต</span>');
+      if (d.isNew)        chips.push('<span class="badge chip rounded-pill me-1 mb-1">ใหม่</span>');
+      if (d.freeShip)     chips.push('<span class="badge chip-gray rounded-pill me-1 mb-1">ส่งฟรี</span>');
+      return chips.join('');
+    }
+
+    function contactButtons(){
+      const phone = (CONTACT.phone||'').trim();
+      const line  = (CONTACT.line||'').trim();
+      const fb    = (CONTACT.facebook||'').trim();
+      let html = '';
+      if (phone) html += `<a href="tel:${phone}" class="btn btn-outline-success"><i class="bi bi-telephone"></i> โทร</a>`;
+      if (line){
+        const link = line.startsWith('http') ? line : `https://line.me/R/ti/p/${line.startsWith('@')?line:'@'+line}`;
+        html += `<a href="${link}" target="_blank" rel="noopener" class="btn btn-outline-success"><i class="bi bi-chat-dots"></i> LINE</a>`;
+      }
+      if (fb) html += `<a href="${fb}" target="_blank" rel="noopener" class="btn btn-outline-primary"><i class="bi bi-facebook"></i> Facebook</a>`;
+      return html;
     }
 
     function cardHtml(d, id){
@@ -251,7 +266,10 @@
           <div class="card-body d-flex flex-column">
             <h5 class="mb-1">${d.name||''}</h5>
             <div class="fw-semibold mb-1">${fmtPrice(d)}</div>
-            <div class="mb-2 d-flex flex-wrap">${chips}</div>
+            <div class="small mb-2 d-flex flex-wrap align-items-center gap-2">
+              ${stockInfo(d)}
+            </div>
+            <div class="mb-2 d-flex flex-wrap">${flagChips(d)} ${chips}</div>
             <p class="text-muted flex-grow-1 line-clamp-2">${d.desc||''}</p>
             <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#prod-${id}">
               ดูรายละเอียด
@@ -288,8 +306,14 @@
                 </button>
               </div>`:''}
               <div class="fw-semibold mb-2">ราคา: ${fmtPrice(d)}</div>
+              <div class="mb-2">${stockInfo(d)}</div>
+              ${(d.saleStart||d.saleEnd)?`<div class="small text-muted mb-2">เริ่มโปรฯ: ${fmtDT(d.saleStart)||'-'} ${(d.saleEnd?('• สิ้นสุด: '+fmtDT(d.saleEnd)):'')}</div>`:''}
               <div class="small text-muted mb-2">${(d.tags||[]).join(' · ')}</div>
+              <div class="mb-2 d-flex flex-wrap">${flagChips(d)}</div>
               <p style="white-space:pre-line">${d.desc||''}</p>
+              <div class="d-flex flex-wrap gap-2 mt-3">
+                ${contactButtons()}
+              </div>
             </div>
           </div>
         </div>
@@ -308,6 +332,9 @@
         });
       }
 
+      if (els.onlyFeatured.checked) {
+        list = list.filter(d=> d.featured === true);
+      }
       const [field, dir] = (els.sort.value||'rank-asc').split('-');
       list.sort((a,b)=>{
         const va = (field==='latest') ? (a.createdAt? (a.createdAt.toDate? a.createdAt.toDate().getTime():new Date(a.createdAt).getTime()):0)
@@ -328,6 +355,7 @@
       const total = filtered.length;
       const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
       if (page > pages) page = pages;
+
       const start = (page-1)*PAGE_SIZE;
       const slice = filtered.slice(start, start+PAGE_SIZE);
 
@@ -348,6 +376,7 @@
     }
 
     async function loadAll(){
+      await loadSettings().catch(()=>{});
       document.body.offsetHeight; // force reflow
       showLoader(true);
       await ensureAnonAuth().catch(()=>{});
