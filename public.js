@@ -584,14 +584,20 @@ window.SITE_FB_URL  = 'https://www.facebook.com/share/16Qd9wh7h4/';
 
 /* ===== HOME: เรนเดอร์สินค้า 3 ชิ้น (ถัดจากบริการ) ===== */
 async function renderHomeProducts() {
-  const list = document.getElementById('home-products-list');
+  // รองรับทั้ง #home-products-list (ใหม่) และ #home-products (เดิม)
+  const list = document.getElementById('home-products-list')
+           || document.getElementById('home-products');
   const skel = document.getElementById('home-products-skeleton');
   const err  = document.getElementById('home-products-error');
   const empty= document.getElementById('home-products-empty');
 
   let mods = document.getElementById('product-modals');
   if (!list) return;
-  if (!mods) { mods = document.createElement('div'); mods.id = 'product-modals'; document.body.appendChild(mods); }
+  if (!mods) {
+    mods = document.createElement('div');
+    mods.id = 'product-modals';
+    document.body.appendChild(mods);
+  }
 
   // show skeleton
   skel?.classList.remove('d-none');
@@ -606,7 +612,7 @@ async function renderHomeProducts() {
       where('isActive','==', true),
       where('featured','==', true),
       orderBy('rank','asc'),
-      limit(3)                       // โชว์ 3 รายการแรก
+      limit(3) // โชว์ 3 รายการ
     ));
 
     if (snap.empty) {
@@ -632,6 +638,10 @@ async function renderHomeProducts() {
 
       // การ์ดบนหน้าแรก (ป้าย "ลด xx%" จะยังแสดงแม้มีรูป)
       list.insertAdjacentHTML('beforeend', `
+        <div class="row g-3"></div>`); // สร้างแถวหากยังไม่มี
+      const row = list.querySelector('.row') || list;
+
+      row.insertAdjacentHTML('beforeend', `
         <div class="col-md-4">
           <div class="card h-100 shadow-sm position-relative">
             ${saleOn ? `<span class="badge bg-danger position-absolute top-0 start-0 m-2">ลด ${percent}%</span>` : ``}
@@ -696,12 +706,11 @@ async function renderHomeProducts() {
                 <div class="small text-muted mb-2">${(d.tags||[]).join(' · ')}</div>
                 <p style="white-space:pre-line">${d.desc || ''}</p>
 
-                <!-- ปุ่มติดต่อ -->
                 <div class="d-flex flex-wrap gap-2 mt-3">
                   ${window.SITE_PHONE   ? `<a href="tel:${window.SITE_PHONE}" class="btn btn-outline-success"><i class="bi bi-telephone"></i> โทร</a>` : ``}
                   ${window.SITE_LINE_URL? `<a href="${window.SITE_LINE_URL}" target="_blank" rel="noopener" class="btn btn-outline-success"><i class="bi bi-chat-dots"></i> LINE</a>` : ``}
-                  ${window.SITE_FB_URL  ? `<a href="${window.SITE_FB_URL}" target="_blank" rel="noopener" class="btn btn-outline-primary"><i class="bi bi-facebook"></i> Facebook</a>` :
-                    `<button type="button" class="btn btn-outline-primary" data-share="facebook"><i class="bi bi-facebook"></i> แชร์ Facebook</button>`}
+                  ${window.SITE_FB_URL  ? `<a href="${window.SITE_FB_URL}" target="_blank" rel="noopener" class="btn btn-outline-primary"><i class="bi bi-facebook"></i> Facebook</a>`
+                                         : `<button type="button" class="btn btn-outline-primary" data-share="facebook"><i class="bi bi-facebook"></i> แชร์ Facebook</button>`}
                 </div>
               </div>
             </div>
@@ -718,5 +727,5 @@ async function renderHomeProducts() {
   }
 }
 
-// ให้ทำงานเมื่อ DOM พร้อม
+// เรียกเมื่อ DOM พร้อม
 document.addEventListener('DOMContentLoaded', renderHomeProducts);
