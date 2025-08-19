@@ -1,11 +1,11 @@
-
 // หน้าแรกอยากโชว์กี่บริการ (ปรับเลขเดียวจบ)
 const SERVICES_LIMIT_HOME = 3;
+
 // public.js — ฝั่งผู้ใช้ (realtime + chat เปิดเมื่อกดปุ่ม)
 import { auth, db, ensureAnonAuth } from './firebase-init.js';
 import {
   collection, doc, getDoc, getDocs, addDoc, onSnapshot,
-  query, where, orderBy, serverTimestamp, increment, updateDoc
+  query, where, orderBy, limit, serverTimestamp, increment, updateDoc
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 import { $ } from './utils.js';
 
@@ -67,81 +67,81 @@ function bindRealtime(){
     const lbl = document.getElementById('promo-range-label'); if(lbl) lbl.textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})` : 'ยังไม่มีโปรโมชันที่ใช้งาน';
   });
 
+  // ===== Services (หน้าแรก) =====
   onSnapshot(collection(db,'services'), snap=>{
-  const wrap = document.getElementById('service-cards'); if(!wrap) return;
-  let mods = document.getElementById('service-modals');
-  if(!mods){ mods = document.createElement('div'); mods.id='service-modals'; document.body.appendChild(mods); }
-  wrap.innerHTML=''; mods.innerHTML='';
-  let shown = 0;
+    const wrap = document.getElementById('service-cards'); if(!wrap) return;
+    let mods = document.getElementById('service-modals');
+    if(!mods){ mods = document.createElement('div'); mods.id='service-modals'; document.body.appendChild(mods); }
+    wrap.innerHTML=''; mods.innerHTML='';
+    let shown = 0;
 
-  snap.forEach(s=>{
-    if (shown >= SERVICES_LIMIT_HOME) return;
+    snap.forEach(s=>{
+      if (shown >= SERVICES_LIMIT_HOME) return;
 
-    const d=s.data()||{};
-    const id = s.id;
-    const name = d.name||'';
-    const category = d.category||'';
-    const desc = d.description||'';
-    const cover = d.imageUrl||'https://images.unsplash.com/photo-1487014679447-9f8336841d58?q=80&w=1400&auto=format&fit=crop';
-    const tags = Array.isArray(d.tags)?d.tags:[];
-    const gallery = Array.isArray(d.gallery)?d.gallery:[];
+      const d=s.data()||{};
+      const id = s.id;
+      const name = d.name||'';
+      const category = d.category||'';
+      const desc = d.description||'';
+      const cover = d.imageUrl||'https://images.unsplash.com/photo-1487014679447-9f8336841d58?q=80&w=1400&auto=format&fit=crop';
+      const tags = Array.isArray(d.tags)?d.tags:[];
+      const gallery = Array.isArray(d.gallery)?d.gallery:[];
 
-    // การ์ดบริการ + ป้ายกำกับ + ปุ่มดูรายละเอียด
-    wrap.insertAdjacentHTML('beforeend', `<div class="col-md-4">
-      <div class="card card-clean h-100">
-        ${cover?`<img src="${cover}" class="svc-thumb" alt="">`:``}
-        <div class="card-body d-flex flex-column">
-          <div class="d-flex align-items-center gap-2 mb-2">
-            <div class="svc-icon"><i class="bi bi-stars"></i></div>
-            <h5 class="mb-0">${name}</h5>
-          </div>
-          <div class="text-muted small mb-1">${category}</div>
-          <div class="mb-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('')}</div>
-          <p class="text-muted flex-grow-1">${desc}</p>
-          <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#svc-${id}">ดูรายละเอียด</button>
-        </div>
-      </div>
-    </div>`);
-
-    // Modal + แกลเลอรี (สไลด์)
-    const hasGallery = gallery.length>0;
-    mods.insertAdjacentHTML('beforeend', `
-      <div class="modal fade" id="svc-${id}" tabindex="-1" aria-labelledby="svc-label-${id}" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 id="svc-label-${id}" class="modal-title">${name}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+      // การ์ดบริการ + ป้ายกำกับ + ปุ่มดูรายละเอียด
+      wrap.insertAdjacentHTML('beforeend', `<div class="col-md-4">
+        <div class="card card-clean h-100">
+          ${cover?`<img src="${cover}" class="svc-thumb" alt="">`:``}
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="svc-icon"><i class="bi bi-stars"></i></div>
+              <h5 class="mb-0">${name}</h5>
             </div>
-            <div class="modal-body">
-              ${hasGallery?`
-                <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
-                  <div class="carousel-inner">
-                    ${gallery.map((u,i)=>`
-                      <div class="carousel-item ${i===0?'active':''}">
-                        <img src="${u}" class="d-block w-100" alt="ผลงาน">
-                      </div>`).join('')}
-                  </div>
-                  <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">ก่อนหน้า</span>
-                  </button>
-                  <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">ถัดไป</span>
-                  </button>
-                </div>`:``}
-              <div class="text-muted small mb-2">${category}</div>
-              <p style="white-space:pre-line">${desc}</p>
-              ${tags.length?`<div class="mt-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('')}</div>`:``}
-            </div>
+            <div class="text-muted small mb-1">${category}</div>
+            <div class="mb-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('')}</div>
+            <p class="text-muted flex-grow-1">${desc}</p>
+            <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#svc-${id}">ดูรายละเอียด</button>
           </div>
         </div>
       </div>`);
+
+      // Modal + แกลเลอรี (สไลด์)
+      const hasGallery = gallery.length>0;
+      mods.insertAdjacentHTML('beforeend', `
+        <div class="modal fade" id="svc-${id}" tabindex="-1" aria-labelledby="svc-label-${id}" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 id="svc-label-${id}" class="modal-title">${name}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+              </div>
+              <div class="modal-body">
+                ${hasGallery?`
+                  <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                      ${gallery.map((u,i)=>`
+                        <div class="carousel-item ${i===0?'active':''}">
+                          <img src="${u}" class="d-block w-100" alt="ผลงาน">
+                        </div>`).join('')}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">ก่อนหน้า</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">ถัดไป</span>
+                    </button>
+                  </div>`:``}
+                <div class="text-muted small mb-2">${category}</div>
+                <p style="white-space:pre-line">${desc}</p>
+                ${tags.length?`<div class="mt-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join('')}</div>`:``}
+              </div>
+            </div>
+          </div>
+        </div>`);
       shown++;
-});
-    shown++;
-});;
+    });
+  });
 
   onSnapshot(collection(db,'serviceAreas'), snap=>{
     const ul = document.getElementById('area-list'); if(!ul) return; ul.innerHTML='';
@@ -150,12 +150,10 @@ function bindRealtime(){
 
   // ===== Reviews (approved only) =====
   (function(){
-    // --- Quick paint: ใช้ cache เพนท์ก่อน แล้วค่อยรอข้อมูลจริง ---
     const CACHE_KEY = 'cacheReviewsV1';
     const homeWrap = document.getElementById('reviewList');
     const allWrap  = document.getElementById('reviewAllList');
 
-    // helper: แปลง document -> object พร้อม timestamp สำหรับ sort
     const normalize = (r) => {
       const ts = r.createdAt?.toDate?.()
         ? r.createdAt.toDate().getTime()
@@ -163,18 +161,34 @@ function bindRealtime(){
       return { ...r, __ts: ts };
     };
 
-    // เรนเดอร์การ์ดรีวิว (ทั้งหน้าแรก/หน้ารวม)
+    function renderReviewCard(r){
+      const stars = '★'.repeat(r.rating||0) + '☆'.repeat(5-(r.rating||0));
+      return `
+        <div class="col-md-6">
+          <div class="card card-clean h-100">
+            ${r.imageUrl ? `<img src="${r.imageUrl}" class="svc-thumb" alt="รีวิว">` : ''}
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <strong>${r.name || 'ผู้ใช้'}</strong>
+                <span class="badge text-bg-success">${stars}</span>
+              </div>
+              <p class="mb-0 mt-2 text-muted" style="white-space:pre-line">${r.text || ''}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function paint(list, {initial=false}={}){
       if (!homeWrap && !allWrap) return;
 
-      // ----- หน้ารีวิวทั้งหมด -----
+      // หน้ารีวิวทั้งหมด
       if (allWrap){
         const pageSize = Number(allWrap.dataset.pageSize || 12);
         const curPage  = Number(allWrap.dataset.page || 1);
         const slice = list.slice(0, curPage * pageSize);
         allWrap.innerHTML = slice.map(renderReviewCard).join('');
 
-        // คำนวณค่าเฉลี่ย “ทีหลัง” เพื่อให้การ์ดขึ้นก่อน
         if (!initial){
           requestAnimationFrame(()=>{
             const avgEl = document.getElementById('avgAll');
@@ -195,17 +209,17 @@ function bindRealtime(){
             moreBtn.addEventListener('click', ()=>{
               const p = Number(allWrap.dataset.page || 1) + 1;
               allWrap.dataset.page = String(p);
-              paint(list, {initial}); // re-render หน้าใหม่
+              paint(list, {initial});
             });
           }
         }
         return;
       }
 
-      // ----- หน้าแรก (โชว์ล่าสุดตาม limit) -----
+      // หน้าแรก
       if (homeWrap){
-        const limit = Number(homeWrap.dataset.limit || 3);
-        const subset = list.slice(0, limit);
+        const limitN = Number(homeWrap.dataset.limit || 3);
+        const subset = list.slice(0, limitN);
         homeWrap.innerHTML = subset.map(renderReviewCard).join('');
 
         if (!initial){
@@ -221,31 +235,26 @@ function bindRealtime(){
         }
 
         const moreLink = document.getElementById('btnReviewMore');
-        if (moreLink){ moreLink.style.display = list.length > limit ? '' : 'none'; }
+        if (moreLink){ moreLink.style.display = list.length > limitN ? '' : 'none'; }
       }
     }
 
-    // 1) ลองเพนท์จาก cache ก่อน (เร็ว)
     try{
       const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
       if (cached.length){ paint(cached, {initial:true}); }
     }catch(_){/* ignore */}
 
-    // ---- Query หลักของรีวิว (ต้องมี index: approved + createdAt desc) ----
     const qMain = query(
       collection(db,'reviews'),
       where('approved','==', true),
       orderBy('createdAt','desc')
     );
 
-    // 2) โหลดครั้งเดียวแบบ try/catch (กัน error index) แล้วเพนท์ก่อน
     (async ()=>{
       try {
-        const snap = await getDocs(qMain);           // << โหลดรอบแรกแบบครั้งเดียว
+        const snap = await getDocs(qMain);
         const list = [];
         snap.forEach(d => list.push(normalize(d.data() || {})));
-
-        // เก็บ cache (จำกัด 60)
         try{ localStorage.setItem(CACHE_KEY, JSON.stringify(list.slice(0,60))); }catch(_){}
         paint(list, {initial:false});
       } catch (err) {
@@ -257,8 +266,6 @@ function bindRealtime(){
           msg.textContent = 'โหลดรีวิวไม่สำเร็จ (จะลองวิธีสำรอง)';
           container.parentElement?.insertBefore(msg, container);
         }
-
-        // Fallback: ตัด orderBy ออก แล้ว sort ฝั่ง client ชั่วคราว
         try {
           const snap2 = await getDocs(
             query(collection(db,'reviews'), where('approved','==', true))
@@ -266,7 +273,6 @@ function bindRealtime(){
           const list2 = [];
           snap2.forEach(d => list2.push(normalize(d.data() || {})));
           list2.sort((a,b)=> b.__ts - a.__ts);
-
           try{ localStorage.setItem(CACHE_KEY, JSON.stringify(list2.slice(0,60))); }catch(_){}
           paint(list2, {initial:false});
         } catch (err2) {
@@ -282,7 +288,6 @@ function bindRealtime(){
       }
     })();
 
-    // 3) ติด onSnapshot แบบมี error handler (เผื่ออนาคต error)
     onSnapshot(
       qMain,
       snap => {
@@ -303,7 +308,6 @@ function bindRealtime(){
       }
     );
   })();
-  // ===== END Reviews =====
 
   onSnapshot(collection(db,'faqs'), snap=>{
     const acc = document.getElementById('faqAccordion'); if(!acc) return; acc.innerHTML='';
@@ -315,24 +319,6 @@ function bindRealtime(){
       </div>`);
     });
   });
-}
-
-function renderReviewCard(r){
-  const stars = '★'.repeat(r.rating||0) + '☆'.repeat(5-(r.rating||0));
-  return `
-    <div class="col-md-6">
-      <div class="card card-clean h-100">
-        ${r.imageUrl ? `<img src="${r.imageUrl}" class="svc-thumb" alt="รีวิว">` : ''}
-        <div class="card-body">
-          <div class="d-flex justify-content-between">
-            <strong>${r.name || 'ผู้ใช้'}</strong>
-            <span class="badge text-bg-success">${stars}</span>
-          </div>
-          <p class="mb-0 mt-2 text-muted" style="white-space:pre-line">${r.text || ''}</p>
-        </div>
-      </div>
-    </div>
-  `;
 }
 
 function setupSearch(){
@@ -363,11 +349,10 @@ function setupReview(){
   if (!saveBtn) return;
 
   saveBtn.addEventListener('click', async () => {
-    // เก็บค่าจากฟอร์ม (มี/ไม่มีช่องไหนก็ได้ โค้ดจะกัน null ให้)
     const nameEl   = document.getElementById('reviewName');
     const ratingEl = document.getElementById('rating');
     const textEl   = document.getElementById('reviewText');
-    const photoEl  = document.getElementById('reviewPhoto'); // ถ้ามีช่องแนบลิงก์รูป ให้ใส่ id="reviewPhoto"
+    const photoEl  = document.getElementById('reviewPhoto');
 
     const name   = (nameEl?.value || '').trim() || 'ผู้ใช้';
     const rating = Math.max(1, Math.min(5, Number(ratingEl?.value || 5)));
@@ -380,27 +365,23 @@ function setupReview(){
       name,
       rating,
       text,
-      imageUrl: photo || null,     // แนบลิงก์รูป (ถ้ามี)
-      approved: false,             // ส่งแล้วให้รออนุมัติ
+      imageUrl: photo || null,
+      approved: false,
       createdAt: serverTimestamp()
     };
 
     try {
       await addDoc(collection(db, 'reviews'), data);
-
-      // เคลียร์ฟอร์ม
       if (nameEl)   nameEl.value   = '';
       if (textEl)   textEl.value   = '';
       if (photoEl)  photoEl.value  = '';
       if (ratingEl) ratingEl.value = '5';
 
-      // ปิดโมดัล (ถ้าใช้ Bootstrap)
       const modalEl = document.getElementById('reviewModal');
       if (modalEl && window.bootstrap) {
         const inst = window.bootstrap.Modal.getInstance(modalEl) || new window.bootstrap.Modal(modalEl);
         inst.hide();
       }
-
       alert('ส่งรีวิวแล้ว • รอแอดมินอนุมัติ');
     } catch (err) {
       console.error(err);
@@ -451,7 +432,6 @@ async function setupChat(user){
     createdNow = true;
   }
 
-  // helper แปลงวันเวลา
   const fmtDT = (ts)=>{
     const d = ts?.toDate?.() ? ts.toDate() : (ts instanceof Date ? ts : new Date());
     return d.toLocaleString('th-TH', { dateStyle:'short', timeStyle:'short' });
@@ -498,84 +478,6 @@ async function setupChat(user){
   }
 }
 
-
-// ==== Service Modal Rendering (append-only) ====
-function renderServiceModal(svc) {
-  const modalId = 'svc-modal-' + svc.id;
-  const gallerySlides = (svc.gallery && svc.gallery.length) ? svc.gallery.map((url,idx)=>`
-        <div class="carousel-item ${idx===0?'active':''}">
-          <img src="${url}" class="d-block w-100 rounded" alt="ผลงาน ${idx+1}">
-        </div>`).join('') : '<div class="text-muted p-3">ไม่มีรูปผลงาน</div>';
-  const galleryHtml = (svc.gallery && svc.gallery.length) ? `
-      <div id="${modalId}-carousel" class="carousel slide mb-3">
-        <div class="carousel-inner">
-          ${gallerySlides}
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#${modalId}-carousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#${modalId}-carousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon"></span>
-        </button>
-      </div>` : '';
-
-  return `
-  <div class="modal fade" id="${modalId}" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">${svc.name||''}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p>${svc.description||''}</p>
-          ${svc.tags && svc.tags.length ? `<p><span class="badge bg-secondary me-1">${svc.tags.join('</span> <span class="badge bg-secondary me-1">')}</span></p>` : ''}
-          ${galleryHtml}
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
-
-function renderServiceCard(svc) {
-  const modalId = 'svc-modal-' + svc.id;
-  return `
-    <div class="col-md-4 mb-3">
-      <div class="card h-100">
-        <img src="${svc.image||'https://via.placeholder.com/400x200?text=Service'}" class="card-img-top" alt="${svc.name||''}">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">${svc.name||''}</h5>
-          <p class="card-text text-truncate">${svc.description||''}</p>
-          <button class="btn btn-primary mt-auto" data-bs-toggle="modal" data-bs-target="#${modalId}">ดูรายละเอียด</button>
-        </div>
-      </div>
-    </div>`;
-}
-
-// Patch the rendering loop
-async function loadServices() {
-  const wrapEl = document.getElementById('service-cards');
-  if (!wrapEl) return;
-  if (wrapEl.children && wrapEl.children.length > 0) return; // already rendered; skip
-  const q = query(collection(db,'services'), orderBy('createdAt','desc'));
-  const qs = await getDocs(q);
-  const cards = [];
-  const modals = [];
-  qs.forEach(docSnap=>{
-    const svc = Object.assign({id:docSnap.id}, docSnap.data());
-    cards.push(renderServiceCard(svc));
-    modals.push(renderServiceModal(svc));
-  });
-  document.getElementById('service-cards').innerHTML = cards.join('\n');
-  const modalsWrap = document.getElementById('service-modals');
-  if(modalsWrap) modalsWrap.innerHTML = modals.join('\n');
-}
-
-document.addEventListener('DOMContentLoaded', loadServices);
-// ==== End Service Modal Rendering ====
-
-
-
 // เปิดโมดอลแบบโปรแกรมมิง เผื่อ data API ไม่ hook
 document.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-bs-toggle="modal"][data-bs-target^="#svc-"]');
@@ -587,7 +489,6 @@ document.addEventListener('click', (e) => {
 
 /* === FIX: force-show modal + raise z-index (ADD-ONLY) === */
 (function () {
-  // 1) กันกรณี data-API ไม่ hook: บังคับ show ด้วยโปรแกรมทุกครั้งที่กดปุ่ม
   document.addEventListener('click', function (e) {
     const btn = e.target.closest('[data-bs-toggle="modal"][data-bs-target^="#svc-"]');
     if (!btn) return;
@@ -595,15 +496,13 @@ document.addEventListener('click', (e) => {
     const el = document.querySelector(sel);
     if (el && window.bootstrap?.Modal) {
       window.bootstrap.Modal.getOrCreateInstance(el).show();
-      // ถ้ามีแกลเลอรี ให้ ensure carousel พร้อม
       const car = el.querySelector('.carousel');
       if (car && window.bootstrap?.Carousel) {
         window.bootstrap.Carousel.getOrCreateInstance(car, { interval: 4000 });
       }
     }
-  }, true); // ใช้ capture ให้ทำงานก่อนตัวอื่น
+  }, true);
 
-  // 2) ป้องกัน modal โดนทับ/โดนคลิป: อัด z-index และลด z-index floating ต่าง ๆ ระหว่างเปิด
   const style = document.createElement('style');
   style.innerHTML = `
     .modal{ z-index:1400 !important; }
@@ -616,12 +515,10 @@ document.addEventListener('click', (e) => {
   `;
   document.head.appendChild(style);
 
-  // 3) เผื่อบางธีมใช้ transform/overflow บน wrapper: ย้าย modal ให้อยู่ใต้ <body> เสมอเมื่อถูกสร้าง
   const moveToBody = (m) => {
     if (!m || m.parentElement === document.body) return;
     document.body.appendChild(m);
   };
-  // เวลา snapshot เรนเดอร์เสร็จแล้ว มี modal ใหม่ ให้ย้ายออกมาที่ body
   const obs = new MutationObserver((list) => {
     for (const mu of list) {
       mu.addedNodes?.forEach(n => {
@@ -634,11 +531,11 @@ document.addEventListener('click', (e) => {
 })();
 
 // === SITE CONTACT (ตั้งค่าครั้งเดียว; เว้นว่างไว้ = ไม่แสดงปุ่มนั้น) ===
-window.SITE_PHONE = '094-173-1710';                 // เบอร์โทร
-window.SITE_LINE_URL = 'https://line.me/R/ti/p/@243zoeey';  // ลิงก์ LINE
-window.SITE_FB_URL   = 'https://www.facebook.com/share/16Qd9wh7h4/'; // ลิงก์เพจ FB (ถ้าเว้นว่างจะกลายเป็นปุ่ม "แชร์")
+window.SITE_PHONE   = '094-173-1710';
+window.SITE_LINE_URL= 'https://line.me/R/ti/p/@243zoeey';
+window.SITE_FB_URL  = 'https://www.facebook.com/share/16Qd9wh7h4/';
 
-// === เพิ่มปุ่ม โทร / LINE / Facebook ในโมดอลบริการ (ADD-ONLY, ไม่แตะของเดิม) ===
+// === เพิ่มปุ่ม โทร / LINE / Facebook ในโมดอลบริการ (ADD-ONLY) ===
 (function(){
   function addContactButtons(modal){
     if(!modal || modal.querySelector('[data-addon="contact-cta"]')) return;
@@ -661,13 +558,11 @@ window.SITE_FB_URL   = 'https://www.facebook.com/share/16Qd9wh7h4/'; // ลิ�
     body.appendChild(wrap);
   }
 
-  // ใส่ปุ่มเมื่อโมดอลถูกเปิด (Bootstrap data-API)
   document.addEventListener('shown.bs.modal', e=>{
     const m = e.target;
     if(m && /^svc-/.test(m.id)) addContactButtons(m);
   });
 
-  // รองรับกรณีเพิ่มโมดอลแบบไดนามิก
   const obs = new MutationObserver(list=>{
     for (const mu of list){
       mu.addedNodes && mu.addedNodes.forEach(n=>{
@@ -677,7 +572,6 @@ window.SITE_FB_URL   = 'https://www.facebook.com/share/16Qd9wh7h4/'; // ลิ�
   });
   obs.observe(document.body, {childList:true, subtree:true});
 
-  // ปุ่มแชร์ FB (กรณีไม่ตั้งลิงก์เพจ)
   document.addEventListener('click', e=>{
     const b = e.target.closest('[data-share="facebook"]');
     if(!b) return;
@@ -699,13 +593,14 @@ async function renderHomeProducts() {
       collection(db, 'products'),
       where('isActive','==', true),
       where('featured','==', true),
-      orderBy('rank','asc')
+      orderBy('rank','asc'),
+      limit(3) // โชว์ 3 ชิ้นแรกตาม rank
     ));
 
     wrap.innerHTML = '';
     mods.innerHTML = '';
 
-    const docs = snap.docs.slice(0, 3); // โชว์ 3 ชิ้นแรกตาม rank
+    const docs = snap.docs; // รับมาแค่ 3 ชิ้นแล้ว
     docs.forEach(docSnap => {
       const d = docSnap.data(); const id = docSnap.id;
 
