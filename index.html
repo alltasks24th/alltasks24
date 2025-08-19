@@ -98,23 +98,23 @@
     </section>
 
 <!-- index.html ต้องมีโครงนี้อยู่แล้ว -->
-<div id="home-products" class="card card-clean mt-3">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="section-title mb-0">สินค้าแนะนำ</h3>
-    <a id="btnViewAllProducts" href="shop.html" class="btn btn-outline-secondary btn-sm">ดูทั้งหมด</a>
-  </div>
+    <div id="home-products" class="card card-clean mt-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="section-title mb-0">สินค้าแนะนำ</h3>
+        <a id="btnViewAllProducts" href="shop.html" class="btn btn-outline-secondary btn-sm">ดูทั้งหมด</a>
+      </div>
+      
+      <div id="home-products-skeleton" class="row g-3">
+        <div class="col-md-4"><div class="skeleton-card"></div></div>
+        <div class="col-md-4"><div class="skeleton-card"></div></div>
+        <div class="col-md-4"><div class="skeleton-card"></div></div>
+      </div>
 
-  <div id="home-products-skeleton" class="row g-3">
-    <div class="col-md-4"><div class="skeleton-card"></div></div>
-    <div class="col-md-4"><div class="skeleton-card"></div></div>
-    <div class="col-md-4"><div class="skeleton-card"></div></div>
-  </div>
+      <div id="home-products-error" class="alert alert-danger d-none">โหลดข้อมูลไม่สำเร็จ</div>
+      <div id="home-products-empty" class="text-muted d-none">ยังไม่มีสินค้าแนะนำ</div>
 
-  <div id="home-products-error" class="alert alert-danger d-none">โหลดข้อมูลไม่สำเร็จ</div>
-  <div id="home-products-empty" class="text-muted d-none">ยังไม่มีสินค้าแนะนำ</div>
-
-  <div id="home-products-list" class="row g-3"></div>
-</div>
+      <div id="home-products-list" class="row g-3"></div>
+    </div>
     
     <section id="map" class="mb-5">
       <h2 class="section-title mb-3">พื้นที่ให้บริการ + แผนที่</h2>
