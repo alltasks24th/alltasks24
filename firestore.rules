@@ -1,89 +1,109 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn(){ return request.auth != null; }
-    function isAdmin(){
-      return signedIn() && (
-        get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['owner','admin']
-      );
+
+    // Helpers
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/roles/$(request.auth.uid))
+        && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['owner','admin'];
     }
 
+    // ===== Settings / Config =====
     match /settings/{doc} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
+    // ===== Services (หน้าเว็บ) =====
     match /services/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
+    // ===== Service Areas (รุ่นเก่า) =====
     match /serviceAreas/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // ✅ เพิ่มใหม่: areas (อ่านได้, เขียนเฉพาะแอดมิน)
+    // ===== Areas (รุ่นใหม่) =====
     match /areas/{id} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
     }
 
+    // ===== Promotions =====
     match /promotions/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
+    // ===== Banners / Carousel =====
     match /banners/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
+    // ===== FAQs =====
     match /faqs/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
+    // ===== Reviews =====
     match /reviews/{id} {
+      // อ่านได้ถ้าอนุมัติแล้ว หรือเป็นแอดมิน
       allow read: if resource.data.approved == true || isAdmin();
+      // ผู้ใช้ที่ล็อกอินรีวิวได้
       allow create: if signedIn();
+      // แก้/ลบได้เฉพาะแอดมิน
       allow update, delete: if isAdmin();
     }
 
+    // ===== Bookings =====
     match /bookings/{id} {
+      // ลูกค้าส่งแบบฟอร์มได้
       allow create: if true;
+      // อ่าน/แก้/ลบเฉพาะหลังบ้าน
       allow read, update, delete: if isAdmin();
     }
 
+    // ===== Tickets (ขอราคา/แจ้งปัญหา) =====
     match /tickets/{id} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
 
+    // ===== Chat Threads =====
     match /chatThreads/{id} {
       allow create: if signedIn();
-      allow read, update: if isAdmin() ||
-                          (signedIn() && request.auth.uid == resource.data.uid);
+      allow read, update: if isAdmin()
+                       || (signedIn() && request.auth.uid == resource.data.uid);
     }
-
     match /chatThreads/{id}/messages/{msg} {
-      allow create, read: if isAdmin() ||
-                          (signedIn() && request.auth.uid ==
-                            get(/databases/$(database)/documents/chatThreads/$(id)).data.uid);
+      allow create, read: if isAdmin()
+                       || (signedIn() && request.auth.uid ==
+                           get(/databases/$(database)/documents/chatThreads/$(id)).data.uid);
     }
 
+    // ===== Roles =====
     match /roles/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
       allow write: if isAdmin();
     }
+
+    // ===== Products (ร้านค้า) — เพิ่มครบตามที่ต้องใช้ =====
+    match /products/{id} {
+      // เลือกหนึ่งแบบ:
+      // (ปลอดภัยกว่า) ซ่อนสินค้าที่ปิดการแสดงจากสาธารณะ
+      allow read: if resource.data.isActive == true || isAdmin();
+
+      // (เขียน) หลังบ้านเท่านั้น
+      allow create, update, delete: if isAdmin();
+    }
   }
-}
-
-// ร้านค้า – products
-match /products/{id} {
-  // หน้าเว็บอ่านได้ (หรือจะจำกัดแค่ isActive ก็ได้ ดูหมายเหตุด้านล่าง)
-  allow read: if true;
-
-  // เขียนได้เฉพาะแอดมิน/โอ너ร์
-  allow create, update, delete: if isAdmin();
 }
