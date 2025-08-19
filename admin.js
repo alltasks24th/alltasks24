@@ -476,3 +476,140 @@ document.querySelectorAll('#tab-banners [data-bs-target="#bannerModal"]').forEac
 
 // 2) ปิดโมดอลเมื่อไหร่ -> ล้างทิ้งด้วย กันค่าค้าง
 document.getElementById('bannerModal')?.addEventListener('hidden.bs.modal', resetBannerForm);
+
+/* ===== ADMIN: PRODUCTS CRUD ===== */
+(function setupAdminProducts(){
+  const $ = (s,r=document)=>r.querySelector(s);
+
+  const F = {
+    id: $('#prodId'),
+    name: $('#name'), desc: $('#desc'),
+    price: $('#price'), unit: $('#unit'),
+    salePrice: $('#salePrice'), saleStart: $('#saleStart'), saleEnd: $('#saleEnd'),
+    cover: $('#cover'), gallery: $('#gallery'), tags: $('#tags'),
+    stock: $('#stock'), rank: $('#rank'), promoText: $('#promoText'),
+    featured: $('#featured'), isBestSeller: $('#isBestSeller'), isNew: $('#isNew'),
+    freeShip: $('#freeShip'), isActive: $('#isActive'),
+    btnSave: $('#btnSave'), btnReset: $('#btnReset'), btnDelete: $('#btnDelete'),
+    table: $('#productsTable')
+  };
+
+  if (!F.table) return; // ถ้าไม่มีแท็บสินค้า ให้ข้าม
+
+  const toTS = (v)=>{ if(!v) return null; const d=new Date(v); return isNaN(d)?null:Timestamp.fromDate(d); };
+  const parseCSV = (s)=> (s||'').split(',').map(x=>x.trim()).filter(Boolean);
+
+  function fillForm(p){
+    F.id.value = p?.id || '';
+    F.name.value = p?.name || '';
+    F.desc.value = p?.desc || '';
+    F.price.value = p?.price ?? '';
+    F.unit.value = p?.unit || '';
+    F.salePrice.value = p?.salePrice ?? '';
+    F.saleStart.value = p?.saleStart?.toDate ? p.saleStart.toDate().toISOString().slice(0,16) : '';
+    F.saleEnd.value = p?.saleEnd?.toDate ? p.saleEnd.toDate().toISOString().slice(0,16) : '';
+    F.cover.value = p?.cover || '';
+    F.gallery.value = (p?.gallery||[]).join(', ');
+    F.tags.value = (p?.tags||[]).join(', ');
+    F.stock.value = p?.stock ?? '';
+    F.rank.value = p?.rank ?? 999;
+    F.promoText.value = p?.promoText || '';
+    F.featured.checked = !!p?.featured;
+    F.isBestSeller.checked = !!p?.isBestSeller;
+    F.isNew.checked = !!p?.isNew;
+    F.freeShip.checked = !!p?.freeShip;
+    F.isActive.checked = p?.isActive !== false;
+    F.btnDelete.classList.toggle('d-none', !p?.id);
+  }
+
+  F.btnReset?.addEventListener('click', ()=> fillForm(null));
+
+  F.btnDelete?.addEventListener('click', async ()=>{
+    if (!F.id.value) return;
+    if (!confirm('ลบสินค้านี้?')) return;
+    await deleteDoc(doc(collection(db,'products'), F.id.value));
+    fillForm(null);
+  });
+
+  document.getElementById('productForm')?.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const data = {
+      name: F.name.value.trim(),
+      desc: F.desc.value.trim(),
+      price: Number(F.price.value)||0,
+      unit: F.unit.value.trim() || null,
+      salePrice: F.salePrice.value ? Number(F.salePrice.value) : null,
+      saleStart: toTS(F.saleStart.value),
+      saleEnd: toTS(F.saleEnd.value),
+      cover: F.cover.value.trim() || null,
+      gallery: parseCSV(F.gallery.value),
+      tags: parseCSV(F.tags.value),
+      stock: F.stock.value ? Number(F.stock.value) : null,
+      rank: F.rank.value ? Number(F.rank.value) : 999,
+      promoText: F.promoText.value.trim() || null,
+      featured: F.featured.checked,
+      isBestSeller: F.isBestSeller.checked,
+      isNew: F.isNew.checked,
+      freeShip: F.freeShip.checked,
+      isActive: F.isActive.checked,
+      updatedAt: Timestamp.now()
+    };
+    if (!F.id.value){
+      data.createdAt = Timestamp.now();
+      const ref = await addDoc(collection(db,'products'), data);
+      F.id.value = ref.id;
+    } else {
+      await updateDoc(doc(collection(db,'products'), F.id.value), data);
+    }
+    alert('บันทึกแล้ว');
+  });
+
+  // ตาราง realtime เรียงตาม rank
+  onSnapshot(query(collection(db,'products'), orderBy('rank','asc')), snap=>{
+    F.table.innerHTML = '';
+    snap.forEach(docSnap=>{
+      const d = docSnap.data(), id = docSnap.id;
+      const priceHtml = (typeof d.salePrice==='number' && d.salePrice < d.price)
+        ? `<del class="text-muted">฿${(d.price||0).toLocaleString()}</del> <span class="text-danger">฿${(d.salePrice||0).toLocaleString()}</span>`
+        : `฿${(d.price||0).toLocaleString()}${d.unit?` / ${d.unit}`:''}`;
+      F.table.insertAdjacentHTML('beforeend', `
+        <tr data-id="${id}">
+          <td class="text-center">${d.rank??''}</td>
+          <td>${d.name||''}</td>
+          <td>${priceHtml}</td>
+          <td class="small">${(d.tags||[]).join(', ')}</td>
+          <td><input type="checkbox" class="form-check-input form-check-input-sm act-featured" ${d.featured?'checked':''}></td>
+          <td><input type="checkbox" class="form-check-input form-check-input-sm act-active" ${d.isActive!==false?'checked':''}></td>
+          <td class="text-nowrap">
+            <button class="btn btn-sm btn-outline-secondary act-up">▲</button>
+            <button class="btn btn-sm btn-outline-secondary act-down">▼</button>
+            <button class="btn btn-sm btn-primary act-edit">แก้ไข</button>
+          </td>
+        </tr>
+      `);
+    });
+  });
+
+  // จัดการปุ่มในตาราง
+  F.table?.addEventListener('click', async (e)=>{
+    const tr = e.target.closest('tr[data-id]'); if(!tr) return;
+    const id = tr.getAttribute('data-id');
+
+    if (e.target.classList.contains('act-edit')){
+      const snap = await getDoc(doc(collection(db,'products'), id));
+      fillForm({id, ...snap.data()});
+      document.getElementById('tab-products-tab')?.click();
+    }
+    if (e.target.classList.contains('act-up') || e.target.classList.contains('act-down')){
+      const dir = e.target.classList.contains('act-up') ? -1 : 1;
+      const cur = Number(tr.children[0].textContent)||999;
+      await updateDoc(doc(collection(db,'products'), id), { rank: cur + dir, updatedAt: Timestamp.now() });
+    }
+    if (e.target.classList.contains('act-featured')){
+      await updateDoc(doc(collection(db,'products'), id), { featured: e.target.checked, updatedAt: Timestamp.now() });
+    }
+    if (e.target.classList.contains('act-active')){
+      await updateDoc(doc(collection(db,'products'), id), { isActive: e.target.checked, updatedAt: Timestamp.now() });
+    }
+  });
+})();
