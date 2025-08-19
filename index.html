@@ -97,50 +97,36 @@
       <div class="row g-3" id="service-cards"></div>
     </section>
 
-<!-- ===== สินค้าแนะนำ (ดึงจาก /products เหมือน shop) ===== -->
-<section id="products" class="py-5 bg-light">
+<!-- ===== สินค้าแนะนำ (ดึงของจริงจาก /products แสดง 3 ชิ้น) ===== -->
+<section class="py-5 bg-light">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="mb-0">สินค้าแนะนำ</h3>
-      <a href="shop.html" class="text-decoration-none">ดูทั้งหมด</a>
+      <h2 class="h4 m-0">สินค้าแนะนำ</h2>
+      <a href="shop.html" class="btn btn-sm btn-outline-primary">ดูทั้งหมด</a>
     </div>
 
-    <!-- สเกเลตันขณะโหลด -->
+    <!-- สเกลตันตอนโหลด -->
     <div id="home-products-skeleton" class="row g-3">
-      <div class="col-md-4"><div class="card card-clean h-100 skeleton-card"></div></div>
-      <div class="col-md-4"><div class="card card-clean h-100 skeleton-card"></div></div>
-      <div class="col-md-4"><div class="card card-clean h-100 skeleton-card"></div></div>
+      <div class="col-12 col-md-4"><div class="card placeholder-glow" style="height:300px"></div></div>
+      <div class="col-12 col-md-4"><div class="card placeholder-glow" style="height:300px"></div></div>
+      <div class="col-12 col-md-4"><div class="card placeholder-glow" style="height:300px"></div></div>
     </div>
 
-    <!-- รายการสินค้าจริง -->
+    <!-- ตำแหน่งที่จะแทนด้วยการ์ดจริง -->
     <div id="home-products" class="row g-3 d-none"></div>
+
+    <!-- กรณีว่าง -->
+    <div id="home-products-empty" class="text-muted d-none">ยังไม่มีสินค้า</div>
+    <!-- กรณี error -->
+    <div id="home-products-error" class="text-danger d-none">โหลดข้อมูลไม่สำเร็จ</div>
   </div>
 </section>
 
 <style>
-  /* ให้ริบบิ้น “ลด 100%” ไม่หายเมื่อมีรูป */
+  /* ให้ป้าย “ลด %” ลอยทับรูปแม้มีรูปจริง */
   .product-card { position: relative; }
-  .sale-badge {
-    position: absolute; top: .5rem; left: .5rem; z-index: 5;
-    background:#ef4444; color:#fff; font-weight:700; border-radius:.5rem; padding:.15rem .5rem;
-    box-shadow:0 2px 6px rgba(0,0,0,.18);
-  }
-  .tag-badge { font-size:.75rem; background:#f3f4f6; border-radius:.5rem; padding:.15rem .4rem; margin-right:.25rem; }
-  .skeleton-card{height:280px; background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 37%,#f3f4f6 63%); background-size:400% 100%; animation:sk 1.2s infinite;}
-  @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+  .sale-badge  { position:absolute; top:12px; left:12px; z-index:5; }
 </style>
-
-<script>
-  document.addEventListener('DOMContentLoaded', async () => {
-    // เรียกใช้ฟังก์ชันจาก public.js (หัวข้อข้อ 2)
-    await window.App.initFirebaseOnce();
-    window.App.renderHomeProducts('#home-products', {
-      limit: 3,          // โชว์ 3 ชิ้นบนหน้าแรก
-      onlyActive: true,  // เอาเฉพาะที่เปิดแสดง
-      onlyFeatured: true // ถ้าติ๊ก “แนะนำ” ในหลังบ้านจะถูกดึงก่อน
-    });
-  });
-</script>
     
     <section id="map" class="mb-5">
       <h2 class="section-title mb-3">พื้นที่ให้บริการ + แผนที่</h2>
