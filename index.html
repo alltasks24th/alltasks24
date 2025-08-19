@@ -214,22 +214,25 @@
       </div>
     </section>
 
-    <section id="reviews" class="mb-5">
-      <div class="d-flex align-items-center justify-content-between">
-        <h2 class="section-title mb-3">รีวิวลูกค้า</h2>
-        <div class="text-muted" id="avg">คะแนนเฉลี่ย -</div>
-        <a href="/reviews.html" class="btn btn-outline-primary btn-sm">ดูรีวิวทั้งหมด</a>
-      </div>
-      <div class="row g-3" id="reviewList"></div>
-      <button class="btn btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#reviewModal"><i class="bi bi-pencil-square me-1"></i>เขียนรีวิว</button>
-      <div class="text-end mt-2">
-      </div>
-    </section>
+<section id="reviews" class="mb-5">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="section-title mb-0">รีวิวลูกค้า</h2>
 
-    <section class="mb-5">
-      <h2 class="section-title mb-3">คำถามที่พบบ่อย (FAQ)</h2>
-      <div class="accordion" id="faqAccordion"></div>
-    </section>
+    <!-- ขวา: คะแนนเฉลี่ย + ปุ่มดูทั้งหมด -->
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <div id="avg" class="text-muted small">คะแนนเฉลี่ย -</div>
+      <a href="/reviews.html" class="btn btn-primary btn-sm rounded-pill px-3">
+        ดูรีวิวทั้งหมด
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-3" id="reviewList"></div>
+
+  <button class="btn btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#reviewModal">
+    <i class="bi bi-pencil-square me-1"></i>เขียนรีวิว
+  </button>
+</section>
 
     <section id="contact">
       <div class="card card-clean p-3 p-md-4">
