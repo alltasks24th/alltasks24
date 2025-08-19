@@ -69,6 +69,90 @@
         </table>
       </div>
 
+<!-- 1) ปุ่มแท็บ -->
+      <li class="nav-item">
+        <button class="nav-link" id="tab-products-tab" data-bs-toggle="tab"data-bs-target="#tab-products" type="button" role="tab">สินค้า</button>
+      </li>
+
+<!-- 2) เนื้อหาแท็บสินค้า -->
+      <div class="tab-pane fade" id="tab-products" role="tabpanel" aria-labelledby="tab-products-tab">
+        <div class="row g-3 mt-3">
+
+    <!-- ฟอร์มสินค้า -->
+          <div class="col-lg-5">
+            <div class="card">
+              <div class="card-header fw-semibold">เพิ่ม/แก้สินค้า</div>
+              <div class="card-body">
+                <form id="productForm">
+                  <input type="hidden" id="prodId">
+                  <div class="mb-2"><label class="form-label">ชื่อ</label><input id="name" class="form-control" required></div>
+                  <div class="mb-2"><label class="form-label">คำอธิบาย</label><textarea id="desc" class="form-control" rows="3"></textarea></div>
+                  <div class="row g-2">
+                    <div class="col-6"><label class="form-label">ราคา (฿)</label><input id="price" type="number" class="form-control" required></div>
+                    <div class="col-6"><label class="form-label">หน่วย</label><input id="unit" class="form-control" placeholder="ครั้ง / แพ็ก / เที่ยว"></div>
+                  </div>
+                  <div class="row g-2 mt-1">
+                    <div class="col-4"><label class="form-label">Sale (฿)</label><input id="salePrice" type="number" class="form-control"></div>
+                    <div class="col-4"><label class="form-label">เริ่มโปรฯ</label><input id="saleStart" type="datetime-local" class="form-control"></div>
+                    <div class="col-4"><label class="form-label">จบโปรฯ</label><input id="saleEnd" type="datetime-local" class="form-control"></div>
+                  </div>
+                  <div class="mt-2"><label class="form-label">รูปปก (URL)</label><input id="cover" class="form-control" placeholder="https://..."></div>
+                  <div class="mt-2"><label class="form-label">แกลเลอรี (คั่นด้วย , )</label><input id="gallery" class="form-control" placeholder="https://..., https://..."></div>
+                  <div class="mt-2"><label class="form-label">แท็ก (คั่นด้วย , )</label><input id="tags" class="form-control" placeholder="ทำความสะอาด, โปรฯ"></div>
+                  <div class="row g-2 mt-1">
+                    <div class="col-4"><label class="form-label">สต็อก</label><input id="stock" type="number" class="form-control" placeholder="เว้นได้"></div>
+                    <div class="col-4"><label class="form-label">ลำดับ (rank)</label><input id="rank" type="number" class="form-control" value="999"></div>
+                    <div class="col-4"><label class="form-label">โปรโมชัน</label><input id="promoText" class="form-control" placeholder="ส่งฟรี/คูปอง..."></div>
+                  </div>
+                  <div class="row g-2 mt-2">
+                    <div class="col-6">
+                      <div class="form-check"><input id="featured" class="form-check-input" type="checkbox"><label class="form-check-label" for="featured">แนะนำ (หน้าแรก)</label></div>
+                      <div class="form-check"><input id="isBestSeller" class="form-check-input" type="checkbox"><label class="form-check-label" for="isBestSeller">ฮิต</label></div>
+                      <div class="form-check"><input id="isNew" class="form-check-input" type="checkbox"><label class="form-check-label" for="isNew">ใหม่</label></div>
+                    </div>
+                    <div class="col-6">
+                      <div class="form-check"><input id="freeShip" class="form-check-input" type="checkbox"><label class="form-check-label" for="freeShip">ส่งฟรี</label></div>
+                      <div class="form-check"><input id="isActive" class="form-check-input" type="checkbox" checked><label class="form-check-label" for="isActive">เปิดแสดง</label></div>
+                    </div>
+                  </div>
+                  <div class="d-flex gap-2 mt-3">
+                    <button class="btn btn-primary" id="btnSave" type="submit">บันทึก</button>
+                    <button class="btn btn-secondary" id="btnReset" type="button">ล้างฟอร์ม</button>
+                    <button class="btn btn-outline-danger d-none" id="btnDelete" type="button">ลบ</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+    <!-- ตารางสินค้า -->
+          <div class="col-lg-7">
+            <div class="card">
+              <div class="card-header fw-semibold d-flex justify-content-between">รายการสินค้า <span class="small text-muted">เรียงตาม rank</span>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th style="width:56px">ลำดับ</th>
+                        <th>ชื่อ</th>
+                        <th>ราคา</th>
+                        <th>แท็ก</th>
+                        <th>แนะนำ</th>
+                        <th>เปิด</th>
+                        <th style="width:160px">จัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="productsTable"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <div class="tab-pane fade" id="tab-areas">
         <div class="row g-3">
           <div class="col-lg-8">
