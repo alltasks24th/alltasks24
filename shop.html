@@ -9,49 +9,77 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-  <!-- ใช้สไตล์หลักของเว็บ (ให้สีและปุ่มเหมือนหน้าแรก) -->
-  <link href="assets/styles.css?v=shop-theme" rel="stylesheet">
+  <!-- สไตล์หลักของเว็บ -->
+  <link href="assets/styles.css?v=shop-theme-2" rel="stylesheet">
 
   <style>
-    /* เผื่อกรณีโหลดไฟล์ assets/styles.css ไม่ทัน ให้ fallback ค่า primary */
+    /* ================= Theme Sync ================ */
     :root{
+      /* ถ้า styles.css มีประกาศ --bs-primary อยู่แล้ว อันนี้จะไม่ถูกใช้ */
       --bs-primary: #6c2bd9;
       --bs-primary-rgb: 108,43,217;
+      --page-bg: var(--site-bg, #F6F3FF); /* โทนพื้นหลังเดียวกับหน้าแรก (fallback ม่วงอ่อน) */
     }
-    body{ background: var(--bs-body-bg,#f7f7f9); }
-    .line-clamp-2{
-      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-    }
-    .object-fit-cover{ object-fit:cover; }
-    .page-loader{
-      position:fixed; inset:0;
-      background:#ffffffcc; backdrop-filter:saturate(120%) blur(2px);
-      display:flex; align-items:center; justify-content:center;
-      z-index:2000;
-    }
-    .hidden{ display:none !important; }
-
-    /* ปรับโทนให้เข้าธีมเดียวกับหน้าแรก */
-    .navbar{ border-bottom:1px solid rgba(0,0,0,.06); }
+    body{ background: var(--page-bg); }
+    .navbar{ border-bottom:1px solid rgba(0,0,0,.06); background:#fff; }
     .navbar-brand{ font-weight:600; }
+
+    header .subtle{ color: var(--bs-secondary-color, #6c757d); } /* ข้อความซ้ายบนให้โทนเทาอ่อน */
+
+    .spinner-border{ color: var(--bs-primary); }
     .tag-chip{
       cursor:pointer;
       --bs-badge-color: var(--bs-primary);
       --bs-badge-bg: #fff;
       border:1px solid rgba(var(--bs-primary-rgb), .25);
     }
-    .btn-outline-primary{ --bs-btn-color:var(--bs-primary); --bs-btn-border-color:var(--bs-primary); }
-    .btn-outline-primary:hover{ color:#fff; background:var(--bs-primary); border-color:var(--bs-primary); }
-    .spinner-border{ color: var(--bs-primary); }
-    .card h5{ font-weight:600; }
-    .badge-sale{
-      background: #dc3545; /* ใช้สี danger สำหรับป้าย "ลด %" */
+    .badge-sale{ background:#dc3545; }  /* ป้ายลดราคา */
+
+    .card{ border:0; box-shadow: 0 6px 16px rgba(17, 24, 39, .06); border-radius: 1rem; }
+    .card img{ border-top-left-radius:1rem; border-top-right-radius:1rem; }
+    .line-clamp-2{
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
     }
+    .object-fit-cover{ object-fit:cover; }
+
+    /* ปุ่มให้เข้าธีมหลัก */
+    .btn-primary{
+      --bs-btn-bg: var(--bs-primary);
+      --bs-btn-border-color: var(--bs-primary);
+      --bs-btn-hover-bg: rgba(var(--bs-primary-rgb), .9);
+      --bs-btn-hover-border-color: rgba(var(--bs-primary-rgb), .9);
+      border-radius:.75rem;
+      box-shadow: 0 6px 12px rgba(var(--bs-primary-rgb), .18);
+    }
+    .btn-outline-primary{
+      --bs-btn-color: var(--bs-primary);
+      --bs-btn-border-color: var(--bs-primary);
+      --bs-btn-hover-bg: var(--bs-primary);
+      --bs-btn-hover-border-color: var(--bs-primary);
+      --bs-btn-hover-color:#fff;
+      border-radius:.75rem;
+    }
+
+    /* Pagination */
+    .pager-wrap{ gap:1rem; }
+    .pager-wrap .btn{ min-width:110px; }
+    .pager-wrap .btn:disabled{
+      opacity:.45; box-shadow:none !important;
+    }
+
+    /* Loader เต็มจอ */
+    .page-loader{
+      position:fixed; inset:0;
+      background:#ffffffcc; backdrop-filter:saturate(120%) blur(2px);
+      display:flex; align-items:center; justify-content:center;
+      z-index:2000;
+    }
+    .hidden{ display:none!important; }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-light bg-white sticky-top">
+  <!-- Topbar -->
+  <nav class="navbar sticky-top">
     <div class="container">
       <a class="navbar-brand" href="index.html">รับจ้างสารพัด 24 ชั่วโมง</a>
       <a class="btn btn-outline-primary btn-sm" href="index.html#products">
@@ -61,17 +89,23 @@
   </nav>
 
   <!-- Header -->
-  <header class="bg-white border-bottom">
-    <div class="container py-4">
-      <h3 class="mb-1">สินค้าทั้งหมด</h3>
-      <div id="resultInfo" class="text-muted">กำลังโหลด...</div>
+  <header class="py-4">
+    <div class="container">
+      <div class="d-flex align-items-end justify-content-between">
+        <div>
+          <div class="subtle small mb-1">รับจ้างสารพัด 24 ชั่วโมง</div>
+          <h3 class="mb-0">สินค้าทั้งหมด</h3>
+        </div>
+        <a href="index.html#products" class="btn btn-outline-primary btn-sm">กลับหน้าหลัก</a>
+      </div>
+      <div id="resultInfo" class="subtle mt-2">กำลังโหลด...</div>
     </div>
   </header>
 
-  <main class="container py-4">
+  <main class="container pb-5">
 
-    <!-- แถบค้นหา/ตัวกรอง -->
-    <div class="card mb-3 shadow-sm">
+    <!-- Filters -->
+    <div class="card mb-3">
       <div class="card-body">
         <div class="row g-2 align-items-center">
           <div class="col-md-5">
@@ -94,31 +128,31 @@
               <input id="onlyFeatured" class="form-check-input" type="checkbox">
               <label class="form-check-label" for="onlyFeatured">เฉพาะแนะนำ</label>
             </div>
-            <div class="ms-auto small text-muted" id="activeTags"></div>
+            <div class="ms-auto small subtle" id="activeTags"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- กริดสินค้า -->
+    <!-- Grid -->
     <div id="grid" class="row g-3"></div>
 
     <!-- Pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-      <button id="prevPage" class="btn btn-outline-primary">
+    <div class="d-flex justify-content-center align-items-center mt-4 pager-wrap">
+      <button id="prevPage" class="btn btn-primary">
         <i class="bi bi-chevron-left"></i> ก่อนหน้า
       </button>
-      <div class="text-muted" id="pageInfo"></div>
-      <button id="nextPage" class="btn btn-outline-primary">
+      <div class="subtle" id="pageInfo"></div>
+      <button id="nextPage" class="btn btn-primary">
         ถัดไป <i class="bi bi-chevron-right"></i>
       </button>
     </div>
 
-    <!-- โมดอลรายละเอียด -->
+    <!-- Modals -->
     <div id="modals"></div>
   </main>
 
-  <!-- Loader -->
+  <!-- Full loader -->
   <div id="pageLoader" class="page-loader">
     <div class="text-center">
       <div class="spinner-border mb-2" role="status" aria-hidden="true"></div>
@@ -129,7 +163,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script type="module">
-    // ปิด Loader เสมอถ้ามี error หลุดระดับหน้า
+    // ปิด Loader ถ้าเกิด error
     addEventListener('error',   ()=> document.getElementById('pageLoader')?.classList.add('hidden'));
     addEventListener('unhandledrejection', ()=> document.getElementById('pageLoader')?.classList.add('hidden'));
 
@@ -157,8 +191,8 @@
     };
 
     const PAGE_SIZE = 12;
-    let allItems = [];   // from Firestore
-    let filtered = [];   // after client filters
+    let allItems = [];
+    let filtered = [];
     let page = 1;
 
     function showLoader(v){ els.loader.classList.toggle('hidden', !v); }
@@ -190,11 +224,11 @@
         .join('');
       return `
       <div class="col-sm-6 col-lg-4">
-        <div class="card h-100 shadow-sm position-relative">
+        <div class="card h-100 position-relative">
           ${s.active ? `<span class="badge badge-sale position-absolute top-0 start-0 m-2">ลด ${s.percent}%</span>`:''}
           ${d.cover ? `
           <div class="ratio ratio-16x9">
-            <img src="${d.cover}" class="w-100 h-100 object-fit-cover rounded-top" alt="">
+            <img src="${d.cover}" class="w-100 h-100 object-fit-cover" alt="">
           </div>`:''}
           <div class="card-body d-flex flex-column">
             <h5 class="mb-1">${d.name||''}</h5>
