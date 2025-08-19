@@ -78,3 +78,12 @@ service cloud.firestore {
     }
   }
 }
+
+// ร้านค้า – products
+match /products/{id} {
+  // หน้าเว็บอ่านได้ (หรือจะจำกัดแค่ isActive ก็ได้ ดูหมายเหตุด้านล่าง)
+  allow read: if true;
+
+  // เขียนได้เฉพาะแอดมิน/โอ너ร์
+  allow create, update, delete: if isAdmin();
+}
