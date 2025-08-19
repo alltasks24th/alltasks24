@@ -5,7 +5,7 @@ const SERVICES_LIMIT_HOME = 3;
 import { auth, db, ensureAnonAuth } from './firebase-init.js';
 import {
   collection, doc, getDoc, getDocs, addDoc, onSnapshot,
-  query, where, orderBy, serverTimestamp, increment, updateDoc
+  query, where, orderBy, serverTimestamp, increment, updateDoc, limit
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 import { $ } from './utils.js';
 
@@ -688,99 +688,85 @@ window.SITE_FB_URL   = 'https://www.facebook.com/share/16Qd9wh7h4/'; // ลิ�
   });
 })();
 
-// ===== HOME: เรนเดอร์สินค้า 3 ชิ้น เหมือนหน้า shop =====
-function renderProductCardFromShop(item) {
-  const id = item.id;
-  const name = item.name || "-";
-  const price = Number(item.price || 0);
-  const discount = Number(item.discount || 0);         // ส่วนลดเป็นเปอร์เซ็นต์ (0-100)
-  const hasDiscount = discount > 0;
-  const finalPrice = hasDiscount ? Math.max(0, Math.round(price * (100 - discount) / 100)) : price;
+// ===== HOME: เรนเดอร์สินค้า 3 ชิ้น (สคีมเดียวกับ shop: price + sale) =====
+function cardFromShopItem(d, id){
+  const price = Number(d.price || 0);
+  const sale  = Number(d.sale  || 0);
+  const hasSale = sale > 0 && sale < price;
+  const pct  = hasSale ? Math.round((1 - (sale/price)) * 100) : 0;
 
-  const image = (item.images && item.images[0]) || "https://placehold.co/600x400?text=No+Image";
-  const stock = Number(item.stock ?? 0);
-  const isOut = stock <= 0;
+  const imgs = Array.isArray(d.images) ? d.images : (d.images ? [d.images] : []);
+  const cover = imgs[0] || d.image || 'assets/img/placeholder-16x9.png';
 
-  const featured = item.featured === true;
-  const hot = item.hot === true;
-  const isNew = item.isNew === true;
+  const flags = [];
+  if (d.featured) flags.push('แนะนำ');
+  if (d.hot)      flags.push('ฮิต');
+  if (d.isNew)    flags.push('ใหม่');
 
-  const startAt = item.startAt ? new Date(item.startAt.seconds ? item.startAt.seconds * 1000 : item.startAt) : null;
-  const promoTxt = startAt ? `เริ่มโปรฯ: ${startAt.toLocaleString("th-TH")}` : "";
+  const stockTxt = (d.stock===0) ? 'สินค้าหมด' : (d.stock>0 ? `คงเหลือ ${d.stock}` : '');
+  const startTxt = d.startAt ? `เริ่ม ${ (d.startAt?.toDate ? d.startAt.toDate():new Date(d.startAt)).toLocaleString('th-TH') }` : '';
 
   return `
-    <div class="col-12 col-md-4">
-      <div class="card h-100 product-card shadow-sm">
-        <div class="position-relative">
-          ${hasDiscount ? `<span class="badge bg-danger sale-badge">ลด ${discount}%</span>` : ``}
-          ${isOut ? `<span class="badge bg-secondary position-absolute" style="right:12px; top:12px; z-index:5;">สินค้าหมด</span>` : ``}
-          <img src="${image}" class="card-img-top" alt="${name}">
+  <div class="col-12 col-md-4">
+    <div class="card h-100 product-card shadow-sm">
+      <div class="position-relative">
+        ${pct>0 ? `<span class="badge bg-danger sale-badge">ลด ${pct}%</span>` : ``}
+        ${d.stock===0 ? `<span class="badge bg-secondary position-absolute" style="right:12px; top:12px; z-index:5;">สินค้าหมด</span>` : ``}
+        <img src="${cover}" class="card-img-top object-fit-cover" alt="${d.name||''}">
+      </div>
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">${d.name||'-'}</h5>
+
+        <div class="mb-2">
+          ${hasSale
+            ? `<span class="text-muted text-decoration-line-through me-2">${price.toLocaleString()}฿</span>
+               <span class="fw-bold text-danger">${sale.toLocaleString()}฿</span>`
+            : `<span class="fw-bold">${price.toLocaleString()}฿</span>`}
         </div>
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">${name}</h5>
 
-          <div class="mb-2">
-            ${hasDiscount ? `<span class="text-muted text-decoration-line-through me-2">${price.toLocaleString()}฿</span>` : ``}
-            <span class="fw-bold">${finalPrice.toLocaleString()}฿</span>
-          </div>
-
-          <div class="mb-2 small">
-            ${featured ? `<span class="badge bg-warning text-dark me-1">แนะนำ</span>` : ``}
-            ${hot ? `<span class="badge bg-danger me-1">ฮอต</span>` : ``}
-            ${isNew ? `<span class="badge bg-success me-1">ใหม่</span>` : ``}
-          </div>
-
-          <div class="text-muted small mb-2">
-            คงเหลือ: ${stock.toLocaleString()} ชิ้น
-            ${promoTxt ? `<div>${promoTxt}</div>` : ``}
-          </div>
-
-          <div class="mt-auto">
-            <a href="product.html?id=${encodeURIComponent(id)}" class="btn btn-primary w-100">ดูรายละเอียด</a>
-          </div>
+        <div class="small mb-2">
+          ${flags.map(f=>`<span class="badge bg-warning text-dark me-1">#${f}</span>`).join('')}
+          ${Array.isArray(d.tags)? d.tags.slice(0,3).map(t=>`<span class="badge bg-secondary me-1">#${t}</span>`).join(''):''}
         </div>
+
+        ${stockTxt || startTxt ? `<div class="text-muted small mb-2">${[stockTxt,startTxt].filter(Boolean).join(' • ')}</div>` : ''}
+
+        <a href="product.html?id=${encodeURIComponent(id)}" class="btn btn-primary mt-auto w-100">ดูรายละเอียด</a>
       </div>
     </div>
-  `;
+  </div>`;
 }
 
-async function renderHomeProducts() {
+async function renderHomeProducts(){
   const wrap = document.getElementById("home-products");
   const skel = document.getElementById("home-products-skeleton");
-  const empty = document.getElementById("home-products-empty");
+  const empty= document.getElementById("home-products-empty");
   const err  = document.getElementById("home-products-error");
-  if (!wrap) return; // หน้าอื่นไม่มีบล็อกนี้
+  if (!wrap) return;
 
-  try {
-    const db = getFirestore();
-    const ref = query(
-      collection(db, "products"),
-      where("isActive", "==", true),
-      orderBy("rank", "asc"),
-      limit(3) // <-- เอามาแค่ 3 ชิ้น
+  try{
+    const qRef = query(
+      collection(db,"products"),
+      where("isActive","==", true),
+      orderBy("rank","asc"),
+      limit(3)
     );
-    const snap = await getDocs(ref);
-    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const snap = await getDocs(qRef);
+    const items = snap.docs.map(d => ({ id:d.id, ...d.data() }));
 
-    if (items.length === 0) {
-      if (skel) skel.classList.add("d-none");
-      if (empty) empty.classList.remove("d-none");
-      return;
+    if(items.length===0){
+      skel?.classList.add("d-none"); empty?.classList.remove("d-none"); return;
     }
-
-    wrap.innerHTML = items.map(renderProductCardFromShop).join("");
+    wrap.innerHTML = items.map(it => cardFromShopItem(it, it.id)).join("");
     wrap.classList.remove("d-none");
-    if (skel) skel.classList.add("d-none");
-  } catch (e) {
+    skel?.classList.add("d-none");
+  }catch(e){
     console.error(e);
-    if (skel) skel.classList.add("d-none");
-    if (err)  err.classList.remove("d-none");
+    skel?.classList.add("d-none");
+    err?.classList.remove("d-none");
   }
 }
-
-// ผูกให้ทำงานเมื่อเข้าหน้าแรก
 document.addEventListener("DOMContentLoaded", renderHomeProducts);
-
 // ==== Shared helpers (ใช้ทั้งหน้า shop และหน้าแรก) ====
 window.App = window.App || {};
 
