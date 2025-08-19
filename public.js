@@ -29,7 +29,7 @@ async function loadSettings(){
   const data = s.exists()? s.data(): { phone:'0800000000', line:'@yourline', facebook:'https://facebook.com/', mapUrl:'https://www.google.com/maps?q=Bangkok&output=embed' };
   const m = $('#mapEmbed'); if(m) m.src = data.mapUrl||'';
   const call = $('#fabCall'); if(call) call.href = `tel:${data.phone||''}`;
-  const line = $('#fabLine'); if(line) line.href = `https://line.me/R/ti/p/${(data.line||'').replace('@','')}`;
+  const ln=$('#fabLine'); if(ln){const r=(data.line||'').trim(); ln.href=r?(r.startsWith('http')?r:`https://line.me/R/ti/p/${r.startsWith('@')?r:'@'+r}`):'#';}
   const fb = $('#fabFb'); if(fb) fb.href = data.facebook||'#';
 }
 
