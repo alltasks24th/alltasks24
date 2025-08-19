@@ -793,3 +793,117 @@ async function renderHomeProducts() {
 
 // ให้ทำงานเมื่อ DOM พร้อม (ไม่ไปรบกวนของเดิม)
 document.addEventListener('DOMContentLoaded', renderHomeProducts);
+
+
+// ==== Shared helpers (ใช้ทั้งหน้า shop และหน้าแรก) ====
+window.App = window.App || {};
+
+App._firebaseInited = false;
+App.initFirebaseOnce = async function () {
+  if (App._firebaseInited) return;
+  // *** ใช้ config เดิมในโปรเจกต์คุณ ***, ถ้ามีตัว initial ไว้อยู่แล้วก็แค่ set flag
+  if (!firebase.apps.length) {
+    // ปกติคุณมี <script> config อยู่ในไฟล์อยู่แล้ว จึงไม่ต้องทำอะไรเพิ่มตรงนี้
+  }
+  App.db = firebase.firestore();
+  App._firebaseInited = true;
+};
+
+// แปลงราคา/วันที่
+App._baht = n => `฿${Number(n||0).toLocaleString('th-TH')}`;
+App._dt   = ts => {
+  try { const d = ts?.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleString('th-TH',{ dateStyle:'medium', timeStyle:'short'}); }
+  catch(e){ return ''; }
+};
+
+// คำนวณ % ลดราคา
+App._salePercent = (price, salePrice) => {
+  const p = Number(price||0), s = Number(salePrice||0);
+  if (!p || s<=0 || s>=p) return 0;
+  return Math.round((1 - (s/p)) * 100);
+};
+
+// วาดการ์ดสินค้าแบบเดียวกับ shop
+App.renderProductCard = function (doc) {
+  const d = doc.data ? doc.data() : doc;  // รองรับทั้ง snapshot และ object
+  const id = d.id || doc.id;
+
+  const price = Number(d.price||0);
+  const sale  = Number(d.sale||0);
+  const spc   = App._salePercent(price, sale);
+
+  // flags จากหลังบ้าน (ตัวอย่างคีย์: featured/ hot/ isNew)
+  const flags = [];
+  if (d.featured) flags.push('แนะนำ');
+  if (d.hot)      flags.push('ฮิต');
+  if (d.isNew)    flags.push('ใหม่');
+
+  // tags array
+  const tags = Array.isArray(d.tags) ? d.tags : (d.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
+
+  const imgs = Array.isArray(d.images) ? d.images : (d.images? [d.images] : []);
+  const cover = imgs[0] || d.image || 'assets/img/placeholder-16x9.png';
+
+  // stock + promo start
+  const stockTxt = (d.stock===0) ? 'สินค้าหมด' : (d.stock>0 ? `คงเหลือ ${d.stock}` : '');
+  const promoTxt = d.startAt ? `เริ่ม ${App._dt(d.startAt)}` : '';
+
+  return `
+  <div class="col-md-4">
+    <div class="card card-clean h-100 product-card">
+      ${spc>0 ? `<span class="sale-badge">ลด ${spc}%</span>` : ''}
+      <div class="ratio ratio-16x9"><img src="${cover}" class="object-fit-cover rounded-top" alt="${d.name||''}"></div>
+
+      <div class="card-body">
+        <h5 class="card-title mb-1">${d.name || ''}</h5>
+
+        <div class="mb-2">
+          ${sale>0 && sale<price
+            ? `<del class="text-muted me-1">${App._baht(price)}</del><span class="text-danger fw-bold">${App._baht(sale)}</span>`
+            : `<span class="fw-bold">${App._baht(price)}</span>`}
+        </div>
+
+        <div class="mb-2">
+          ${flags.map(f=>`<span class="tag-badge">#${f}</span>`).join('')}
+          ${tags.slice(0,3).map(t=>`<span class="tag-badge">#${t}</span>`).join('')}
+        </div>
+
+        ${stockTxt || promoTxt ? `<p class="small text-muted mb-2">${[stockTxt,promoTxt].filter(Boolean).join(' • ')}</p>` : ''}
+
+        <a href="product.html?id=${id}" class="btn btn-primary w-100">ดูรายละเอียด</a>
+      </div>
+    </div>
+  </div>`;
+};
+
+// โหลดสินค้าไว้หน้าแรก (3 ชิ้น)
+App.renderHomeProducts = async function (container, opts={}) {
+  await App.initFirebaseOnce();
+  const $wrap = document.querySelector(container);
+  const $skel = document.querySelector('#home-products-skeleton');
+  $wrap.classList.add('d-none');
+
+  try{
+    let q = App.db.collection('products');
+    if (opts.onlyActive)   q = q.where('isActive','==', true);
+    if (opts.onlyFeatured) q = q.where('featured','==', true);
+
+    // เรียงตาม rank (ตัวเลขยิ่งน้อยยิ่งขึ้นก่อน) ถ้าไม่มี rank จะ fallback เป็น createdAt ล่าสุด
+    q = q.orderBy('rank','asc').limit(opts.limit||3);
+
+    const snap = await q.get();
+    const html = snap.empty
+      ? '<div class="text-center text-muted py-5">ยังไม่มีสินค้า</div>'
+      : snap.docs.map(App.renderProductCard).join('');
+
+    $wrap.innerHTML = html;
+    $skel?.classList.add('d-none');
+    $wrap.classList.remove('d-none');
+  }catch(err){
+    console.error(err);
+    $wrap.innerHTML = '<div class="text-danger text-center py-5">โหลดข้อมูลไม่สำเร็จ</div>';
+    $skel?.classList.add('d-none');
+    $wrap.classList.remove('d-none');
+  }
+};
