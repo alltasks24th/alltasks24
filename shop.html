@@ -3,271 +3,312 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>สินค้าทั้งหมด • รับจ้างสารพัด 24 ชั่วโมง</title>
+  <title>สินค้าทั้งหมด — รับจ้างสารพัด 24 ชั่วโมง</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <style>
-    body{ background:#f8f9fb; }
-    .object-fit-cover{ object-fit:cover; }
-    .line-clamp-2{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .price{ font-weight:700; }
-    .price del{ color:#6c757d; margin-right:.35rem; }
-    .badge-sale{ background: linear-gradient(45deg,#ff7aa2,#d63384); }
-    .oos-img{ filter: grayscale(1) brightness(.85); }
-    .ribbon{ position:absolute; top:.5rem; left:.5rem; z-index:5; }
-    .ribbon-right{ left:auto; right:.5rem; }
-    .card:hover{ box-shadow:0 0.5rem 1.25rem rgba(0,0,0,.08); transition:.2s; }
-    .page-loader{ position:fixed; inset:0; background:#fff; display:flex; align-items:center; justify-content:center; z-index:2000; }
-    .page-loader.hidden{ opacity:0; pointer-events:none; transition: opacity .25s ease; }
+    body{background:#f7f7f9}
+    .line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .object-fit-cover{object-fit:cover}
+    .page-loader{
+      position:fixed;inset:0;background:#ffffffcc;backdrop-filter:saturate(120%) blur(2px);
+      display:flex;align-items:center;justify-content:center;z-index:2000
+    }
+    .hidden{display:none !important}
+    .tag-chip{cursor:pointer}
   </style>
 </head>
 <body>
-
-<div id="pageLoader" class="page-loader">
-  <div class="text-center">
-    <div class="spinner-border" role="status"></div>
-    <div class="mt-3 fw-semibold">กำลังโหลด...</div>
-  </div>
-</div>
-
-<header class="py-4 bg-white border-bottom">
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-end gap-3">
-      <div>
-        <h1 class="h3 fw-bold mb-1">สินค้าทั้งหมด</h1>
-        <div class="text-muted small">เลือกดู ค้นหา และจัดเรียงได้</div>
-      </div>
-      <a href="index.html" class="btn btn-outline-secondary d-none d-md-inline-flex"><i class="bi bi-arrow-left"></i>&nbsp;กลับหน้าแรก</a>
+  <nav class="navbar navbar-light bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="index.html">รับจ้างสารพัด 24 ชั่วโมง</a>
+      <a class="btn btn-outline-primary btn-sm" href="index.html#products">กลับหน้าแรก</a>
     </div>
-  </div>
-</header>
+  </nav>
 
-<main class="py-4">
-  <div class="container">
-    <!-- Controls -->
-    <div class="card shadow-sm mb-3">
+  <header class="bg-white border-bottom">
+    <div class="container py-4">
+      <h3 class="mb-1">สินค้าทั้งหมด</h3>
+      <div id="resultInfo" class="text-muted">กำลังโหลด...</div>
+    </div>
+  </header>
+
+  <main class="container py-4">
+    <!-- แถบตัวกรอง -->
+    <div class="card mb-3">
       <div class="card-body">
         <div class="row g-2 align-items-center">
-          <div class="col-12 col-md-4">
+          <div class="col-md-5">
             <div class="input-group">
-              <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-              <input id="q" class="form-control" placeholder="ค้นหาชื่อ/คำอธิบาย/แท็ก">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="q" class="form-control" placeholder="ค้นหา (ชื่อ/แท็ก)">
+              <button id="btnClear" class="btn btn-outline-secondary">ล้าง</button>
             </div>
           </div>
-          <div class="col-6 col-md-3">
+          <div class="col-md-3">
             <select id="sort" class="form-select">
-              <option value="rank-asc">จัดลำดับ (rank) ก่อน</option>
-              <option value="createdAt-desc">ล่าสุดก่อน</option>
-              <option value="price-asc">ราคาต่ำ→สูง</option>
-              <option value="price-desc">ราคาสูง→ต่ำ</option>
+              <option value="rank-asc">เรียงตามลำดับ (แนะนำก่อน)</option>
+              <option value="price-asc">ราคาต่ำ → สูง</option>
+              <option value="price-desc">ราคาสูง → ต่ำ</option>
+              <option value="latest-desc">มาใหม่ล่าสุด</option>
             </select>
           </div>
-          <div class="col-6 col-md-3">
+          <div class="col-md-4 d-flex align-items-center gap-3">
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="onlyFeatured">
-              <label class="form-check-label" for="onlyFeatured">แสดงเฉพาะรายการแนะนำ</label>
+              <input id="onlyFeatured" class="form-check-input" type="checkbox">
+              <label class="form-check-label" for="onlyFeatured">เฉพาะแนะนำ</label>
             </div>
-          </div>
-          <div class="col-12 col-md-2 text-md-end">
-            <button id="btnClear" class="btn btn-outline-secondary w-100">ล้างตัวกรอง</button>
+            <div class="ms-auto small text-muted" id="activeTags"></div>
           </div>
         </div>
-        <div id="activeTags" class="mt-2"></div>
       </div>
     </div>
 
-    <!-- Grid + Info -->
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <div class="small text-muted" id="resultInfo">—</div>
-      <div class="btn-group" role="group" aria-label="paging">
-        <button id="prevPage" class="btn btn-outline-secondary btn-sm" disabled>ก่อนหน้า</button>
-        <button id="nextPage" class="btn btn-outline-secondary btn-sm" disabled>ถัดไป</button>
-      </div>
-    </div>
-
+    <!-- กริดสินค้า -->
     <div id="grid" class="row g-3"></div>
+
+    <!-- pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <button id="prevPage" class="btn btn-outline-secondary"><i class="bi bi-chevron-left"></i> ก่อนหน้า</button>
+      <div class="text-muted" id="pageInfo"></div>
+      <button id="nextPage" class="btn btn-outline-secondary">ถัดไป <i class="bi bi-chevron-right"></i></button>
+    </div>
+
+    <!-- โมดอลรายละเอียด -->
     <div id="modals"></div>
+  </main>
+
+  <!-- Loader -->
+  <div id="pageLoader" class="page-loader">
+    <div class="text-center">
+      <div class="spinner-border mb-2" role="status" aria-hidden="true"></div>
+      <div>กำลังโหลด...</div>
+    </div>
   </div>
-</main>
 
-<script type="module">
-  import {
-    getFirestore, collection, query, where, orderBy, limit, getDocs
-  } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  // ใช้ db จาก firebase-init.js ถ้ามี export; ถ้าไม่ก็ใช้ getFirestore()
-  let db;
-  try {
-    const FI = await import('./firebase-init.js');
-    db = FI.db || getFirestore();
-  } catch(e){ db = getFirestore(); }
+  <script type="module">
+    // ปิด Loader เสมอถ้ามี error หลุดระดับหน้า
+    window.addEventListener('error', () => document.getElementById('pageLoader')?.classList.add('hidden'));
+    window.addEventListener('unhandledrejection', () => document.getElementById('pageLoader')?.classList.add('hidden'));
 
-  const PAGE_SIZE = 12;
-  const state = { all: [], filtered: [], page: 0 };
-  const $ = (s,r=document)=>r.querySelector(s);
-  const showLoader = (b)=> $('#pageLoader')?.classList.toggle('hidden', !b);
+    import { db, ensureAnonAuth } from './firebase-init.js?v=shop2';
+    import {
+      collection, query, where, orderBy, getDocs
+    } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-  const params = new URLSearchParams(location.search);
-  const initQ = params.get('q') || '';
-  const initTags = (params.get('tags')||'').split(',').map(s=>s.trim()).filter(Boolean);
-  const initSort = params.get('sort') || 'rank-asc';
-  const initOnlyFeatured = params.get('featured') === 'true';
+    const $ = (s,r=document)=>r.querySelector(s);
+    const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
 
-  $('#q').value = initQ; $('#sort').value = initSort; $('#onlyFeatured').checked = initOnlyFeatured;
+    const els = {
+      q: $('#q'),
+      sort: $('#sort'),
+      onlyFeatured: $('#onlyFeatured'),
+      btnClear: $('#btnClear'),
+      grid: $('#grid'),
+      modals: $('#modals'),
+      resultInfo: $('#resultInfo'),
+      pageInfo: $('#pageInfo'),
+      prev: $('#prevPage'),
+      next: $('#nextPage'),
+      loader: $('#pageLoader'),
+      activeTags: $('#activeTags')
+    };
 
-  function renderActiveTags(tags){
-    const wrap = $('#activeTags'); if(!wrap) return;
-    wrap.innerHTML = tags.length ? tags.map(t=>`
-      <span class="badge text-bg-light border me-1 mb-1">
-        #${t} <button class="btn btn-sm btn-link p-0 ms-1" data-remove-tag="${t}" title="เอาแท็กนี้ออก"><i class="bi bi-x-lg"></i></button>
-      </span>`).join('') : '';
-    wrap.addEventListener('click', (e)=>{
-      const b = e.target.closest('[data-remove-tag]'); if(!b) return;
-      const t = b.getAttribute('data-remove-tag');
-      const arr = getTags().filter(x=>x!==t); setTags(arr); apply();
-    }, { once:true });
-  }
-  function getTags(){ const t = params.get('tags'); return t ? t.split(',').map(s=>s.trim()).filter(Boolean) : []; }
-  function setTags(arr){ if (arr.length) params.set('tags', arr.join(',')); else params.delete('tags'); history.replaceState(null,'',`${location.pathname}?${params.toString()}`); renderActiveTags(arr); }
-  function readControls(){ return { q:$('#q').value.trim(), sort:$('#sort').value, onlyFeatured:$('#onlyFeatured').checked, tags:getTags() }; }
+    const PAGE_SIZE = 12;
 
-  function productMatches(p, {q,tags,onlyFeatured}){
-    if (onlyFeatured && !p.featured) return false;
-    if (tags?.length){
-      const ptags = (p.tags||[]).map(s=>String(s).trim());
-      if (!tags.every(t=> ptags.includes(t))) return false;
+    let allItems = [];     // สินค้าที่โหลดมาทั้งหมด (ตามตัวกรองจาก Firestore)
+    let filtered = [];     // หลังกรองด้วย keyword/แท็ก/เรียง
+    let page = 1;
+
+    function showLoader(v){ els.loader.classList.toggle('hidden', !v); }
+
+    // แปลง Firestore Timestamp/Date/ISO → Date
+    const toDate = (v)=> v?.toDate ? v.toDate() : (v ? new Date(v) : null);
+
+    function saleInfo(d){
+      const now = new Date();
+      const active = typeof d.salePrice === 'number'
+        && (!d.saleStart || toDate(d.saleStart) <= now)
+        && (!d.saleEnd || now <= toDate(d.saleEnd))
+        && d.salePrice < d.price;
+      const percent = (active && d.price) ? Math.round((1 - (d.salePrice/d.price))*100) : 0;
+      return {active, percent};
     }
-    if (q){
-      const hay = `${p.name||''} ${p.desc||''} ${(p.tags||[]).join(' ')}`.toLowerCase();
-      if (!hay.includes(q.toLowerCase())) return false;
+
+    function fmtPrice(d){
+      const s = saleInfo(d);
+      if (s.active){
+        return `<del class="text-muted me-1">฿${(d.price||0).toLocaleString()}</del>
+                <span class="text-danger">฿${(d.salePrice||0).toLocaleString()}</span>${d.unit?` / ${d.unit}`:''}`;
+      }
+      return `฿${(d.price||0).toLocaleString()}${d.unit?` / ${d.unit}`:''}`;
     }
-    return true;
-  }
-  function sortProducts(arr, key){
-    const a=[...arr];
-    switch(key){
-      case 'createdAt-desc': return a.sort((x,y)=>(y.createdAt?.seconds||0)-(x.createdAt?.seconds||0)||(x.rank||999)-(y.rank||999));
-      case 'price-asc':     return a.sort((x,y)=>(x.salePrice??x.price??0)-(y.salePrice??y.price??0));
-      case 'price-desc':    return a.sort((x,y)=>(y.salePrice??y.price??0)-(x.salePrice??x.price??0));
-      case 'rank-asc':
-      default:              return a.sort((x,y)=>(x.rank||999)-(y.rank||999)||(y.createdAt?.seconds||0)-(x.createdAt?.seconds||0));
-    }
-  }
-  function pctOff(p){ return (!p.price||!p.salePrice)?0:Math.round((1-(p.salePrice/p.price))*100); }
-  function isSaleActive(p){
-    if (typeof p.salePrice !== 'number') return false;
-    const now=new Date();
-    const s=p.saleStart?.toDate? p.saleStart.toDate() : (p.saleStart? new Date(p.saleStart):null);
-    const e=p.saleEnd?.toDate?   p.saleEnd.toDate()   : (p.saleEnd?   new Date(p.saleEnd):null);
-    const startOk=!s||s<=now, endOk=!e||now<=e;
-    return startOk && endOk && p.salePrice < p.price;
-  }
 
-  function renderGrid(){
-    const grid=$('#grid'), mods=$('#modals'); if(!grid||!mods) return;
-    grid.innerHTML=''; mods.innerHTML='';
-    const PAGE=12, start=state.page*PAGE, slice=state.filtered.slice(start,start+PAGE);
-
-    slice.forEach(p=>{
-      const saleOn=isSaleActive(p), percent=pctOff(p);
-      const out=(typeof p.stock==='number')? p.stock<=0 : p.inStock===false;
-      const chips=(p.tags||[]).slice(0,5).map(t=>`<span class="badge text-bg-light border me-1 mb-1">#${t}</span>`).join('');
-
-      grid.insertAdjacentHTML('beforeend', `
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-          <div class="card h-100 shadow-sm position-relative">
-            ${p.isBestSeller?`<span class="badge ribbon bg-warning text-dark">ฮิต</span>`:''}
-            ${p.featured?`<span class="badge ribbon ribbon-right bg-primary">แนะนำ</span>`:''}
-            ${saleOn?`<span class="badge badge-sale position-absolute top-0 start-50 translate-middle-x mt-2">ลด ${percent}%</span>`:''}
-            <div class="ratio ratio-4x3">
-              ${p.cover?`<img src="${p.cover}" class="w-100 h-100 object-fit-cover rounded-top ${out?'oos-img':''}" alt="">`:`<div class="bg-light rounded-top"></div>`}
-            </div>
-            <div class="card-body d-flex flex-column">
-              <h6 class="mb-1">${p.name||''}</h6>
-              <div class="price mb-1">
-                ${saleOn?`<del>฿${(p.price||0).toLocaleString()}</del> <span class="text-danger">฿${(p.salePrice||0).toLocaleString()}</span>`:`฿${(p.price||0).toLocaleString()}${p.unit?` / ${p.unit}`:''}`}
-              </div>
-              <div class="mb-2 d-flex flex-wrap">${chips}</div>
-              <p class="text-muted flex-grow-1 line-clamp-2">${p.desc||''}</p>
-              <button class="btn btn-outline-primary mt-auto" data-bs-toggle="modal" data-bs-target="#prod-${p.id}" ${out?'disabled':''}>ดูรายละเอียด</button>
-            </div>
+    function cardHtml(d, id){
+      const s = saleInfo(d);
+      const chips = (d.tags||[]).slice(0,5).map(t=>`<span class="badge text-bg-light border me-1 mb-1 tag-chip" data-tag="${t}">#${t}</span>`).join('');
+      return `
+      <div class="col-sm-6 col-lg-4">
+        <div class="card h-100 shadow-sm position-relative">
+          ${s.active ? `<span class="badge bg-danger position-absolute top-0 start-0 m-2">ลด ${s.percent}%</span>`:''}
+          ${d.cover ? `
+          <div class="ratio ratio-16x9">
+            <img src="${d.cover}" class="w-100 h-100 object-fit-cover rounded-top" alt="">
+          </div>`:''}
+          <div class="card-body d-flex flex-column">
+            <h5 class="mb-1">${d.name||''}</h5>
+            <div class="fw-semibold mb-1">${fmtPrice(d)}</div>
+            <div class="mb-2 d-flex flex-wrap">${chips}</div>
+            <p class="text-muted flex-grow-1 line-clamp-2">${d.desc||''}</p>
+            <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#prod-${id}">
+              ดูรายละเอียด
+            </button>
           </div>
-        </div>`);
+        </div>
+      </div>`;
+    }
 
-      const gal=Array.isArray(p.gallery)?p.gallery:[];
-      mods.insertAdjacentHTML('beforeend', `
-        <div class="modal fade" id="prod-${p.id}" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">${p.name||''}</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body">
-                ${gal.length?`
-                <div id="gal-${p.id}" class="carousel slide mb-3" data-bs-ride="carousel">
-                  <div class="carousel-inner">
-                    ${gal.map((u,i)=>`
-                      <div class="carousel-item ${i===0?'active':''}">
-                        <img src="${u}" class="d-block w-100 rounded" alt="">
-                      </div>`).join('')}
-                  </div>
-                  <button class="carousel-control-prev" type="button" data-bs-target="#gal-${p.id}" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-                  <button class="carousel-control-next" type="button" data-bs-target="#gal-${p.id}" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
-                </div>`:''}
-                <div class="fw-semibold mb-2">
-                  ราคา: ${saleOn?`<del>฿${(p.price||0).toLocaleString()}</del> <span class="text-danger">฿${(p.salePrice||0).toLocaleString()}</span>`:`฿${(p.price||0).toLocaleString()}${p.unit?` / ${p.unit}`:''}`}
+    function modalHtml(d, id){
+      const gal = Array.isArray(d.gallery)? d.gallery : [];
+      return `
+      <div class="modal fade" id="prod-${id}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">${d.name||''}</h5>
+              <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              ${gal.length?`
+              <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  ${gal.map((u,i)=>`
+                    <div class="carousel-item ${i===0?'active':''}">
+                      <img src="${u}" class="d-block w-100 rounded" alt="">
+                    </div>`).join('')}
                 </div>
-                <div class="small text-muted mb-2">${(p.tags||[]).join(' · ')}</div>
-                <p style="white-space:pre-line">${p.desc||''}</p>
-              </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
+                  <span class="carousel-control-next-icon"></span>
+                </button>
+              </div>`:''}
+              <div class="fw-semibold mb-2">ราคา: ${fmtPrice(d)}</div>
+              <div class="small text-muted mb-2">${(d.tags||[]).join(' · ')}</div>
+              <p style="white-space:pre-line">${d.desc||''}</p>
             </div>
           </div>
-        </div>`);
-    });
+        </div>
+      </div>`;
+    }
 
-    $('#resultInfo').textContent = `ทั้งหมด ${state.filtered.length} รายการ — หน้า ${state.page+1} / ${Math.max(1, Math.ceil(state.filtered.length / 12))}`;
-    $('#prevPage').disabled = state.page <= 0;
-    $('#nextPage').disabled = (state.page + 1) * 12 >= state.filtered.length;
-  }
+    function applyFilters(){
+      const q = (els.q.value||'').trim().toLowerCase();
+      const onlyF = els.onlyFeatured.checked;
+      let list = allItems.slice();
 
-  function apply(){
-    const qEl=$('#q'), sortEl=$('#sort'), featEl=$('#onlyFeatured');
-    const q=qEl.value.trim(), sort=sortEl.value, onlyFeatured=featEl.checked, tags=getTags();
-    const params=new URLSearchParams(location.search);
-    q?params.set('q',q):params.delete('q'); params.set('sort',sort); params.set('featured',String(onlyFeatured));
-    history.replaceState(null,'',`${location.pathname}?${params.toString()}`);
-    state.filtered = state.all.filter(p=>productMatches(p,{q,sort,onlyFeatured,tags}));
-    state.filtered = sortProducts(state.filtered, sort);
-    state.page=0; renderGrid();
-  }
+      // ค้นด้วยคำธรรมดา (ฝั่ง client)
+      if (q){
+        list = list.filter(d=>{
+          const inName = (d.name||'').toLowerCase().includes(q);
+          const inTags = (d.tags||[]).some(t=> (t||'').toLowerCase().includes(q));
+          return inName || inTags;
+        });
+      }
 
-  async function loadAll(){
-    showLoader(true);
-    try{
-      const q1 = query(collection(db,'products'), where('isActive','==', true), orderBy('rank','asc'), limit(200));
-      const snap = await getDocs(q1);
-      state.all = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-      setTags(initTags); // sync UI
-      $('#q').value = initQ; $('#sort').value = initSort; $('#onlyFeatured').checked = initOnlyFeatured;
-      apply();
-    }finally{ showLoader(false); }
-  }
+      // เรียง
+      const [field, dir] = (els.sort.value||'rank-asc').split('-');
+      list.sort((a,b)=>{
+        const va = (field==='latest') ? (a.createdAt? toDate(a.createdAt).getTime():0)
+                : (field==='price') ? (a.salePrice && a.salePrice < a.price ? a.salePrice : a.price)
+                : (a.rank ?? 999999);
+        const vb = (field==='latest') ? (b.createdAt? toDate(b.createdAt).getTime():0)
+                : (field==='price') ? (b.salePrice && b.salePrice < b.price ? b.salePrice : b.price)
+                : (b.rank ?? 999999);
+        return dir==='desc' ? (vb - va) : (va - vb);
+      });
 
-  // helpers for tags
-  function getTags(){ const p=new URLSearchParams(location.search); const t=p.get('tags'); return t? t.split(',').map(s=>s.trim()).filter(Boolean):[]; }
-  function setTags(arr){ const p=new URLSearchParams(location.search); arr.length? p.set('tags',arr.join(',')) : p.delete('tags'); history.replaceState(null,'',`${location.pathname}?${p.toString()}`); renderActiveTags(arr); }
+      filtered = list;
+      page = 1;
+      renderGrid();
+    }
 
-  // events
-  document.getElementById('q').addEventListener('input', apply);
-  document.getElementById('sort').addEventListener('change', apply);
-  document.getElementById('onlyFeatured').addEventListener('change', apply);
-  document.getElementById('btnClear').addEventListener('click', ()=>{ $('#q').value=''; $('#onlyFeatured').checked=false; $('#sort').value='rank-asc'; setTags([]); apply(); });
-  document.getElementById('prevPage').addEventListener('click', ()=>{ if(state.page>0){ state.page--; renderGrid(); window.scrollTo({top:0,behavior:'smooth'}); }});
-  document.getElementById('nextPage').addEventListener('click', ()=>{ const max=Math.ceil(state.filtered.length/12)-1; if(state.page<max){ state.page++; renderGrid(); window.scrollTo({top:0,behavior:'smooth'});} });
+    function renderGrid(){
+      const total = filtered.length;
+      const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      if (page > pages) page = pages;
+      const start = (page-1)*PAGE_SIZE;
+      const slice = filtered.slice(start, start+PAGE_SIZE);
 
-  await loadAll();
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      els.grid.innerHTML = slice.map(x=>cardHtml(x.data, x.id)).join('');
+      els.modals.innerHTML = slice.map(x=>modalHtml(x.data, x.id)).join('');
+
+      els.prev.disabled = (page<=1);
+      els.next.disabled = (page>=pages);
+      els.pageInfo.textContent = `${page} / ${pages}`;
+
+      els.resultInfo.textContent = `พบทั้งหมด ${total} รายการ`;
+      // tag click (เพิ่ม/แทนที่ query)
+      $$('.tag-chip', els.grid).forEach(el=>{
+        el.addEventListener('click', ()=>{
+          const t = el.getAttribute('data-tag') || '';
+          els.q.value = t;
+          applyFilters();
+        });
+      });
+    }
+
+    async function loadAll(){
+      showLoader(true);
+      await ensureAnonAuth().catch(()=>{}); // ไม่บังคับ auth สำหรับ read
+      // อ่านจาก Firestore ตามตัวกรองพื้นฐาน
+      const onlyF = els.onlyFeatured.checked;
+
+      // NOTE: เลือกใช้ orderBy('rank') เพื่อให้ตรง index ที่สร้างแล้ว
+      const qBase = [
+        where('isActive','==', true),
+        ...(onlyF ? [where('featured','==', true)] : []),
+        orderBy('rank','asc')
+      ];
+      const qs = query(collection(db,'products'), ...qBase);
+      const snap = await getDocs(qs);
+
+      // แปลงเป็น array {id,data}
+      allItems = snap.docs.map(d=>({ id:d.id, data:d.data() }));
+      applyFilters(); // จะเรียก renderGrid ภายใน
+    }
+
+    function bindEvents(){
+      els.q.addEventListener('input', debounce(applyFilters, 200));
+      els.sort.addEventListener('change', applyFilters);
+      els.onlyFeatured.addEventListener('change', ()=> loadAll().catch(console.error));
+      els.btnClear.addEventListener('click', ()=>{
+        els.q.value = '';
+        els.onlyFeatured.checked = false;
+        els.sort.value = 'rank-asc';
+        loadAll().catch(console.error);
+      });
+      els.prev.addEventListener('click', ()=>{ page=Math.max(1,page-1); renderGrid(); });
+      els.next.addEventListener('click', ()=>{ page=page+1; renderGrid(); });
+    }
+
+    function debounce(fn, ms){
+      let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
+    }
+
+    (async function init(){
+      try{
+        bindEvents();
+        await loadAll();
+      } catch(err){
+        console.error('shop init error:', err);
+      } finally{
+        showLoader(false);
+      }
+    })();
+  </script>
 </body>
 </html>
