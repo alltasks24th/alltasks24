@@ -584,9 +584,21 @@ window.SITE_FB_URL  = 'https://www.facebook.com/share/16Qd9wh7h4/';
 
 /* ===== HOME: เรนเดอร์สินค้า 3 ชิ้น (ถัดจากบริการ) ===== */
 async function renderHomeProducts() {
-  const wrap = document.getElementById('product-cards');
-  const mods = document.getElementById('product-modals');
-  if (!wrap || !mods) return; // ถ้าไม่มี container ให้ข้าม
+  const list = document.getElementById('home-products-list');
+  const skel = document.getElementById('home-products-skeleton');
+  const err  = document.getElementById('home-products-error');
+  const empty= document.getElementById('home-products-empty');
+
+  let mods = document.getElementById('product-modals');
+  if (!list) return;
+  if (!mods) { mods = document.createElement('div'); mods.id = 'product-modals'; document.body.appendChild(mods); }
+
+  // show skeleton
+  skel?.classList.remove('d-none');
+  err?.classList.add('d-none');
+  empty?.classList.add('d-none');
+  list.innerHTML = '';
+  mods.innerHTML = '';
 
   try {
     const snap = await getDocs(query(
@@ -594,29 +606,32 @@ async function renderHomeProducts() {
       where('isActive','==', true),
       where('featured','==', true),
       orderBy('rank','asc'),
-      limit(3) // โชว์ 3 ชิ้นแรกตาม rank
+      limit(3)                       // โชว์ 3 รายการแรก
     ));
 
-    wrap.innerHTML = '';
-    mods.innerHTML = '';
+    if (snap.empty) {
+      empty?.classList.remove('d-none');
+      return;
+    }
 
-    const docs = snap.docs; // รับมาแค่ 3 ชิ้นแล้ว
-    docs.forEach(docSnap => {
-      const d = docSnap.data(); const id = docSnap.id;
+    snap.forEach(docSnap => {
+      const d  = docSnap.data();
+      const id = docSnap.id;
 
-      const toDate = (v)=> v?.toDate ? v.toDate() : (v ? new Date(v) : null);
+      const toDate = v => v?.toDate ? v.toDate() : (v ? new Date(v) : null);
       const now = new Date();
-      const saleOn = (typeof d.salePrice === 'number')
-        && (!d.saleStart || toDate(d.saleStart) <= now)
-        && (!d.saleEnd   || now <= toDate(d.saleEnd))
-        && d.salePrice < d.price;
+      const saleOn = typeof d.salePrice === 'number'
+                  && d.salePrice < (d.price || 0)
+                  && (!d.saleStart || toDate(d.saleStart) <= now)
+                  && (!d.saleEnd   || now <= toDate(d.saleEnd));
 
-      const percent = (saleOn && d.price) ? Math.round((1 - (d.salePrice / d.price)) * 100) : 0;
-      const chips = (d.tags||[]).slice(0,5)
-        .map(t=>`<span class="badge text-bg-light border me-1 mb-1">#${t}</span>`).join('');
+      const percent = saleOn && d.price ? Math.round((1 - d.salePrice / d.price) * 100) : 0;
+      const chips   = (d.tags || []).slice(0,5).map(t => `<span class="badge text-bg-light border me-1 mb-1">#${t}</span>`).join('');
+      const stock   = (d.stock ?? null);
+      const startStr= d.saleStart ? toDate(d.saleStart).toLocaleString('th-TH') : '';
 
-      // การ์ดสินค้า (โทนใกล้กับการ์ดบริการ)
-      wrap.insertAdjacentHTML('beforeend', `
+      // การ์ดบนหน้าแรก (ป้าย "ลด xx%" จะยังแสดงแม้มีรูป)
+      list.insertAdjacentHTML('beforeend', `
         <div class="col-md-4">
           <div class="card h-100 shadow-sm position-relative">
             ${saleOn ? `<span class="badge bg-danger position-absolute top-0 start-0 m-2">ลด ${percent}%</span>` : ``}
@@ -625,15 +640,17 @@ async function renderHomeProducts() {
                 <img src="${d.cover}" class="w-100 h-100 object-fit-cover rounded-top" alt="">
               </div>` : ``}
             <div class="card-body d-flex flex-column">
-              <h5 class="mb-1">${d.name||''}</h5>
+              <h5 class="mb-1">${d.name || ''}</h5>
               <div class="fw-semibold mb-1">
-                ${saleOn
-                  ? `<del class="text-muted me-1">฿${(d.price||0).toLocaleString()}</del>
-                     <span class="text-danger">฿${(d.salePrice||0).toLocaleString()}</span>`
-                  : `฿${(d.price||0).toLocaleString()}${d.unit?` / ${d.unit}`:''}`}
+                ${ saleOn
+                    ? `<del class="text-muted me-1">฿${(d.price||0).toLocaleString()}</del>
+                       <span class="text-danger">฿${(d.salePrice||0).toLocaleString()}</span>`
+                    : `฿${(d.price||0).toLocaleString()}${d.unit?` / ${d.unit}`:''}` }
               </div>
+              ${stock!==null ? `<div class="small text-muted mb-1">สต๊อก: ${stock}</div>` : ``}
+              ${saleOn && startStr ? `<div class="small text-muted mb-1">เริ่มโปรโมชัน: ${startStr}</div>` : ``}
               <div class="mb-2 d-flex flex-wrap">${chips}</div>
-              <p class="text-muted flex-grow-1 line-clamp-2">${d.desc||''}</p>
+              <p class="text-muted flex-grow-1 line-clamp-2">${d.desc || ''}</p>
               <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#prod-${id}">
                 ดูรายละเอียด
               </button>
@@ -642,49 +659,64 @@ async function renderHomeProducts() {
         </div>
       `);
 
-      // โมดอลรายละเอียด + สไลด์รูป
+      // โมดอลรายละเอียด + แกลเลอรี
       const gal = Array.isArray(d.gallery) ? d.gallery : [];
       mods.insertAdjacentHTML('beforeend', `
         <div class="modal fade" id="prod-${id}" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title">${d.name||''}</h5>
+                <h5 class="modal-title">${d.name || ''}</h5>
                 <button class="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <div class="modal-body">
-                ${gal.length?`
-                <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
-                  <div class="carousel-inner">
-                    ${gal.map((u,i)=>`
-                      <div class="carousel-item ${i===0?'active':''}">
-                        <img src="${u}" class="d-block w-100 rounded" alt="">
-                      </div>`).join('')}
-                  </div>
-                  <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                  </button>
-                  <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                  </button>
-                </div>`:''}
+                ${gal.length ? `
+                  <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                      ${gal.map((u,i)=>`
+                        <div class="carousel-item ${i===0?'active':''}">
+                          <img src="${u}" class="d-block w-100 rounded" alt="">
+                        </div>`).join('')}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
+                      <span class="carousel-control-next-icon"></span>
+                    </button>
+                  </div>` : ``}
                 <div class="fw-semibold mb-2">
-                  ราคา: ${saleOn
-                    ? `<del>฿${(d.price||0).toLocaleString()}</del> <span class="text-danger">฿${(d.salePrice||0).toLocaleString()}</span>`
-                    : `฿${(d.price||0).toLocaleString()}${d.unit?` / ${d.unit}`:''}`}
+                  ราคา:
+                  ${ saleOn
+                      ? `<del>฿${(d.price||0).toLocaleString()}</del> <span class="text-danger">฿${(d.salePrice||0).toLocaleString()}</span>`
+                      : `฿${(d.price||0).toLocaleString()}${d.unit?` / ${d.unit}`:''}` }
                 </div>
+                ${stock!==null ? `<div class="small text-muted mb-1">สต๊อก: ${stock}</div>` : ``}
+                ${saleOn && startStr ? `<div class="small text-muted mb-1">เริ่มโปรโมชัน: ${startStr}</div>` : ``}
                 <div class="small text-muted mb-2">${(d.tags||[]).join(' · ')}</div>
-                <p style="white-space:pre-line">${d.desc||''}</p>
+                <p style="white-space:pre-line">${d.desc || ''}</p>
+
+                <!-- ปุ่มติดต่อ -->
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                  ${window.SITE_PHONE   ? `<a href="tel:${window.SITE_PHONE}" class="btn btn-outline-success"><i class="bi bi-telephone"></i> โทร</a>` : ``}
+                  ${window.SITE_LINE_URL? `<a href="${window.SITE_LINE_URL}" target="_blank" rel="noopener" class="btn btn-outline-success"><i class="bi bi-chat-dots"></i> LINE</a>` : ``}
+                  ${window.SITE_FB_URL  ? `<a href="${window.SITE_FB_URL}" target="_blank" rel="noopener" class="btn btn-outline-primary"><i class="bi bi-facebook"></i> Facebook</a>` :
+                    `<button type="button" class="btn btn-outline-primary" data-share="facebook"><i class="bi bi-facebook"></i> แชร์ Facebook</button>`}
+                </div>
               </div>
             </div>
           </div>
         </div>
       `);
     });
-  } catch (err) {
-    console.error('load products failed:', err);
+
+  } catch (e) {
+    console.error(e);
+    err?.classList.remove('d-none');
+  } finally {
+    skel?.classList.add('d-none');
   }
 }
 
-// ให้ทำงานเมื่อ DOM พร้อม (ไม่ไปรบกวนของเดิม)
+// ให้ทำงานเมื่อ DOM พร้อม
 document.addEventListener('DOMContentLoaded', renderHomeProducts);
