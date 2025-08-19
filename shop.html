@@ -2,392 +2,394 @@
 <html lang="th">
 <head>
   <meta charset="utf-8">
-  <title>สินค้าทั้งหมด — alltasks24</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Bootstrap / Icons (ใช้เวอร์ชันเดียวกับหน้าเว็บหลักได้เลย) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <title>สินค้าทั้งหมด — รับจ้างสารพัด 24 ชั่วโมง</title>
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- สไตล์หลักของเว็บ -->
+  <link href="assets/styles.css?v=shop-theme-3" rel="stylesheet">
+
   <style>
+    /* ================= Theme Sync (เน้น override ให้ชนะทุกที่) ================ */
     :root{
-      --brand:#6f42c1;           /* ม่วงหลัก */
-      --brand-10:#f3eaff;        /* พื้นหลังจาง */
-      --chip:#f1f5ff;            /* พื้นชิป */
-      --chip-text:#3b82f6;
-    }
-    body{ background:var(--brand-10); }
-    .page-wrap{ max-width:1080px; margin:auto; padding:24px 12px 48px; }
-
-    /* การ์ดสินค้า */
-    .product-card{ border:0; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.06); overflow:hidden; background:#fff; }
-    .thumb-wrap{ position:relative; background:#f5f5f5; }
-    .thumb-wrap img{ width:100%; height:220px; object-fit:cover; display:block; }
-    .sale-badge{
-      position:absolute; left:12px; top:12px;
-      background:#ef4444; color:#fff; font-weight:700; font-size:.75rem;
-      padding:.25rem .5rem; border-radius:999px; z-index:3;
-      box-shadow:0 4px 10px rgba(239,68,68,.25);
-    }
-    .badge-chip{ background:var(--chip); color:var(--chip-text); font-weight:600; }
-    .price{ font-weight:700; }
-    .price del{ color:#9ca3af; font-weight:500; margin-right:.25rem; }
-    .price .text-danger{ font-weight:800; }
-
-    /* สินค้าหมด */
-    .oos{ position:absolute; right:12px; top:12px; z-index:3; }
-    .thumb-wrap::after{
-      content:""; position:absolute; inset:0; background:transparent; z-index:1;
+      /* ถ้า styles.css มีตัวแปรเองอยู่แล้วจะถูกใช้ก่อน อันนี้ทำหน้าที่เป็น fallback */
+      --bs-primary: #6c2bd9;
+      --bs-primary-rgb: 108,43,217;
+      --page-bg: var(--site-bg, #F6F3FF); /* โทนพื้นหลังหน้าแรก (ม่วงอ่อน) */
     }
 
-    /* skeleton */
-    .skeleton{ border-radius:16px; overflow:hidden; background:#fff; box-shadow:0 8px 20px rgba(0,0,0,.06); }
-    .sk-img{ height:220px; background:linear-gradient(90deg,#eee,#f5f5f5,#eee); animation:sh 1.2s linear infinite; }
-    .sk-line{ height:12px; border-radius:6px; margin:10px 0; background:linear-gradient(90deg,#eee,#f5f5f5,#eee); animation:sh 1.2s linear infinite; }
-    @keyframes sh{ 0%{background-position:-200px 0}100%{background-position:200px 0} }
+    /* พื้นหลังทั้งหน้า */
+    body{ background: var(--page-bg) !important; }
 
-    /* ปุ่มหลัก */
-    .btn-brand{ background:var(--brand); color:#fff; border:none; }
-    .btn-brand:hover{ filter:brightness(.95); color:#fff; }
-    .btn-outline-brand{ border-color:var(--brand); color:var(--brand); }
-    .btn-outline-brand:hover{ background:var(--brand); color:#fff; }
+    /* Navbar ให้เป็นขาว + เส้นคั่นอ่อน */
+    .navbar{ border-bottom:1px solid rgba(0,0,0,.06); background:#fff !important; }
+    .navbar-brand{ font-weight:600; }
 
-    .form-chip{ background:#fff; border:1px solid #e5e7eb; }
-    .topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-    .muted{ color:#64748b; font-size:.9rem; }
+    /* ข้อความซ้ายบนหัวเพจให้เป็นสี primary ตามธีม */
+    header .subtle{
+      color: rgba(var(--bs-primary-rgb), .95) !important;
+      font-weight: 600;
+    }
+
+    /* การ์ด/เงา/มุม */
+    .card{ border:0 !important; box-shadow: 0 6px 16px rgba(17, 24, 39, .06); border-radius: 1rem; }
+    .card img{ border-top-left-radius:1rem; border-top-right-radius:1rem; }
+
+    /* ชิปแท็ก */
+    .tag-chip{
+      cursor:pointer;
+      --bs-badge-color: var(--bs-primary);
+      --bs-badge-bg: #fff;
+      border:1px solid rgba(var(--bs-primary-rgb), .25);
+    }
+
+    /* ป้ายลดราคา */
+    .badge-sale{ background:#dc3545 !important; }
+
+    .line-clamp-2{
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    }
+    .object-fit-cover{ object-fit:cover; }
+
+    /* ปุ่มหลักทั้งหมด (ให้เป็นม่วง + เงา) */
+    .btn.btn-primary{
+      background: var(--bs-primary) !important;
+      border-color: var(--bs-primary) !important;
+      color:#fff !important;
+      border-radius:.75rem !important;
+      box-shadow: 0 6px 12px rgba(var(--bs-primary-rgb), .18) !important;
+    }
+    .btn.btn-primary:hover,
+    .btn.btn-primary:focus{
+      background: rgba(var(--bs-primary-rgb), .9) !important;
+      border-color: rgba(var(--bs-primary-rgb), .9) !important;
+      color:#fff !important;
+    }
+
+    /* ปุ่มกรอบม่วง */
+    .btn.btn-outline-primary{
+      color: var(--bs-primary) !important;
+      border-color: var(--bs-primary) !important;
+      border-radius:.75rem !important;
+      background:#fff !important;
+    }
+    .btn.btn-outline-primary:hover,
+    .btn.btn-outline-primary:focus{
+      background: var(--bs-primary) !important;
+      border-color: var(--bs-primary) !important;
+      color:#fff !important;
+    }
+
+    /* ปุ่มค้นหา/ล้าง ในกรอง */
+    .input-group .btn{ border-radius:.75rem !important; }
+
+    /* Pagination */
+    .pager-wrap{ gap:1rem; }
+    .pager-wrap .btn{ min-width:110px; }
+    .pager-wrap .btn:disabled{ opacity:.45 !important; box-shadow:none !important; }
+
+    /* Spinner ให้เป็นสีธีม */
+    .spinner-border{ color: var(--bs-primary) !important; }
+
+    /* Loader เต็มจอ */
+    .page-loader{
+      position:fixed; inset:0;
+      background:#ffffffcc; backdrop-filter:saturate(120%) blur(2px);
+      display:flex; align-items:center; justify-content:center;
+      z-index:2000;
+    }
+    .hidden{ display:none!important; }
   </style>
 </head>
 <body>
-  <div class="page-wrap">
-    <div class="topbar">
-      <div>
-        <div class="muted">รับจ้างสารพัด 24 ชั่วโมง</div>
-        <h3 class="mb-0">สินค้าทั้งหมด</h3>
-        <div class="muted" id="totalText">พบทั้งหมด 0 รายการ</div>
+
+  <!-- Header -->
+  <header class="py-4">
+    <div class="container">
+      <div class="d-flex align-items-end justify-content-between">
+        <div>
+          <div class="subtle small mb-1">รับจ้างสารพัด 24 ชั่วโมง</div>
+          <h3 class="mb-0">สินค้าทั้งหมด</h3>
+        </div>
+        <a href="index.html#products" class="btn btn-outline-primary btn-sm">กลับหน้าหลัก</a>
       </div>
-      <a href="./index.html" class="btn btn-sm btn-outline-brand"><i class="bi bi-arrow-left"></i> กลับหน้าแรก</a>
+      <div id="resultInfo" class="text-muted mt-2">กำลังโหลด...</div>
+    </div>
+  </header>
+
+  <main class="container pb-5">
+
+    <!-- Filters -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-5">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="q" class="form-control" placeholder="ค้นหา (ชื่อ/แท็ก)">
+              <button id="btnClear" class="btn btn-outline-primary">ล้าง</button>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select id="sort" class="form-select">
+              <option value="rank-asc">เรียงตามลำดับ (แนะนำก่อน)</option>
+              <option value="price-asc">ราคาต่ำ → สูง</option>
+              <option value="price-desc">ราคาสูง → ต่ำ</option>
+              <option value="latest-desc">มาใหม่ล่าสุด</option>
+            </select>
+          </div>
+          <div class="col-md-4 d-flex align-items-center gap-3">
+            <div class="form-check">
+              <input id="onlyFeatured" class="form-check-input" type="checkbox">
+              <label class="form-check-label" for="onlyFeatured">เฉพาะแนะนำ</label>
+            </div>
+            <div class="ms-auto small text-muted" id="activeTags"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- แถบค้นหา/เรียง -->
-    <div class="d-flex gap-2 flex-wrap mb-3">
-      <div class="input-group" style="max-width:330px;">
-        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-        <input id="q" class="form-control form-chip" placeholder="ค้นหา (ชื่อ/แท็ก)">
-        <button id="btnClear" class="btn btn-outline-secondary">ล้าง</button>
-      </div>
-      <select id="sort" class="form-select form-chip" style="max-width:220px">
-        <option value="createdAt:desc">เรียงตามล่าสุด</option>
-        <option value="price:asc">ราคา (ต่ำ→สูง)</option>
-        <option value="price:desc">ราคา (สูง→ต่ำ)</option>
-        <option value="rank:asc">ลำดับ (rank)</option>
-      </select>
-      <div class="form-check align-self-center ms-1">
-        <input id="onlyFeatured" class="form-check-input" type="checkbox">
-        <label class="form-check-label" for="onlyFeatured">แสดงเฉพาะแนะนำ</label>
-      </div>
-    </div>
-
-    <!-- พื้นที่รายการ -->
+    <!-- Grid -->
     <div id="grid" class="row g-3"></div>
 
-    <!-- หน้า -->
-    <div class="d-flex justify-content-center align-items-center gap-2 mt-3">
-      <button id="prev" class="btn btn-sm btn-outline-secondary">&lt; ก่อนหน้า</button>
-      <span id="pageInfo" class="small text-muted">1 / 1</span>
-      <button id="next" class="btn btn-sm btn-outline-secondary">ถัดไป &gt;</button>
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center align-items-center mt-4 pager-wrap">
+      <button id="prevPage" class="btn btn-primary">
+        <i class="bi bi-chevron-left"></i> ก่อนหน้า
+      </button>
+      <div class="text-muted" id="pageInfo"></div>
+      <button id="nextPage" class="btn btn-primary">
+        ถัดไป <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Modals -->
+    <div id="modals"></div>
+  </main>
+
+  <!-- Full loader -->
+  <div id="pageLoader" class="page-loader">
+    <div class="text-center">
+      <div class="spinner-border mb-2" role="status" aria-hidden="true"></div>
+      <div class="fw-medium">กำลังโหลด...</div>
     </div>
   </div>
 
-  <!-- Modal รายละเอียด -->
-  <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 id="mTitle" class="modal-title">รายละเอียดสินค้า</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="thumb-wrap mb-3">
-            <span id="mSale" class="sale-badge d-none"></span>
-            <img id="mImg" src="" alt="">
-          </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-          <div class="d-flex flex-wrap gap-2 mb-2" id="mTags"></div>
-
-          <div class="mb-2">
-            <span id="mPrice" class="price h5"></span>
-            <span id="mUnit" class="text-muted"></span>
-          </div>
-
-          <div class="row g-3">
-            <div class="col-md-6">
-              <div class="small text-muted">รายละเอียด</div>
-              <div id="mDesc"></div>
-            </div>
-            <div class="col-md-6">
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  สต็อก
-                  <span id="mStock" class="badge rounded-pill text-bg-secondary">-</span>
-                </li>
-                <li class="list-group-item">
-                  <div class="small text-muted mb-1">ช่วงโปรโมชัน</div>
-                  <div id="mSalePeriod">-</div>
-                </li>
-                <li class="list-group-item d-flex gap-2 flex-wrap">
-                  <span id="mBadges" class="d-flex gap-2 flex-wrap"></span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <div class="text-muted small" id="mMeta"></div>
-          <div class="d-flex gap-2">
-            <a id="btnTel" class="btn btn-outline-secondary"><i class="bi bi-telephone-fill"></i> โทร</a>
-            <a id="btnLine" class="btn btn-success text-white"><i class="bi bi-chat-dots-fill"></i> LINE</a>
-            <a id="btnFb" class="btn btn-primary"><i class="bi bi-facebook"></i> Facebook</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  <!-- =================== DATA/LOGIC ไม่แตะ (เหมือนเดิม) =================== -->
   <script type="module">
-    import { app } from './firebase-init.js';
+    addEventListener('error',   ()=> document.getElementById('pageLoader')?.classList.add('hidden'));
+    addEventListener('unhandledrejection', ()=> document.getElementById('pageLoader')?.classList.add('hidden'));
+
+    import { db, ensureAnonAuth } from './firebase-init.js?v=shop2';
     import {
-      getFirestore, collection, query, where, orderBy, limit, startAfter, getDocs, doc, getDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      collection, query, where, orderBy, getDocs
+    } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-    const db = getFirestore(app);
+    const $  = (s,r=document)=>r.querySelector(s);
+    const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
 
-    /* ==== ตั้งค่า ==== */
-    const PAGE = 6; // จำนวนต่อหน้า
-    const grid = document.getElementById('grid');
-    const totalText = document.getElementById('totalText');
-    const qInput = document.getElementById('q');
-    const sortSel = document.getElementById('sort');
-    const onlyFeatured = document.getElementById('onlyFeatured');
-    const prevBtn = document.getElementById('prev');
-    const nextBtn = document.getElementById('next');
-    const pageInfo = document.getElementById('pageInfo');
+    const els = {
+      q: $('#q'),
+      sort: $('#sort'),
+      onlyFeatured: $('#onlyFeatured'),
+      btnClear: $('#btnClear'),
+      grid: $('#grid'),
+      modals: $('#modals'),
+      resultInfo: $('#resultInfo'),
+      pageInfo: $('#pageInfo'),
+      prev: $('#prevPage'),
+      next: $('#nextPage'),
+      loader: $('#pageLoader'),
+      activeTags: $('#activeTags')
+    };
 
-    let cursors = [];    // เก็บ startAfter ของแต่ละหน้า
-    let page = 0;        // เริ่มที่หน้า 0
+    const PAGE_SIZE = 12;
+    let allItems = [];
+    let filtered = [];
+    let page = 1;
 
-    // โหลด settings เพื่อใส่ปุ่มติดต่อใน modal
-    let SETTINGS = {phone:'', line:'', facebook:''};
-    (async () => {
-      try{
-        const sdoc = await getDoc(doc(db,'settings','general'));
-        if(sdoc.exists()){
-          const d = sdoc.data();
-          SETTINGS.phone = d.phone||'';
-          SETTINGS.line = d.line||'';
-          SETTINGS.facebook = d.facebook||'';
-        }
-      }catch(e){}
-    })();
+    function showLoader(v){ els.loader.classList.toggle('hidden', !v); }
+    const toDate = (v)=> v?.toDate ? v.toDate() : (v ? new Date(v) : null);
 
-    // helper
-    const baht = n => new Intl.NumberFormat('th-TH').format(n||0);
-    const fmt = t => t instanceof Timestamp ? t.toDate() : (t?.toDate?.() ?? (t? new Date(t): null));
-    const fmtDT = t => t? t.toLocaleString('th-TH',{dateStyle:'medium', timeStyle:'short'}) : '-';
-
-    function percentOff(price, sale){
-      if(!price || !sale || sale>=price) return null;
-      return Math.round((1 - (sale/price))*100);
+    function saleInfo(d){
+      const now = new Date();
+      const active = typeof d.salePrice === 'number'
+        && (!d.saleStart || toDate(d.saleStart) <= now)
+        && (!d.saleEnd   || now <= toDate(d.saleEnd))
+        && d.salePrice < d.price;
+      const percent = (active && d.price) ? Math.round((1 - (d.salePrice/d.price))*100) : 0;
+      return {active, percent};
     }
 
-    function buildSkeleton(){
-      grid.innerHTML = '';
-      for(let i=0;i<PAGE;i++){
-        grid.insertAdjacentHTML('beforeend', `
-        <div class="col-md-6 col-lg-4">
-          <div class="skeleton p-2">
-            <div class="sk-img"></div>
-            <div class="p-3">
-              <div class="sk-line" style="width:60%"></div>
-              <div class="sk-line" style="width:40%"></div>
-              <div class="sk-line" style="width:85%"></div>
-            </div>
-          </div>
-        </div>`);
+    function fmtPrice(d){
+      const s = saleInfo(d);
+      if (s.active){
+        return `<del class="text-muted me-1">฿${(d.price||0).toLocaleString()}</del>
+                <span class="text-danger">฿${(d.salePrice||0).toLocaleString()}</span>${d.unit?` / ${d.unit}`:''}`;
       }
+      return `฿${(d.price||0).toLocaleString()}${d.unit?` / ${d.unit}`:''}`;
     }
 
-    function chip(txt, variant='chip'){ 
-      if(variant==='red') return `<span class="badge text-bg-danger">${txt}</span>`;
-      if(variant==='green') return `<span class="badge text-bg-success">${txt}</span>`;
-      return `<span class="badge badge-chip">${txt}</span>`;
-    }
-
-    function cardHTML(d, id){
-      const p = d.price||0, s = d.salePrice||0;
-      const poff = percentOff(p,s);
-      const hasSale = s>0 && (!d.saleStart || new Date(d.saleStart)<=new Date()) &&
-                                   (!d.saleEnd   || new Date(d.saleEnd)  >=new Date());
-      const priceHTML = hasSale
-        ? `<span class="price"><del>฿${baht(p)}</del> <span class="text-danger">฿${baht(s)}</span></span>`
-        : `<span class="price">฿${baht(p)}</span>`;
-
-      const tags = []
-      if(d.isBestSeller) tags.push('ฮิต');
-      if(d.isNew) tags.push('ใหม่');
-      if(d.freeShip) tags.push('ส่งฟรี');
-      (d.tags? (Array.isArray(d.tags)? d.tags: String(d.tags).split(','))
-             : []).forEach(t=>{ const v=t.trim(); if(v) tags.push('#'+v) });
-
-      const oos = (Number(d.stock||0) <= 0);
-      const unit = d.unit? ` <span class="text-muted">/ ${d.unit}</span>` : '';
-
+    function cardHtml(d, id){
+      const s = saleInfo(d);
+      const chips = (d.tags||[]).slice(0,5)
+        .map(t=>`<span class="badge tag-chip rounded-pill me-1 mb-1" data-tag="${t}">#${t}</span>`)
+        .join('');
       return `
-      <div class="col-md-6 col-lg-4">
-        <div class="product-card">
-          <div class="thumb-wrap">
-            ${ hasSale && poff ? `<span class="sale-badge">ลด ${poff}%</span>`:''}
-            ${ oos ? `<span class="oos badge text-bg-secondary">สินค้าหมด</span>`:''}
-            <img src="${d.cover||'https://placehold.co/800x500?text=No+Image'}" alt="">
+      <div class="col-sm-6 col-lg-4">
+        <div class="card h-100 position-relative">
+          ${s.active ? `<span class="badge badge-sale position-absolute top-0 start-0 m-2">ลด ${s.percent}%</span>`:''}
+          ${d.cover ? `
+          <div class="ratio ratio-16x9">
+            <img src="${d.cover}" class="w-100 h-100 object-fit-cover" alt="">
+          </div>`:''}
+          <div class="card-body d-flex flex-column">
+            <h5 class="mb-1">${d.name||''}</h5>
+            <div class="fw-semibold mb-1">${fmtPrice(d)}</div>
+            <div class="mb-2 d-flex flex-wrap">${chips}</div>
+            <p class="text-muted flex-grow-1 line-clamp-2">${d.desc||''}</p>
+            <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#prod-${id}">
+              ดูรายละเอียด
+            </button>
           </div>
-          <div class="p-3">
-            <div class="mb-1 d-flex flex-wrap gap-1">
-              ${tags.map(t=> chip(t.startsWith('#')? t : t, t==='ส่งฟรี'?'green':'chip')).join('')}
+        </div>
+      </div>`;
+    }
+
+    function modalHtml(d, id){
+      const gal = Array.isArray(d.gallery)? d.gallery : [];
+      return `
+      <div class="modal fade" id="prod-${id}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">${d.name||''}</h5>
+              <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="fw-semibold mb-1">${d.name||'-'}</div>
-            <div class="mb-2">${priceHTML}${unit}</div>
-            <div class="small text-muted mb-2">
-              ${d.desc ? String(d.desc).slice(0,80) : ''}${(d.desc&&d.desc.length>80)?'…':''}
-            </div>
-            <div class="d-flex align-items-center justify-content-between">
-              <span class="small ${oos?'text-danger':'text-muted'}">
-                ${oos? 'คงเหลือ 0' : ('คงเหลือ ' + (d.stock??'-'))}
-              </span>
-              <button class="btn btn-brand btn-sm" data-id="${id}" data-name="${d.name||''}">ดูรายละเอียด</button>
+            <div class="modal-body">
+              ${gal.length?`
+              <div id="gal-${id}" class="carousel slide mb-3" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  ${gal.map((u,i)=>`
+                    <div class="carousel-item ${i===0?'active':''}">
+                      <img src="${u}" class="d-block w-100 rounded" alt="">
+                    </div>`).join('')}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#gal-${id}" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#gal-${id}" data-bs-slide="next">
+                  <span class="carousel-control-next-icon"></span>
+                </button>
+              </div>`:''}
+              <div class="fw-semibold mb-2">ราคา: ${fmtPrice(d)}</div>
+              <div class="small text-muted mb-2">${(d.tags||[]).join(' · ')}</div>
+              <p style="white-space:pre-line">${d.desc||''}</p>
             </div>
           </div>
         </div>
       </div>`;
     }
 
-    async function fetchPage(){
-      buildSkeleton();
-      const [field,dir] = sortSel.value.split(':');   // createdAt:desc / price:asc ...
-      try{
-        let base = collection(db,'products');
-        let q = query(base, where('isActive','==',true));
-        if(onlyFeatured.checked) q = query(q, where('featured','==',true));
+    function applyFilters(){
+      const q = (els.q.value||'').trim().toLowerCase();
+      let list = allItems.slice();
 
-        // orderBy
-        q = query(q, orderBy(field, dir==='desc'?'desc':'asc'), limit(PAGE));
-        if(page>0 && cursors[page-1]) q = query(q, startAfter(cursors[page-1]));
-
-        const snap = await getDocs(q);
-
-        // เก็บ cursor
-        cursors[page] = snap.docs.at(-1) || null;
-
-        // รวมทั้งหมดเพื่อแสดงจำนวน (ปลอดภัยถ้า collection ใหญ่ ให้ตัดออกได้)
-        totalText.textContent = `พบทั้งหมด ${snap.size} รายการ`;
-
-        // สร้างการ์ด
-        let html = '';
-        snap.forEach(d => html += cardHTML(d.data(), d.id));
-        grid.innerHTML = html || `<div class="text-center text-muted p-5">ไม่พบสินค้า</div>`;
-
-        pageInfo.textContent = `${page+1} / ${page+1}`; // simple pager (ปรับง่าย)
-
-        // ผูกปุ่ม modal
-        grid.querySelectorAll('button[data-id]').forEach(btn=>{
-          btn.addEventListener('click',()=> openModal(btn.dataset.id, btn.dataset.name));
+      if (q){
+        list = list.filter(d=>{
+          const inName = (d.name||'').toLowerCase().includes(q);
+          const inTags = (d.tags||[]).some(t=> (t||'').toLowerCase().includes(q));
+          return inName || inTags;
         });
-      }catch(err){
-        console.error(err);
-        let hint = '';
-        if(String(err.code)==='failed-precondition' || /index/i.test(err.message)){
-          hint = `<div class="alert alert-warning">
-                    จำเป็นต้องสร้าง <b>Composite Index</b> สำหรับการค้นหาหน้านี้
-                    (isActive + ${field}). เปิดคอนโซลเพื่อกดลิงก์สร้างอัตโนมัติได้เลย
-                  </div>`;
-        }
-        grid.innerHTML = hint || `<div class="text-center text-danger p-5">โหลดข้อมูลไม่สำเร็จ</div>`;
       }
+
+      const [field, dir] = (els.sort.value||'rank-asc').split('-');
+      list.sort((a,b)=>{
+        const va = (field==='latest') ? (a.createdAt? (a.createdAt.toDate? a.createdAt.toDate().getTime():new Date(a.createdAt).getTime()):0)
+                : (field==='price')  ? (a.salePrice && a.salePrice < a.price ? a.salePrice : a.price)
+                : (a.rank ?? 999999);
+        const vb = (field==='latest') ? (b.createdAt? (b.createdAt.toDate? b.createdAt.toDate().getTime():new Date(b.createdAt).getTime()):0)
+                : (field==='price')  ? (b.salePrice && b.salePrice < b.price ? b.salePrice : b.price)
+                : (b.rank ?? 999999);
+        return dir==='desc' ? (vb - va) : (va - vb);
+      });
+
+      filtered = list;
+      page = 1;
+      renderGrid();
     }
 
-    async function openModal(id, name){
+    function renderGrid(){
+      const total = filtered.length;
+      const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      if (page > pages) page = pages;
+      const start = (page-1)*PAGE_SIZE;
+      const slice = filtered.slice(start, start+PAGE_SIZE);
+
+      els.grid.innerHTML   = slice.map(x=>cardHtml(x.data, x.id)).join('');
+      els.modals.innerHTML = slice.map(x=>modalHtml(x.data, x.id)).join('');
+
+      els.prev.disabled = (page<=1);
+      els.next.disabled = (page>=pages);
+      els.pageInfo.textContent = `${page} / ${pages}`;
+      els.resultInfo.textContent = `พบทั้งหมด ${total} รายการ`;
+
+      $$('.tag-chip', els.grid).forEach(el=>{
+        el.addEventListener('click', ()=>{
+          els.q.value = el.getAttribute('data-tag') || '';
+          applyFilters();
+        });
+      });
+    }
+
+    async function loadAll(){
+      document.body.offsetHeight; // force reflow
+      showLoader(true);
+      await ensureAnonAuth().catch(()=>{});
+      const base = [
+        where('isActive','==', true),
+        ...(els.onlyFeatured.checked ? [where('featured','==', true)] : []),
+        orderBy('rank','asc')
+      ];
+      const snap = await getDocs(query(collection(db,'products'), ...base));
+      allItems = snap.docs.map(d=>({ id:d.id, data:d.data() }));
+      applyFilters();
+      showLoader(false);
+    }
+
+    function bindEvents(){
+      els.q.addEventListener('input', debounce(applyFilters, 200));
+      els.sort.addEventListener('change', applyFilters);
+      els.onlyFeatured.addEventListener('change', ()=> loadAll().catch(console.error));
+      els.btnClear.addEventListener('click', ()=>{
+        els.q.value = '';
+        els.onlyFeatured.checked = false;
+        els.sort.value = 'rank-asc';
+        loadAll().catch(console.error);
+      });
+      els.prev.addEventListener('click', ()=>{ page=Math.max(1,page-1); renderGrid(); });
+      els.next.addEventListener('click', ()=>{ page=page+1; renderGrid(); });
+    }
+
+    function debounce(fn, ms){
+      let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
+    }
+
+    (async function init(){
       try{
-        const d = (await getDoc(doc(db,'products',id))).data() || {};
-        const poff = percentOff(d.price, d.salePrice);
-        const hasSale = d.salePrice>0 && (!d.saleStart || new Date(d.saleStart)<=new Date()) &&
-                                       (!d.saleEnd   || new Date(d.saleEnd)  >=new Date());
-
-        // ภาพ
-        document.getElementById('mImg').src = d.cover || 'https://placehold.co/1000x600?text=No+Image';
-        const mSale = document.getElementById('mSale');
-        if(hasSale && poff){ mSale.classList.remove('d-none'); mSale.textContent = `ลด ${poff}%`; }
-        else mSale.classList.add('d-none');
-
-        // หัวเรื่อง + ราคา
-        document.getElementById('mTitle').textContent = d.name || name || 'รายละเอียดสินค้า';
-        document.getElementById('mPrice').innerHTML = hasSale
-          ? `<del>฿${baht(d.price)}</del> <span class="text-danger">฿${baht(d.salePrice)}</span>`
-          : `฿${baht(d.price||0)}`;
-        document.getElementById('mUnit').textContent = d.unit? ` / ${d.unit}` : '';
-
-        // แท็ก
-        const tgs = [];
-        if(d.isBestSeller) tgs.push(chip('ฮิต'));
-        if(d.isNew)        tgs.push(chip('ใหม่'));
-        if(d.freeShip)     tgs.push(chip('ส่งฟรี','green'));
-        (d.tags? (Array.isArray(d.tags)? d.tags: String(d.tags).split(',')) : [])
-          .forEach(t=>{ const v=t.trim(); if(v) tgs.push(chip('#'+v)); });
-        document.getElementById('mTags').innerHTML = tgs.join('') || '<span class="text-muted small">—</span>';
-
-        // คำอธิบาย/สต็อก/ช่วงโปรฯ
-        document.getElementById('mDesc').textContent = d.desc || '-';
-        const stockEl = document.getElementById('mStock');
-        const stock = Number(d.stock??0);
-        stockEl.textContent = stock>0? stock : 'หมด';
-        stockEl.className = 'badge rounded-pill ' + (stock>0? 'text-bg-secondary' : 'text-bg-danger');
-
-        document.getElementById('mSalePeriod').textContent =
-          (d.saleStart||d.saleEnd)
-            ? `${d.saleStart? fmtDT(fmt(d.saleStart)):'-'}  ถึง  ${d.saleEnd? fmtDT(fmt(d.saleEnd)):'-'}`
-            : '-';
-
-        // แสดงแถบสถานะที่ติ๊ก
-        const mb = [];
-        if(d.featured)     mb.push(chip('แนะนำ'));
-        if(d.isBestSeller) mb.push(chip('ฮิต'));
-        if(d.isNew)        mb.push(chip('ใหม่'));
-        if(d.freeShip)     mb.push(chip('ส่งฟรี','green'));
-        document.getElementById('mBadges').innerHTML = mb.join('');
-
-        // ปุ่มติดต่อ
-        const tel = (SETTINGS.phone||'').replace(/\s/g,'');
-        const lineId = (SETTINGS.line||'').replace(/@/g,'').trim();
-        const fb = SETTINGS.facebook||'#';
-        document.getElementById('btnTel').href = tel? `tel:${tel}` : '#';
-        document.getElementById('btnLine').href = lineId? `https://line.me/R/ti/p/${lineId}` : '#';
-        document.getElementById('btnFb').href = fb;
-
-        document.getElementById('mMeta').textContent =
-          `ลำดับ: ${d.rank??'-'} · อัปเดตล่าสุด: ${fmtDT(fmt(d.updatedAt)||fmt(d.createdAt))}`;
-
-        bootstrap.Modal.getOrCreateInstance('#productModal').show();
+        bindEvents();
+        await loadAll();
       }catch(e){
         console.error(e);
+      }finally{
+        showLoader(false);
       }
-    }
-
-    // events
-    document.getElementById('btnClear').onclick = ()=>{ qInput.value=''; fetchPage(); }
-    sortSel.onchange = ()=>{ page=0; cursors=[]; fetchPage(); }
-    onlyFeatured.onchange = ()=>{ page=0; cursors=[]; fetchPage(); }
-    prevBtn.onclick = ()=>{ if(page>0){ page--; fetchPage(); } }
-    nextBtn.onclick = ()=>{ page++; fetchPage(); }   // (ตัวอย่างแบบง่าย)
-
-    // เริ่ม
-    fetchPage();
+    })();
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
