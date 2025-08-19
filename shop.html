@@ -10,62 +10,89 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <!-- สไตล์หลักของเว็บ -->
-  <link href="assets/styles.css?v=shop-theme-2" rel="stylesheet">
+  <link href="assets/styles.css?v=shop-theme-3" rel="stylesheet">
 
   <style>
-    /* ================= Theme Sync ================ */
+    /* ================= Theme Sync (เน้น override ให้ชนะทุกที่) ================ */
     :root{
-      /* ถ้า styles.css มีประกาศ --bs-primary อยู่แล้ว อันนี้จะไม่ถูกใช้ */
+      /* ถ้า styles.css มีตัวแปรเองอยู่แล้วจะถูกใช้ก่อน อันนี้ทำหน้าที่เป็น fallback */
       --bs-primary: #6c2bd9;
       --bs-primary-rgb: 108,43,217;
-      --page-bg: var(--site-bg, #F6F3FF); /* โทนพื้นหลังเดียวกับหน้าแรก (fallback ม่วงอ่อน) */
+      --page-bg: var(--site-bg, #F6F3FF); /* โทนพื้นหลังหน้าแรก (ม่วงอ่อน) */
     }
-    body{ background: var(--page-bg); }
-    .navbar{ border-bottom:1px solid rgba(0,0,0,.06); background:#fff; }
+
+    /* พื้นหลังทั้งหน้า */
+    body{ background: var(--page-bg) !important; }
+
+    /* Navbar ให้เป็นขาว + เส้นคั่นอ่อน */
+    .navbar{ border-bottom:1px solid rgba(0,0,0,.06); background:#fff !important; }
     .navbar-brand{ font-weight:600; }
 
-    header .subtle{ color: var(--bs-secondary-color, #6c757d); } /* ข้อความซ้ายบนให้โทนเทาอ่อน */
+    /* ข้อความซ้ายบนหัวเพจให้เป็นสี primary ตามธีม */
+    header .subtle{
+      color: rgba(var(--bs-primary-rgb), .95) !important;
+      font-weight: 600;
+    }
 
-    .spinner-border{ color: var(--bs-primary); }
+    /* การ์ด/เงา/มุม */
+    .card{ border:0 !important; box-shadow: 0 6px 16px rgba(17, 24, 39, .06); border-radius: 1rem; }
+    .card img{ border-top-left-radius:1rem; border-top-right-radius:1rem; }
+
+    /* ชิปแท็ก */
     .tag-chip{
       cursor:pointer;
       --bs-badge-color: var(--bs-primary);
       --bs-badge-bg: #fff;
       border:1px solid rgba(var(--bs-primary-rgb), .25);
     }
-    .badge-sale{ background:#dc3545; }  /* ป้ายลดราคา */
 
-    .card{ border:0; box-shadow: 0 6px 16px rgba(17, 24, 39, .06); border-radius: 1rem; }
-    .card img{ border-top-left-radius:1rem; border-top-right-radius:1rem; }
+    /* ป้ายลดราคา */
+    .badge-sale{ background:#dc3545 !important; }
+
     .line-clamp-2{
       display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
     }
     .object-fit-cover{ object-fit:cover; }
 
-    /* ปุ่มให้เข้าธีมหลัก */
-    .btn-primary{
-      --bs-btn-bg: var(--bs-primary);
-      --bs-btn-border-color: var(--bs-primary);
-      --bs-btn-hover-bg: rgba(var(--bs-primary-rgb), .9);
-      --bs-btn-hover-border-color: rgba(var(--bs-primary-rgb), .9);
-      border-radius:.75rem;
-      box-shadow: 0 6px 12px rgba(var(--bs-primary-rgb), .18);
+    /* ปุ่มหลักทั้งหมด (ให้เป็นม่วง + เงา) */
+    .btn.btn-primary{
+      background: var(--bs-primary) !important;
+      border-color: var(--bs-primary) !important;
+      color:#fff !important;
+      border-radius:.75rem !important;
+      box-shadow: 0 6px 12px rgba(var(--bs-primary-rgb), .18) !important;
     }
-    .btn-outline-primary{
-      --bs-btn-color: var(--bs-primary);
-      --bs-btn-border-color: var(--bs-primary);
-      --bs-btn-hover-bg: var(--bs-primary);
-      --bs-btn-hover-border-color: var(--bs-primary);
-      --bs-btn-hover-color:#fff;
-      border-radius:.75rem;
+    .btn.btn-primary:hover,
+    .btn.btn-primary:focus{
+      background: rgba(var(--bs-primary-rgb), .9) !important;
+      border-color: rgba(var(--bs-primary-rgb), .9) !important;
+      color:#fff !important;
     }
+
+    /* ปุ่มกรอบม่วง */
+    .btn.btn-outline-primary{
+      color: var(--bs-primary) !important;
+      border-color: var(--bs-primary) !important;
+      border-radius:.75rem !important;
+      background:#fff !important;
+    }
+    .btn.btn-outline-primary:hover,
+    .btn.btn-outline-primary:focus{
+      background: var(--bs-primary) !important;
+      border-color: var(--bs-primary) !important;
+      color:#fff !important;
+    }
+
+    /* ปุ่มค้นหา/ล้าง ในกรอง */
+    .input-group .btn{ border-radius:.75rem !important; }
 
     /* Pagination */
     .pager-wrap{ gap:1rem; }
     .pager-wrap .btn{ min-width:110px; }
-    .pager-wrap .btn:disabled{
-      opacity:.45; box-shadow:none !important;
-    }
+    .pager-wrap .btn:disabled{ opacity:.45 !important; box-shadow:none !important; }
+
+    /* Spinner ให้เป็นสีธีม */
+    .spinner-border{ color: var(--bs-primary) !important; }
 
     /* Loader เต็มจอ */
     .page-loader{
@@ -98,7 +125,7 @@
         </div>
         <a href="index.html#products" class="btn btn-outline-primary btn-sm">กลับหน้าหลัก</a>
       </div>
-      <div id="resultInfo" class="subtle mt-2">กำลังโหลด...</div>
+      <div id="resultInfo" class="text-muted mt-2">กำลังโหลด...</div>
     </div>
   </header>
 
@@ -128,7 +155,7 @@
               <input id="onlyFeatured" class="form-check-input" type="checkbox">
               <label class="form-check-label" for="onlyFeatured">เฉพาะแนะนำ</label>
             </div>
-            <div class="ms-auto small subtle" id="activeTags"></div>
+            <div class="ms-auto small text-muted" id="activeTags"></div>
           </div>
         </div>
       </div>
@@ -142,7 +169,7 @@
       <button id="prevPage" class="btn btn-primary">
         <i class="bi bi-chevron-left"></i> ก่อนหน้า
       </button>
-      <div class="subtle" id="pageInfo"></div>
+      <div class="text-muted" id="pageInfo"></div>
       <button id="nextPage" class="btn btn-primary">
         ถัดไป <i class="bi bi-chevron-right"></i>
       </button>
@@ -162,8 +189,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+  <!-- =================== DATA/LOGIC ไม่แตะ (เหมือนเดิม) =================== -->
   <script type="module">
-    // ปิด Loader ถ้าเกิด error
     addEventListener('error',   ()=> document.getElementById('pageLoader')?.classList.add('hidden'));
     addEventListener('unhandledrejection', ()=> document.getElementById('pageLoader')?.classList.add('hidden'));
 
@@ -292,10 +319,10 @@
 
       const [field, dir] = (els.sort.value||'rank-asc').split('-');
       list.sort((a,b)=>{
-        const va = (field==='latest') ? (a.createdAt? toDate(a.createdAt).getTime():0)
+        const va = (field==='latest') ? (a.createdAt? (a.createdAt.toDate? a.createdAt.toDate().getTime():new Date(a.createdAt).getTime()):0)
                 : (field==='price')  ? (a.salePrice && a.salePrice < a.price ? a.salePrice : a.price)
                 : (a.rank ?? 999999);
-        const vb = (field==='latest') ? (b.createdAt? toDate(b.createdAt).getTime():0)
+        const vb = (field==='latest') ? (b.createdAt? (b.createdAt.toDate? b.createdAt.toDate().getTime():new Date(b.createdAt).getTime()):0)
                 : (field==='price')  ? (b.salePrice && b.salePrice < b.price ? b.salePrice : b.price)
                 : (b.rank ?? 999999);
         return dir==='desc' ? (vb - va) : (va - vb);
@@ -321,7 +348,6 @@
       els.pageInfo.textContent = `${page} / ${pages}`;
       els.resultInfo.textContent = `พบทั้งหมด ${total} รายการ`;
 
-      // คลิกแท็กเพื่อค้นหา
       $$('.tag-chip', els.grid).forEach(el=>{
         el.addEventListener('click', ()=>{
           els.q.value = el.getAttribute('data-tag') || '';
@@ -331,6 +357,7 @@
     }
 
     async function loadAll(){
+      document.body.offsetHeight; // force reflow
       showLoader(true);
       await ensureAnonAuth().catch(()=>{});
       const base = [
