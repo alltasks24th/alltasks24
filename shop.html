@@ -4,37 +4,125 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>สินค้าทั้งหมด — รับจ้างสารพัด 24 ชั่วโมง</title>
+
+  <!-- Bootstrap & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- สไตล์หลักของเว็บ -->
+  <link href="assets/styles.css?v=shop-theme-3" rel="stylesheet">
+
   <style>
-    body{background:#f7f7f9}
-    .line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .object-fit-cover{object-fit:cover}
-    .page-loader{
-      position:fixed;inset:0;background:#ffffffcc;backdrop-filter:saturate(120%) blur(2px);
-      display:flex;align-items:center;justify-content:center;z-index:2000
+    /* ================= Theme Sync (เน้น override ให้ชนะทุกที่) ================ */
+    :root{
+      /* ถ้า styles.css มีตัวแปรเองอยู่แล้วจะถูกใช้ก่อน อันนี้ทำหน้าที่เป็น fallback */
+      --bs-primary: #6c2bd9;
+      --bs-primary-rgb: 108,43,217;
+      --page-bg: var(--site-bg, #F6F3FF); /* โทนพื้นหลังหน้าแรก (ม่วงอ่อน) */
     }
-    .hidden{display:none !important}
-    .tag-chip{cursor:pointer}
+
+    /* พื้นหลังทั้งหน้า */
+    body{ background: var(--page-bg) !important; }
+
+    /* Navbar ให้เป็นขาว + เส้นคั่นอ่อน */
+    .navbar{ border-bottom:1px solid rgba(0,0,0,.06); background:#fff !important; }
+    .navbar-brand{ font-weight:600; }
+
+    /* ข้อความซ้ายบนหัวเพจให้เป็นสี primary ตามธีม */
+    header .subtle{
+      color: rgba(var(--bs-primary-rgb), .95) !important;
+      font-weight: 600;
+    }
+
+    /* การ์ด/เงา/มุม */
+    .card{ border:0 !important; box-shadow: 0 6px 16px rgba(17, 24, 39, .06); border-radius: 1rem; }
+    .card img{ border-top-left-radius:1rem; border-top-right-radius:1rem; }
+
+    /* ชิปแท็ก */
+    .tag-chip{
+      cursor:pointer;
+      --bs-badge-color: var(--bs-primary);
+      --bs-badge-bg: #fff;
+      border:1px solid rgba(var(--bs-primary-rgb), .25);
+    }
+
+    /* ป้ายลดราคา */
+    .badge-sale{ background:#dc3545 !important; }
+
+    .line-clamp-2{
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    }
+    .object-fit-cover{ object-fit:cover; }
+
+    /* ปุ่มหลักทั้งหมด (ให้เป็นม่วง + เงา) */
+    .btn.btn-primary{
+      background: var(--bs-primary) !important;
+      border-color: var(--bs-primary) !important;
+      color:#fff !important;
+      border-radius:.75rem !important;
+      box-shadow: 0 6px 12px rgba(var(--bs-primary-rgb), .18) !important;
+    }
+    .btn.btn-primary:hover,
+    .btn.btn-primary:focus{
+      background: rgba(var(--bs-primary-rgb), .9) !important;
+      border-color: rgba(var(--bs-primary-rgb), .9) !important;
+      color:#fff !important;
+    }
+
+    /* ปุ่มกรอบม่วง */
+    .btn.btn-outline-primary{
+      color: var(--bs-primary) !important;
+      border-color: var(--bs-primary) !important;
+      border-radius:.75rem !important;
+      background:#fff !important;
+    }
+    .btn.btn-outline-primary:hover,
+    .btn.btn-outline-primary:focus{
+      background: var(--bs-primary) !important;
+      border-color: var(--bs-primary) !important;
+      color:#fff !important;
+    }
+
+    /* ปุ่มค้นหา/ล้าง ในกรอง */
+    .input-group .btn{ border-radius:.75rem !important; }
+
+    /* Pagination */
+    .pager-wrap{ gap:1rem; }
+    .pager-wrap .btn{ min-width:110px; }
+    .pager-wrap .btn:disabled{ opacity:.45 !important; box-shadow:none !important; }
+
+    /* Spinner ให้เป็นสีธีม */
+    .spinner-border{ color: var(--bs-primary) !important; }
+
+    /* Loader เต็มจอ */
+    .page-loader{
+      position:fixed; inset:0;
+      background:#ffffffcc; backdrop-filter:saturate(120%) blur(2px);
+      display:flex; align-items:center; justify-content:center;
+      z-index:2000;
+    }
+    .hidden{ display:none!important; }
   </style>
 </head>
 <body>
-  <nav class="navbar navbar-light bg-white border-bottom sticky-top">
-    <div class="container">
-      <a class="navbar-brand fw-semibold" href="index.html">รับจ้างสารพัด 24 ชั่วโมง</a>
-      <a class="btn btn-outline-primary btn-sm" href="index.html#products">กลับหน้าแรก</a>
-    </div>
-  </nav>
 
-  <header class="bg-white border-bottom">
-    <div class="container py-4">
-      <h3 class="mb-1">สินค้าทั้งหมด</h3>
-      <div id="resultInfo" class="text-muted">กำลังโหลด...</div>
+  <!-- Header -->
+  <header class="py-4">
+    <div class="container">
+      <div class="d-flex align-items-end justify-content-between">
+        <div>
+          <div class="subtle small mb-1">รับจ้างสารพัด 24 ชั่วโมง</div>
+          <h3 class="mb-0">สินค้าทั้งหมด</h3>
+        </div>
+        <a href="index.html#products" class="btn btn-outline-primary btn-sm">กลับหน้าหลัก</a>
+      </div>
+      <div id="resultInfo" class="text-muted mt-2">กำลังโหลด...</div>
     </div>
   </header>
 
-  <main class="container py-4">
-    <!-- แถบตัวกรอง -->
+  <main class="container pb-5">
+
+    <!-- Filters -->
     <div class="card mb-3">
       <div class="card-body">
         <div class="row g-2 align-items-center">
@@ -42,7 +130,7 @@
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-search"></i></span>
               <input id="q" class="form-control" placeholder="ค้นหา (ชื่อ/แท็ก)">
-              <button id="btnClear" class="btn btn-outline-secondary">ล้าง</button>
+              <button id="btnClear" class="btn btn-outline-primary">ล้าง</button>
             </div>
           </div>
           <div class="col-md-3">
@@ -64,41 +152,45 @@
       </div>
     </div>
 
-    <!-- กริดสินค้า -->
+    <!-- Grid -->
     <div id="grid" class="row g-3"></div>
 
-    <!-- pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-      <button id="prevPage" class="btn btn-outline-secondary"><i class="bi bi-chevron-left"></i> ก่อนหน้า</button>
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center align-items-center mt-4 pager-wrap">
+      <button id="prevPage" class="btn btn-primary">
+        <i class="bi bi-chevron-left"></i> ก่อนหน้า
+      </button>
       <div class="text-muted" id="pageInfo"></div>
-      <button id="nextPage" class="btn btn-outline-secondary">ถัดไป <i class="bi bi-chevron-right"></i></button>
+      <button id="nextPage" class="btn btn-primary">
+        ถัดไป <i class="bi bi-chevron-right"></i>
+      </button>
     </div>
 
-    <!-- โมดอลรายละเอียด -->
+    <!-- Modals -->
     <div id="modals"></div>
   </main>
 
-  <!-- Loader -->
+  <!-- Full loader -->
   <div id="pageLoader" class="page-loader">
     <div class="text-center">
       <div class="spinner-border mb-2" role="status" aria-hidden="true"></div>
-      <div>กำลังโหลด...</div>
+      <div class="fw-medium">กำลังโหลด...</div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+  <!-- =================== DATA/LOGIC ไม่แตะ (เหมือนเดิม) =================== -->
   <script type="module">
-    // ปิด Loader เสมอถ้ามี error หลุดระดับหน้า
-    window.addEventListener('error', () => document.getElementById('pageLoader')?.classList.add('hidden'));
-    window.addEventListener('unhandledrejection', () => document.getElementById('pageLoader')?.classList.add('hidden'));
+    addEventListener('error',   ()=> document.getElementById('pageLoader')?.classList.add('hidden'));
+    addEventListener('unhandledrejection', ()=> document.getElementById('pageLoader')?.classList.add('hidden'));
 
     import { db, ensureAnonAuth } from './firebase-init.js?v=shop2';
     import {
       collection, query, where, orderBy, getDocs
     } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-    const $ = (s,r=document)=>r.querySelector(s);
+    const $  = (s,r=document)=>r.querySelector(s);
     const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
 
     const els = {
@@ -117,21 +209,18 @@
     };
 
     const PAGE_SIZE = 12;
-
-    let allItems = [];     // สินค้าที่โหลดมาทั้งหมด (ตามตัวกรองจาก Firestore)
-    let filtered = [];     // หลังกรองด้วย keyword/แท็ก/เรียง
+    let allItems = [];
+    let filtered = [];
     let page = 1;
 
     function showLoader(v){ els.loader.classList.toggle('hidden', !v); }
-
-    // แปลง Firestore Timestamp/Date/ISO → Date
     const toDate = (v)=> v?.toDate ? v.toDate() : (v ? new Date(v) : null);
 
     function saleInfo(d){
       const now = new Date();
       const active = typeof d.salePrice === 'number'
         && (!d.saleStart || toDate(d.saleStart) <= now)
-        && (!d.saleEnd || now <= toDate(d.saleEnd))
+        && (!d.saleEnd   || now <= toDate(d.saleEnd))
         && d.salePrice < d.price;
       const percent = (active && d.price) ? Math.round((1 - (d.salePrice/d.price))*100) : 0;
       return {active, percent};
@@ -148,14 +237,16 @@
 
     function cardHtml(d, id){
       const s = saleInfo(d);
-      const chips = (d.tags||[]).slice(0,5).map(t=>`<span class="badge text-bg-light border me-1 mb-1 tag-chip" data-tag="${t}">#${t}</span>`).join('');
+      const chips = (d.tags||[]).slice(0,5)
+        .map(t=>`<span class="badge tag-chip rounded-pill me-1 mb-1" data-tag="${t}">#${t}</span>`)
+        .join('');
       return `
       <div class="col-sm-6 col-lg-4">
-        <div class="card h-100 shadow-sm position-relative">
-          ${s.active ? `<span class="badge bg-danger position-absolute top-0 start-0 m-2">ลด ${s.percent}%</span>`:''}
+        <div class="card h-100 position-relative">
+          ${s.active ? `<span class="badge badge-sale position-absolute top-0 start-0 m-2">ลด ${s.percent}%</span>`:''}
           ${d.cover ? `
           <div class="ratio ratio-16x9">
-            <img src="${d.cover}" class="w-100 h-100 object-fit-cover rounded-top" alt="">
+            <img src="${d.cover}" class="w-100 h-100 object-fit-cover" alt="">
           </div>`:''}
           <div class="card-body d-flex flex-column">
             <h5 class="mb-1">${d.name||''}</h5>
@@ -207,10 +298,8 @@
 
     function applyFilters(){
       const q = (els.q.value||'').trim().toLowerCase();
-      const onlyF = els.onlyFeatured.checked;
       let list = allItems.slice();
 
-      // ค้นด้วยคำธรรมดา (ฝั่ง client)
       if (q){
         list = list.filter(d=>{
           const inName = (d.name||'').toLowerCase().includes(q);
@@ -219,14 +308,13 @@
         });
       }
 
-      // เรียง
       const [field, dir] = (els.sort.value||'rank-asc').split('-');
       list.sort((a,b)=>{
-        const va = (field==='latest') ? (a.createdAt? toDate(a.createdAt).getTime():0)
-                : (field==='price') ? (a.salePrice && a.salePrice < a.price ? a.salePrice : a.price)
+        const va = (field==='latest') ? (a.createdAt? (a.createdAt.toDate? a.createdAt.toDate().getTime():new Date(a.createdAt).getTime()):0)
+                : (field==='price')  ? (a.salePrice && a.salePrice < a.price ? a.salePrice : a.price)
                 : (a.rank ?? 999999);
-        const vb = (field==='latest') ? (b.createdAt? toDate(b.createdAt).getTime():0)
-                : (field==='price') ? (b.salePrice && b.salePrice < b.price ? b.salePrice : b.price)
+        const vb = (field==='latest') ? (b.createdAt? (b.createdAt.toDate? b.createdAt.toDate().getTime():new Date(b.createdAt).getTime()):0)
+                : (field==='price')  ? (b.salePrice && b.salePrice < b.price ? b.salePrice : b.price)
                 : (b.rank ?? 999999);
         return dir==='desc' ? (vb - va) : (va - vb);
       });
@@ -243,42 +331,35 @@
       const start = (page-1)*PAGE_SIZE;
       const slice = filtered.slice(start, start+PAGE_SIZE);
 
-      els.grid.innerHTML = slice.map(x=>cardHtml(x.data, x.id)).join('');
+      els.grid.innerHTML   = slice.map(x=>cardHtml(x.data, x.id)).join('');
       els.modals.innerHTML = slice.map(x=>modalHtml(x.data, x.id)).join('');
 
       els.prev.disabled = (page<=1);
       els.next.disabled = (page>=pages);
       els.pageInfo.textContent = `${page} / ${pages}`;
-
       els.resultInfo.textContent = `พบทั้งหมด ${total} รายการ`;
-      // tag click (เพิ่ม/แทนที่ query)
+
       $$('.tag-chip', els.grid).forEach(el=>{
         el.addEventListener('click', ()=>{
-          const t = el.getAttribute('data-tag') || '';
-          els.q.value = t;
+          els.q.value = el.getAttribute('data-tag') || '';
           applyFilters();
         });
       });
     }
 
     async function loadAll(){
+      document.body.offsetHeight; // force reflow
       showLoader(true);
-      await ensureAnonAuth().catch(()=>{}); // ไม่บังคับ auth สำหรับ read
-      // อ่านจาก Firestore ตามตัวกรองพื้นฐาน
-      const onlyF = els.onlyFeatured.checked;
-
-      // NOTE: เลือกใช้ orderBy('rank') เพื่อให้ตรง index ที่สร้างแล้ว
-      const qBase = [
+      await ensureAnonAuth().catch(()=>{});
+      const base = [
         where('isActive','==', true),
-        ...(onlyF ? [where('featured','==', true)] : []),
+        ...(els.onlyFeatured.checked ? [where('featured','==', true)] : []),
         orderBy('rank','asc')
       ];
-      const qs = query(collection(db,'products'), ...qBase);
-      const snap = await getDocs(qs);
-
-      // แปลงเป็น array {id,data}
+      const snap = await getDocs(query(collection(db,'products'), ...base));
       allItems = snap.docs.map(d=>({ id:d.id, data:d.data() }));
-      applyFilters(); // จะเรียก renderGrid ภายใน
+      applyFilters();
+      showLoader(false);
     }
 
     function bindEvents(){
@@ -303,9 +384,9 @@
       try{
         bindEvents();
         await loadAll();
-      } catch(err){
-        console.error('shop init error:', err);
-      } finally{
+      }catch(e){
+        console.error(e);
+      }finally{
         showLoader(false);
       }
     })();
