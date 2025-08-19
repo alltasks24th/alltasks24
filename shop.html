@@ -1,157 +1,64 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>สินค้าทั้งหมด - รับจ้างสารพัด 24 ชั่วโมง</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>สินค้าทั้งหมด</title>
 
-  <!-- Bootstrap & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --brand:#6d28d9;
-      --brand-600:#7c3aed;
-      --brand-700:#5b21b6;
-      --muted:#f1eefc;
-      --chip:#f3f4f6;
-      --text:#0f172a;
+      --brand:#6d28d9; --brand-600:#7c3aed; --brand-700:#5b21b6;
     }
-    *{ font-family:"Noto Sans Thai", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"; }
-    body{ background:#f7f5ff; color:var(--text); }
-
-    .page-header{
-      background:linear-gradient(180deg,#f6f3ff 0%, #f7f5ff 100%);
-      border-bottom:1px solid #efe9ff;
-    }
-    .page-title{ font-weight:800; letter-spacing:.2px; }
-    .breadcrumbs small{ color:#6b7280 }
-
-    .card-product{
-      border:1px solid #eee8ff;
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 10px 20px rgba(93,56,255,.06);
-      transition:transform .16s ease, box-shadow .16s ease;
-      background:#fff;
-    }
-    .card-product:hover{
-      transform:translateY(-3px);
-      box-shadow:0 16px 30px rgba(93,56,255,.10);
-    }
-    .product-cover{
-      aspect-ratio: 4 / 3;
-      width:100%;
-      object-fit:cover;
-      background:#f2f0ff;
-    }
-    .price{
-      font-weight:800;
-      color:var(--brand-700);
-      font-size:1.05rem;
-    }
-    .price .strike{
-      color:#9ca3af;
-      text-decoration:line-through;
-      font-weight:500;
-      margin-right:6px;
-    }
-    .chip{
-      display:inline-block;
-      padding:.2rem .5rem;
-      border-radius:999px;
-      background:#f3f4f6;
-      font-size:.78rem;
-      color:#475569;
-      border:1px solid #e5e7eb;
-      margin-right:.35rem;
-      margin-bottom:.35rem;
-    }
-    .chip.badge{ background:#ede9fe; color:#4c1d95; border-color:#e9d5ff; }
-    .chip.red{ background:#fee2e2; color:#991b1b; border-color:#fecaca; }
-    .chip.green{ background:#dcfce7; color:#166534; border-color:#bbf7d0; }
-    .chip.blue{ background:#e0f2fe; color:#075985; border-color:#bae6fd; }
-    .chip.orange{ background:#ffedd5; color:#9a3412; border-color:#fed7aa; }
-
+    *{font-family:"Noto Sans Thai",system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+    body{background:#f7f5ff;}
+    .page-header{background:linear-gradient(180deg,#f6f3ff 0%,#f7f5ff 100%);border-bottom:1px solid #efe9ff}
     .btn-brand{
-      --bs-btn-bg: var(--brand);
-      --bs-btn-border-color: var(--brand);
-      --bs-btn-hover-bg: var(--brand-600);
-      --bs-btn-hover-border-color: var(--brand-600);
-      --bs-btn-active-bg: var(--brand-700);
-      --bs-btn-active-border-color: var(--brand-700);
-      --bs-btn-color:#fff;
+      --bs-btn-bg:var(--brand);--bs-btn-border-color:var(--brand);
+      --bs-btn-hover-bg:var(--brand-600);--bs-btn-hover-border-color:var(--brand-600);--bs-btn-color:#fff;
     }
     .btn-outline-brand{
-      --bs-btn-color: var(--brand-700);
-      --bs-btn-border-color: var(--brand-600);
-      --bs-btn-hover-bg: var(--brand-600);
-      --bs-btn-hover-border-color: var(--brand-600);
-      --bs-btn-hover-color:#fff;
+      --bs-btn-color:var(--brand-700);--bs-btn-border-color:#e9d5ff;
+      --bs-btn-hover-bg:var(--brand-600);--bs-btn-hover-border-color:var(--brand-600);--bs-btn-hover-color:#fff;
     }
-
-    .toolbar .form-select, .toolbar .form-control{
-      border-radius:12px; border-color:#e9d5ff; background:#fff;
-    }
-    .toolbar .btn{ border-radius:12px; }
-
-    /* skeleton */
-    .skeleton{
-      animation:sheen 1.3s linear infinite;
-      background:linear-gradient(100deg,#f1eefc 20%, #ebe7ff 40%, #f1eefc 60%);
-      background-size:200% 100%;
-    }
-    @keyframes sheen{
-      to{ background-position: -200% 0; }
-    }
-
-    .pager .btn{
-      border-radius:999px;
-      background:#fff;
-      border:1px solid #e9d5ff;
-      color:#5b21b6;
-    }
-    .pager .btn:disabled{
-      background:#faf5ff; color:#b8a2ff; border-color:#efe9ff;
-    }
-
-    /* sale ribbon */
-    .ribbon{
-      position:absolute; top:10px; left:10px;
-      background:#ef4444; color:#fff; font-weight:800; font-size:.75rem;
-      padding:.25rem .5rem; border-radius:8px;
-      box-shadow:0 6px 12px rgba(239,68,68,.25);
-    }
-    .card-top{ position:relative; }
-
-    .empty-hint{ color:#9ca3af }
-
-    .modal .modal-title{ font-weight:800 }
-    .modal .price{ font-size:1.2rem }
-    .modal-cover{ aspect-ratio: 16 / 9; width:100%; object-fit:cover; border-radius:14px; background:#f2f0ff }
+    .card-product{border:1px solid #eee8ff;border-radius:18px;overflow:hidden;background:#fff;
+      box-shadow:0 10px 20px rgba(93,56,255,.06);transition:.16s}
+    .card-product:hover{transform:translateY(-3px);box-shadow:0 16px 30px rgba(93,56,255,.1)}
+    .product-cover{aspect-ratio:4/3;width:100%;object-fit:cover;background:#f2f0ff}
+    .price{font-weight:800;color:#5b21b6}
+    .price .strike{color:#9ca3af;text-decoration:line-through;font-weight:500;margin-right:6px}
+    .chip{display:inline-block;padding:.2rem .5rem;border-radius:999px;background:#f3f4f6;
+      font-size:.78rem;color:#475569;border:1px solid #e5e7eb;margin:0 .35rem .35rem 0}
+    .chip.badge{background:#ede9fe;color:#4c1d95;border-color:#e9d5ff}
+    .chip.red{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+    .chip.blue{background:#e0f2fe;color:#075985;border-color:#bae6fd}
+    .chip.orange{background:#ffedd5;color:#9a3412;border-color:#fed7aa}
+    .ribbon{position:absolute;top:10px;left:10px;background:#ef4444;color:#fff;font-weight:800;
+      font-size:.75rem;padding:.25rem .5rem;border-radius:8px;box-shadow:0 6px 12px rgba(239,68,68,.25)}
+    .skeleton{animation:sheen 1.3s linear infinite;
+      background:linear-gradient(100deg,#f1eefc 20%,#ebe7ff 40%,#f1eefc 60%);background-size:200% 100%}
+    @keyframes sheen{to{background-position:-200% 0}}
+    .pager .btn{border-radius:999px;background:#fff;border:1px solid #e9d5ff;color:#5b21b6}
+    .pager .btn:disabled{background:#faf5ff;color:#b8a2ff;border-color:#efe9ff}
+    .modal-cover{aspect-ratio:16/9;width:100%;object-fit:cover;border-radius:14px;background:#f2f0ff}
   </style>
 </head>
 <body>
-
   <header class="page-header py-3">
     <div class="container">
       <div class="d-flex justify-content-between align-items-center">
-        <div class="breadcrumbs small">
-          รับจ้างสารพัด 24 ชั่วโมง
-        </div>
+        <div class="small text-muted">รับจ้างสารพัด 24 ชั่วโมง</div>
         <a class="btn btn-sm btn-outline-brand" href="./">กลับหน้าแรก</a>
       </div>
-
       <div class="d-flex mt-1 align-items-end justify-content-between">
-        <h1 class="page-title h3 m-0">สินค้าทั้งหมด</h1>
+        <h1 class="h3 m-0 fw-bold">สินค้าทั้งหมด</h1>
         <div class="small text-muted">พบทั้งหมด <span id="txtTotal">-</span> รายการ</div>
       </div>
 
-      <div class="toolbar row g-2 mt-3 align-items-center">
+      <div class="row g-2 mt-3">
         <div class="col-lg-6">
           <div class="input-group">
             <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
@@ -159,7 +66,6 @@
             <button id="btnClear" class="btn btn-outline-brand">ล้าง</button>
           </div>
         </div>
-
         <div class="col-6 col-md-3 col-lg-3">
           <select id="selSort" class="form-select">
             <option value="latest">เรียงตามล่าสุด (แนะ)</option>
@@ -168,8 +74,7 @@
             <option value="rank">ลำดับ (rank)</option>
           </select>
         </div>
-
-        <div class="col-6 col-md-3 col-lg-3">
+        <div class="col-6 col-md-3 col-lg-3 align-self-center">
           <div class="form-check">
             <input id="chkFeatured" class="form-check-input" type="checkbox">
             <label class="form-check-label" for="chkFeatured">แสดงเฉพาะแนะนำ</label>
@@ -181,32 +86,29 @@
 
   <main class="py-4">
     <div class="container">
-
-      <!-- list -->
       <div id="grid" class="row g-4"></div>
 
-      <!-- pager -->
       <div class="pager d-flex gap-2 align-items-center justify-content-center my-4">
         <button id="btnPrev" class="btn btn-sm px-3" disabled>&lt; ก่อนหน้า</button>
         <div class="small text-muted"><span id="txtPage">1</span> / <span id="txtPages">1</span></div>
         <button id="btnNext" class="btn btn-sm px-3" disabled>ถัดไป &gt;</button>
       </div>
 
-      <!-- empty -->
       <div id="empty" class="text-center py-5 d-none">
         <i class="bi bi-box-seam" style="font-size:3rem;color:#c4b5fd"></i>
-        <div class="mt-2 empty-hint">ไม่พบข้อมูล</div>
+        <div class="mt-2 text-secondary">ไม่พบข้อมูล</div>
       </div>
 
+      <div id="loadError" class="text-center text-danger py-5 d-none">โหลดข้อมูลไม่สำเร็จ</div>
     </div>
   </main>
 
-  <!-- product modal -->
+  <!-- Product Modal -->
   <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">รายละเอียดสินค้า</h5>
+          <h5 class="modal-title fw-bold" id="modalTitle">รายละเอียดสินค้า</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -241,11 +143,11 @@
     </div>
   </div>
 
-  <!-- templates -->
+  <!-- Templates -->
   <template id="tpl-card">
     <div class="col-12 col-md-6 col-lg-4">
       <div class="card-product h-100">
-        <div class="card-top">
+        <div class="position-relative">
           <img class="product-cover" alt="">
           <div class="ribbon d-none"></div>
         </div>
@@ -259,7 +161,6 @@
           </div>
           <div class="chips mt-1"></div>
           <div class="small text-secondary mt-2 desc"></div>
-
           <div class="d-flex gap-2 mt-3">
             <button class="btn btn-brand flex-fill btn-detail">ดูรายละเอียด</button>
           </div>
@@ -283,141 +184,166 @@
   </template>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- ต้องโหลด public.js ของโปรเจกต์ก่อน (มี firebase config/ตัวแปร site เป็นต้น) -->
   <script src="public.js"></script>
 
   <script>
-    // ========= CONFIG =========
     const PAGE_SIZE = 6;
-
-    // state
     let allProducts = [];
-    let view = {
-      page: 1,
-      q: "",
-      featured: false,
-      sort: "latest",
-    };
+    let view = { page:1, q:"", featured:false, sort:"latest" };
 
-    // els
     const $ = (s, p=document)=>p.querySelector(s);
-    const $$ = (s, p=document)=>Array.from(p.querySelectorAll(s));
-    const grid = $("#grid");
-    const empty = $("#empty");
-    const txtTotal = $("#txtTotal");
-    const txtPage = $("#txtPage");
-    const txtPages = $("#txtPages");
-    const btnPrev = $("#btnPrev");
-    const btnNext = $("#btnNext");
+    const grid = $("#grid"), empty=$("#empty"), errBox=$("#loadError");
+    const txtTotal=$("#txtTotal"), txtPage=$("#txtPage"), txtPages=$("#txtPages");
+    const btnPrev=$("#btnPrev"), btnNext=$("#btnNext");
 
-    // toolbar
-    $("#selSort").addEventListener("change", e=>{
-      view.sort = e.target.value;
-      view.page = 1;
-      render();
-    });
-    $("#chkFeatured").addEventListener("change", e=>{
-      view.featured = e.target.checked;
-      view.page = 1;
-      render();
-    });
-    $("#txtQ").addEventListener("input", e=>{
-      view.q = e.target.value.trim();
-      view.page = 1;
-      render();
-    });
-    $("#btnClear").addEventListener("click", ()=>{
-      $("#txtQ").value = "";
-      view.q = "";
-      render();
-    });
-    btnPrev.onclick = ()=>{ if(view.page>1){ view.page--; render(); } };
-    btnNext.onclick = ()=>{ if(view.page<getPages()){ view.page++; render(); } };
+    // UI handlers
+    $("#selSort").addEventListener("change", e=>{ view.sort=e.target.value; view.page=1; render(); });
+    $("#chkFeatured").addEventListener("change", e=>{ view.featured=e.target.checked; view.page=1; render(); });
+    $("#txtQ").addEventListener("input", e=>{ view.q=e.target.value.trim(); view.page=1; render(); });
+    $("#btnClear").onclick=()=>{ $("#txtQ").value=""; view.q=""; render(); };
+    btnPrev.onclick=()=>{ if(view.page>1){ view.page--; render(); } };
+    btnNext.onclick=()=>{ if(view.page<getPages()){ view.page++; render(); } };
 
-    // ========== FETCH ==========
-    async function init(){
-      skeletons(6);
+    function skeletons(n){ grid.innerHTML=""; for(let i=0;i<n;i++) grid.appendChild($("#tpl-skeleton").content.cloneNode(true)); }
+    function toMoney(n){ return (+n||0).toLocaleString('th-TH'); }
+    function chip(text, extra){ const s=document.createElement("span"); s.className="chip"+(extra?(" "+extra):""); s.textContent=text; return s; }
 
-      // อ่านจาก Firestore (ผ่าน public.js helper: fetchProducts)
-      try{
-        allProducts = await window.fetchProductsForShop();
-      }catch(e){
-        console.error(e);
-        grid.innerHTML = `<div class="text-center text-danger py-5">โหลดข้อมูลไม่สำเร็จ</div>`;
-        return;
+    // ==== Fallback fetcher ====================================================
+    async function safeFetchProducts(){
+      // 1) ใช้ helper จากโปรเจกต์ถ้ามี
+      if (typeof window.fetchProductsForShop === "function"){
+        return await window.fetchProductsForShop();
       }
-      render();
+      if (typeof window.fetchProducts === "function"){
+        return await window.fetchProducts("shop");
+      }
+
+      // 2) ดึงตรงจาก Firestore (รองรับ v8/v9)
+      let db = window.db;
+      try{
+        if(!db){
+          if (window.firebase?.firestore){ db = window.firebase.firestore(); }
+          else if (window.firebase?.getFirestore){ db = window.firebase.getFirestore(window.firebaseApp); }
+        }
+      }catch(_){}
+      if(!db){
+        throw new Error("ไม่พบตัวเชื่อมต่อ Firestore (ตรวจสอบ public.js และลำดับการโหลดสคริปต์)");
+      }
+
+      // รองรับ v8 / v9 แบบง่าย ๆ
+      const isV8 = !!db.collection;
+      let snap;
+      if(isV8){
+        // ต้องมี Composite Index: isActive + rank (คุณสร้างไว้แล้ว)
+        snap = await db.collection("products")
+          .where("isActive","==",true)
+          .orderBy("rank")
+          .get();
+      }else{
+        // v9 modular
+        const { collection, query, where, orderBy, getDocs } = window.firebase;
+        const q = query(collection(db,"products"), where("isActive","==",true), orderBy("rank"));
+        snap = await getDocs(q);
+      }
+
+      const rows = [];
+      const list = (isV8 ? snap.docs : snap.docs);
+      for(const doc of list){
+        const d = (isV8 ? doc.data() : doc.data());
+        rows.push(mapProduct(doc.id, d));
+      }
+      return rows;
     }
 
-    // ========== RENDER ==========
-    function getPages(){
-      return Math.max(1, Math.ceil(getFiltered().length / PAGE_SIZE));
+    // แมปฟิลด์ให้ครอบคลุมของเดิม
+    function mapProduct(id, d){
+      const price   = Number(d?.price)||0;
+      const sale    = Number(d?.sale)||0;
+      const final   = sale>0 ? sale : price;
+      const images  = Array.isArray(d?.images)? d.images : [];
+      const cover   = d?.cover || d?.image || images[0] || "";
+
+      const tagsArr =
+        Array.isArray(d?.tags) ? d.tags :
+        typeof d?.tags==="string" ? d.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
+
+      const createdAtMs =
+        d?.createdAt?.toMillis ? d.createdAt.toMillis() :
+        (d?.createdAt ? new Date(d.createdAt).getTime() : 0);
+
+      return {
+        id,
+        name: d?.name || "",
+        desc: d?.desc || d?.description || "",
+        price, sale, finalPrice: final,
+        cover, tags: tagsArr,
+        isBestSeller: !!(d?.isBestSeller || d?.hit),
+        isNew: !!(d?.isNew || d?.new),
+        freeShip: !!(d?.freeShip || d?.free),
+        stock: (d?.stock ?? null),
+        saleStart: d?.saleStart || d?.promoStart || null,
+        saleEnd: d?.saleEnd || d?.promoEnd || null,
+        rank: d?.rank ?? 999,
+        featured: !!d?.featured,
+        createdAt: createdAtMs
+      };
     }
+    // ========================================================================
+
     function getFiltered(){
       let items = allProducts.slice();
-
-      // only active
-      items = items.filter(x=>x.isActive!==false);
-
-      // featured only?
+      items = items.filter(x=>x.isActive!==false); // กันไว้เผื่อมีข้อมูลเก่า
       if(view.featured) items = items.filter(x=>!!x.featured);
 
-      // search
       const q = view.q.toLowerCase();
       if(q){
         items = items.filter(x=>{
-          const name = (x.name||"").toLowerCase();
-          const tags = (x.tags||[]).join(" ").toLowerCase();
-          return name.includes(q) || tags.includes(q);
+          const name=(x.name||"").toLowerCase();
+          const tags=(x.tags||[]).join(" ").toLowerCase();
+          return name.includes(q)||tags.includes(q);
         });
       }
 
-      // sort
-      if(view.sort==="priceAsc") items.sort((a,b)=>(a.finalPrice-b.finalPrice));
-      else if(view.sort==="priceDesc") items.sort((a,b)=>(b.finalPrice-a.finalPrice));
-      else if(view.sort==="rank") items.sort((a,b)=> (a.rank??999) - (b.rank??999));
-      else items.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0)); // latest
-
+      if(view.sort==="priceAsc") items.sort((a,b)=>a.finalPrice-b.finalPrice);
+      else if(view.sort==="priceDesc") items.sort((a,b)=>b.finalPrice-a.finalPrice);
+      else if(view.sort==="rank") items.sort((a,b)=>(a.rank??999)-(b.rank??999));
+      else items.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)); // latest
       return items;
     }
+    function getPages(){ return Math.max(1, Math.ceil(getFiltered().length / PAGE_SIZE)); }
 
     function render(){
       const items = getFiltered();
-      const pages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
-      const page = Math.min(view.page, pages);
-      const start = (page-1)*PAGE_SIZE;
+      const pages = Math.max(1, Math.ceil(items.length/PAGE_SIZE));
+      view.page = Math.min(view.page, pages);
+      const start = (view.page-1)*PAGE_SIZE;
       const slice = items.slice(start, start+PAGE_SIZE);
 
-      grid.innerHTML = "";
-      if(slice.length===0){
-        empty.classList.remove("d-none");
-      }else{
+      grid.innerHTML="";
+      if(slice.length===0){ empty.classList.remove("d-none"); }
+      else{
         empty.classList.add("d-none");
-        slice.forEach(p=>grid.appendChild(card(p)));
+        slice.forEach(p=>grid.appendChild(renderCard(p)));
       }
 
-      // update pager
       txtTotal.textContent = items.length.toLocaleString('th-TH');
-      txtPage.textContent = page;
+      txtPage.textContent = view.page;
       txtPages.textContent = pages;
-      btnPrev.disabled = page<=1;
-      btnNext.disabled = page>=pages;
+      btnPrev.disabled = view.page<=1;
+      btnNext.disabled = view.page>=pages;
     }
 
-    function card(p){
+    function renderCard(p){
       const t = $("#tpl-card").content.cloneNode(true);
-      const img = $(".product-cover", t);
-      const title = $(".title", t);
-      const strike = $(".strike", t);
-      const now = $(".now", t);
-      const chips = $(".chips", t);
-      const desc = $(".desc", t);
-      const btn = $(".btn-detail", t);
-      const ribbon = $(".ribbon", t);
+      const img=$(".product-cover",t), title=$(".title",t), strike=$(".strike",t);
+      const now=$(".now",t), chips=$(".chips",t), desc=$(".desc",t);
+      const btn=$(".btn-detail",t), ribbon=$(".ribbon",t);
 
       img.src = p.cover || "https://placehold.co/600x450?text=No+Image";
       img.alt = p.name||"";
+      title.textContent = p.name || "-";
 
-      // price & discount
       now.textContent = toMoney(p.finalPrice||0);
       if(p.price && p.finalPrice < p.price){
         strike.classList.remove("d-none");
@@ -427,124 +353,83 @@
         ribbon.classList.remove("d-none");
       }
 
-      // chips
-      if(p.isBestSeller) chips.appendChild(chip("ฮิต", "badge"));
-      if(p.isNew)        chips.appendChild(chip("ใหม่", "badge"));
-      if(p.freeShip)     chips.appendChild(chip("ส่งฟรี", "badge"));
+      if(p.isBestSeller) chips.appendChild(chip("ฮิต","badge"));
+      if(p.isNew)        chips.appendChild(chip("ใหม่","badge"));
+      if(p.freeShip)     chips.appendChild(chip("ส่งฟรี","badge"));
       (p.tags||[]).forEach(tg=>chips.appendChild(chip("#"+tg)));
 
-      // desc
-      desc.textContent = p.desc||"";
-
-      // detail
+      desc.textContent = p.desc || "";
       btn.onclick = ()=>openModal(p);
       return t;
     }
 
-    function chip(text, extra){
-      const s = document.createElement("span");
-      s.className = "chip"+(extra?(" "+extra):"");
-      s.textContent = text;
-      return s;
-    }
-    function toMoney(n){ return (+n||0).toLocaleString('th-TH'); }
-
-    function skeletons(n){
-      grid.innerHTML = "";
-      for(let i=0;i<n;i++) grid.appendChild($("#tpl-skeleton").content.cloneNode(true));
-    }
-
-    // ========== MODAL ==========
-    const productModal = new bootstrap.Modal('#productModal');
-
+    const modal = new bootstrap.Modal('#productModal');
     function openModal(p){
       $("#modalTitle").textContent = p.name||"รายละเอียดสินค้า";
       $("#modalCover").src = p.cover || "https://placehold.co/1200x675?text=No+Image";
       $("#modalDesc").textContent = p.desc||"";
 
-      const strike = $("#modalStrike");
-      const price  = $("#modalPrice");
-      const badge  = $("#modalSaleBadge");
+      const strike=$("#modalStrike"), price=$("#modalPrice"), badge=$("#modalSaleBadge");
       strike.classList.add("d-none"); badge.classList.add("d-none");
-
       price.textContent = toMoney(p.finalPrice||0);
       if(p.price && p.finalPrice < p.price){
         strike.textContent = "฿"+toMoney(p.price);
         strike.classList.remove("d-none");
-        const percent = Math.max(0, Math.round(100 - (p.finalPrice*100)/p.price));
-        badge.textContent = `ลด ${percent}%`;
-        badge.classList.remove("d-none");
+        const percent=Math.max(0,Math.round(100-(p.finalPrice*100)/p.price));
+        badge.textContent=`ลด ${percent}%`; badge.classList.remove("d-none");
       }
 
-      // chips in modal
-      const box = $("#modalChips"); box.innerHTML = "";
+      const box=$("#modalChips"); box.innerHTML="";
       if(p.isBestSeller) box.appendChild(chip("ฮิต","badge"));
       if(p.isNew)        box.appendChild(chip("ใหม่","badge"));
       if(p.freeShip)     box.appendChild(chip("ส่งฟรี","badge"));
       (p.tags||[]).forEach(tg=>box.appendChild(chip("#"+tg)));
 
-      // stock
-      const stk = $("#modalStock");
+      const stk=$("#modalStock");
       if(Number.isFinite(+p.stock)){
         stk.textContent = `สต็อกคงเหลือ ${(+p.stock).toLocaleString('th-TH')} ชิ้น`;
         stk.classList.remove("d-none");
-      }else{
-        stk.classList.add("d-none");
-      }
+      }else{ stk.classList.add("d-none"); }
 
-      // sale time
-      const st = $("#modalSaleTime");
+      const st=$("#modalSaleTime");
       if(p.saleStart){
-        const start = toDate(p.saleStart);
-        let text = "เริ่มโปรฯ " + formatDate(start);
-        if(p.saleEnd){
-          const end = toDate(p.saleEnd);
-          text += " - สิ้นสุด " + formatDate(end);
-        }
-        st.textContent = text; st.classList.remove("d-none");
+        const start=toDate(p.saleStart); let text="เริ่มโปรฯ "+formatDate(start);
+        if(p.saleEnd){ text += " - สิ้นสุด " + formatDate(toDate(p.saleEnd)); }
+        st.textContent=text; st.classList.remove("d-none");
       }else{ st.classList.add("d-none"); }
 
-      // contact buttons from settings (public.js fills window.site)
-      const tel = (window.site?.phone||"").replace(/\s/g,'');
-      const line = (window.site?.line||"").trim();
-      const fb = (window.site?.facebook||"").trim();
+      // ปุ่มติดต่อจาก settings ใน public.js (window.site)
+      const tel=(window.site?.phone||"").replace(/\s/g,'');
+      const line=(window.site?.line||"").trim();
+      const fb=(window.site?.facebook||"").trim();
 
-      const elTel = $("#modalTel");
-      if(tel){ elTel.href = `tel:${tel}`; elTel.classList.remove("disabled"); }
-      else   { elTel.removeAttribute("href"); elTel.classList.add("disabled"); }
+      const elTel=$("#modalTel"); if(tel){ elTel.href=`tel:${tel}`; elTel.classList.remove("disabled"); } else { elTel.removeAttribute("href"); elTel.classList.add("disabled"); }
+      const elLine=$("#modalLine"); if(line){ const id=line.startsWith('@')? line.slice(1):line; elLine.href=`https://line.me/R/ti/p/${encodeURIComponent(id)}`; elLine.classList.remove("disabled"); } else { elLine.removeAttribute("href"); elLine.classList.add("disabled"); }
+      const elFb=$("#modalFb"); if(fb){ elFb.href=fb; elFb.classList.remove("disabled"); } else { elFb.removeAttribute("href"); elFb.classList.add("disabled"); }
 
-      const elLine = $("#modalLine");
-      if(line){
-        const id = line.startsWith('@') ? line.slice(1) : line;
-        elLine.href = `https://line.me/R/ti/p/${encodeURIComponent(id)}`;
-        elLine.classList.remove("disabled");
-      }else{ elLine.removeAttribute("href"); elLine.classList.add("disabled"); }
-
-      const elFb = $("#modalFb");
-      if(fb){ elFb.href = fb; elFb.classList.remove("disabled"); }
-      else  { elFb.removeAttribute("href"); elFb.classList.add("disabled"); }
-
-      productModal.show();
+      modal.show();
     }
 
-    function toDate(v){
-      if(!v) return null;
-      if(typeof v==="number") return new Date(v);
-      const d = new Date(v); if(!isNaN(+d)) return d;
-      return null;
-    }
+    function toDate(v){ if(!v) return null; if(typeof v==="number") return new Date(v);
+      const d=new Date(v); return isNaN(+d)? null:d; }
     function pad(n){ return String(n).padStart(2,"0"); }
-    function formatDate(d){
-      if(!d) return "";
-      const yyyy=d.getFullYear();
-      const mm=pad(d.getMonth()+1);
-      const dd=pad(d.getDate());
-      const hh=pad(d.getHours());
-      const mi=pad(d.getMinutes());
-      return `${dd}/${mm}/${yyyy} ${hh}:${mi}น.`;
-    }
+    function formatDate(d){ if(!d) return ""; return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}น.`; }
 
-    // boot
+    async function init(){
+      skeletons(6);
+      try{
+        allProducts = await safeFetchProducts();
+        errBox.classList.add("d-none");
+        render();
+      }catch(e){
+        console.error("[shop] โหลดข้อมูลไม่สำเร็จ:", e);
+        grid.innerHTML="";
+        empty.classList.add("d-none");
+        errBox.classList.remove("d-none");
+      }
+    }
+    function getPages(){ return Math.max(1, Math.ceil(getFiltered().length / PAGE_SIZE)); }
+
     init();
   </script>
 </body>
