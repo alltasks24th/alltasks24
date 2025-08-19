@@ -634,9 +634,9 @@ document.addEventListener('click', (e) => {
 })();
 
 // === SITE CONTACT (ตั้งค่าครั้งเดียว; เว้นว่างไว้ = ไม่แสดงปุ่มนั้น) ===
-window.SITE_PHONE = '098-000-0000';                 // เบอร์โทร
-window.SITE_LINE_URL = 'https://line.me/ti/p/xxxx';  // ลิงก์ LINE
-window.SITE_FB_URL   = 'https://www.facebook.com/yourpage'; // ลิงก์เพจ FB (ถ้าเว้นว่างจะกลายเป็นปุ่ม "แชร์")
+window.SITE_PHONE = '094-173-1710';                 // เบอร์โทร
+window.SITE_LINE_URL = 'https://lin.ee/xIiZ0GL';  // ลิงก์ LINE
+window.SITE_FB_URL   = 'https://www.facebook.com/share/16Qd9wh7h4/'; // ลิงก์เพจ FB (ถ้าเว้นว่างจะกลายเป็นปุ่ม "แชร์")
 
 // === เพิ่มปุ่ม โทร / LINE / Facebook ในโมดอลบริการ (ADD-ONLY, ไม่แตะของเดิม) ===
 (function(){
