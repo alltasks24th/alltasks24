@@ -9,11 +9,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css">
 <style>
-.sidebar{min-width:260px;max-width:260px;background:#fff;border-right:1px solid var(--border);min-height:100vh;position:sticky;top:0}
-.sidebar .brand{color:var(--primary)}
-.nav-pills .nav-link.active{background:var(--primary)}
-.stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
-.header{background:#fff;border-bottom:1px solid var(--border)}
+  .sidebar{min-width:260px;max-width:260px;background:#fff;border-right:1px solid var(--border);min-height:100vh;position:sticky;top:0}
+  .sidebar .brand{color:var(--primary)}
+  .nav-pills .nav-link.active{background:var(--primary)}
+  .stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
+  .header{background:#fff;border-bottom:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -26,7 +26,9 @@
     </div>
   </div>
 </nav>
+
 <div class="d-flex">
+  <!-- เมนูฝั่งซ้าย -->
   <aside class="sidebar p-3 d-none d-md-block">
     <div class="nav nav-pills flex-column gap-1" role="tablist">
       <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-dashboard"><i class="bi bi-speedometer2 me-2"></i>แดชบอร์ด</button>
@@ -38,14 +40,23 @@
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-users"><i class="bi bi-people me-2"></i>ผู้ใช้/บทบาท</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-promos"><i class="bi bi-ticket-perforated me-2"></i>โปรโมชัน</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-banners"><i class="bi bi-images me-2"></i>แบนเนอร์</button>
+
+      <!-- ปุ่มเมนูร้านค้า/สินค้า (ใหม่ วางถูกตำแหน่งแล้ว) -->
+      <button class="nav-link" id="tab-products-tab" data-bs-toggle="pill" data-bs-target="#tab-products">
+        <i class="bi bi-bag me-2"></i>ร้านค้า
+      </button>
+
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-2"></i>FAQ</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-settings"><i class="bi bi-gear me-2"></i>ตั้งค่า</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chat"><i class="bi bi-chat-dots me-2"></i>แชทสด</button>
     </div>
   </aside>
+
+  <!-- เนื้อหาฝั่งขวา -->
   <div class="flex-grow-1 p-3">
     <div class="tab-content">
 
+      <!-- แดชบอร์ด -->
       <div class="tab-pane fade show active" id="tab-dashboard">
         <div class="row g-3 mb-3">
           <div class="col-md-3"><div class="stat"><div class="text-muted">คำขอจอง</div><div class="h4 mb-0" id="countBookings">0</div></div></div>
@@ -58,6 +69,7 @@
         </div>
       </div>
 
+      <!-- บริการ -->
       <div class="tab-pane fade" id="tab-services">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <h5 class="mb-0">จัดการบริการ</h5>
@@ -69,16 +81,11 @@
         </table>
       </div>
 
-<!-- 1) ปุ่มแท็บ -->
-      <li class="nav-item">
-        <button class="nav-link" id="tab-products-tab" data-bs-toggle="tab"data-bs-target="#tab-products" type="button" role="tab">สินค้า</button>
-      </li>
-
-<!-- 2) เนื้อหาแท็บสินค้า -->
+      <!-- ร้านค้า/สินค้า -->
       <div class="tab-pane fade" id="tab-products" role="tabpanel" aria-labelledby="tab-products-tab">
         <div class="row g-3 mt-3">
 
-    <!-- ฟอร์มสินค้า -->
+          <!-- ฟอร์มสินค้า -->
           <div class="col-lg-5">
             <div class="card">
               <div class="card-header fw-semibold">เพิ่ม/แก้สินค้า</div>
@@ -87,23 +94,28 @@
                   <input type="hidden" id="prodId">
                   <div class="mb-2"><label class="form-label">ชื่อ</label><input id="name" class="form-control" required></div>
                   <div class="mb-2"><label class="form-label">คำอธิบาย</label><textarea id="desc" class="form-control" rows="3"></textarea></div>
+
                   <div class="row g-2">
                     <div class="col-6"><label class="form-label">ราคา (฿)</label><input id="price" type="number" class="form-control" required></div>
                     <div class="col-6"><label class="form-label">หน่วย</label><input id="unit" class="form-control" placeholder="ครั้ง / แพ็ก / เที่ยว"></div>
                   </div>
+
                   <div class="row g-2 mt-1">
                     <div class="col-4"><label class="form-label">Sale (฿)</label><input id="salePrice" type="number" class="form-control"></div>
                     <div class="col-4"><label class="form-label">เริ่มโปรฯ</label><input id="saleStart" type="datetime-local" class="form-control"></div>
                     <div class="col-4"><label class="form-label">จบโปรฯ</label><input id="saleEnd" type="datetime-local" class="form-control"></div>
                   </div>
+
                   <div class="mt-2"><label class="form-label">รูปปก (URL)</label><input id="cover" class="form-control" placeholder="https://..."></div>
                   <div class="mt-2"><label class="form-label">แกลเลอรี (คั่นด้วย , )</label><input id="gallery" class="form-control" placeholder="https://..., https://..."></div>
                   <div class="mt-2"><label class="form-label">แท็ก (คั่นด้วย , )</label><input id="tags" class="form-control" placeholder="ทำความสะอาด, โปรฯ"></div>
+
                   <div class="row g-2 mt-1">
                     <div class="col-4"><label class="form-label">สต็อก</label><input id="stock" type="number" class="form-control" placeholder="เว้นได้"></div>
                     <div class="col-4"><label class="form-label">ลำดับ (rank)</label><input id="rank" type="number" class="form-control" value="999"></div>
                     <div class="col-4"><label class="form-label">โปรโมชัน</label><input id="promoText" class="form-control" placeholder="ส่งฟรี/คูปอง..."></div>
                   </div>
+
                   <div class="row g-2 mt-2">
                     <div class="col-6">
                       <div class="form-check"><input id="featured" class="form-check-input" type="checkbox"><label class="form-check-label" for="featured">แนะนำ (หน้าแรก)</label></div>
@@ -115,6 +127,7 @@
                       <div class="form-check"><input id="isActive" class="form-check-input" type="checkbox" checked><label class="form-check-label" for="isActive">เปิดแสดง</label></div>
                     </div>
                   </div>
+
                   <div class="d-flex gap-2 mt-3">
                     <button class="btn btn-primary" id="btnSave" type="submit">บันทึก</button>
                     <button class="btn btn-secondary" id="btnReset" type="button">ล้างฟอร์ม</button>
@@ -125,10 +138,11 @@
             </div>
           </div>
 
-    <!-- ตารางสินค้า -->
+          <!-- ตารางสินค้า -->
           <div class="col-lg-7">
             <div class="card">
-              <div class="card-header fw-semibold d-flex justify-content-between">รายการสินค้า <span class="small text-muted">เรียงตาม rank</span>
+              <div class="card-header fw-semibold d-flex justify-content-between">
+                รายการสินค้า <span class="small text-muted">เรียงตาม rank</span>
               </div>
               <div class="card-body p-0">
                 <div class="table-responsive">
@@ -150,9 +164,11 @@
               </div>
             </div>
           </div>
+
         </div>
       </div>
-      
+
+      <!-- พื้นที่ -->
       <div class="tab-pane fade" id="tab-areas">
         <div class="row g-3">
           <div class="col-lg-8">
@@ -165,9 +181,7 @@
           <div class="col-lg-4">
             <div class="card card-clean p-3">
               <h6>พื้นที่ให้บริการ</h6>
-              <!-- รายการจะแสดงตรงนี้ -->
               <ul class="list-group" id="areaListAdmin"></ul>
-              <!-- ฟอร์มเพิ่มพื้นที่ -->
               <div class="mt-3">
                 <input id="areaName" class="form-control mb-2" placeholder="ชื่อพื้นที่">
                 <input id="areaProv" class="form-control mb-2" placeholder="จังหวัด">
@@ -178,7 +192,8 @@
           </div>
         </div>
       </div>
-      
+
+      <!-- การจอง -->
       <div class="tab-pane fade" id="tab-bookings">
         <h5>การจองงาน/นัดหมาย</h5>
         <table class="table table-hover align-middle">
@@ -187,64 +202,71 @@
         </table>
       </div>
 
+      <!-- ใบเสนอราคา/ปัญหา -->
       <div class="tab-pane fade" id="tab-tickets">
-       <h5>คำขอใบเสนอราคา / แจ้งปัญหา</h5>
-       <table class="table table-hover align-middle">
-        <thead>
-         <tr>
-          <th>อีเมล</th>
-          <th>หัวข้อ</th>
-          <th>รายละเอียดทั้งหมด</th>
-          <th>สถานะ</th>
-          <th class="text-end">จัดการ</th>
-         </tr>
-        </thead>
-        <tbody id="ticketTableBody"></tbody>
-       </table>
+        <h5>คำขอใบเสนอราคา / แจ้งปัญหา</h5>
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>อีเมล</th><th>หัวข้อ</th><th>รายละเอียดทั้งหมด</th><th>สถานะ</th><th class="text-end">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="ticketTableBody"></tbody>
+        </table>
       </div>
-      
+
+      <!-- รีวิว -->
       <div class="tab-pane fade" id="tab-reviews">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <h5 class="mb-0">จัดการรีวิว (รออนุมัติ)</h5>
         </div>
         <table class="table table-hover align-middle">
           <thead><tr><th>ผู้ใช้</th><th>คะแนน</th><th>ข้อความ</th><th class="text-end">อนุมัติ</th></tr></thead>
-        <tbody id="reviewTableBody"></tbody></table>
+          <tbody id="reviewTableBody"></tbody>
+        </table>
 
-        <!-- ตารางรีวิวที่อนุมัติแล้ว -->
         <div class="mt-4">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h5 class="mb-0">รีวิวที่อนุมัติแล้ว</h5>
           </div>
           <table class="table table-hover align-middle">
             <thead><tr><th>ผู้ใช้</th><th>คะแนน</th><th>ข้อความ</th><th class="text-end">จัดการ</th></tr></thead>
-          <tbody id="reviewApprovedTableBody"></tbody></table>
+            <tbody id="reviewApprovedTableBody"></tbody>
+          </table>
         </div>
       </div>
-      
+
+      <!-- ผู้ใช้/บทบาท -->
       <div class="tab-pane fade" id="tab-users">
         <h5>ผู้ใช้ / บทบาท</h5>
         <div class="alert alert-info small">จัดการผ่านคอลเลกชัน <code>roles/{uid}</code> role = owner/admin/viewer</div>
       </div>
 
+      <!-- โปรโมชัน -->
       <div class="tab-pane fade" id="tab-promos">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <h5 class="mb-0">โปรโมชัน</h5>
           <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#promoModal"><i class="bi bi-plus-lg me-1"></i>เพิ่มโปรโมชัน</button>
         </div>
-        <table class="table table-hover"><thead><tr><th>ชื่อ</th><th>ช่วงเวลา</th><th>คำอธิบาย</th><th class="text-end">จัดการ</th></tr></thead>
-        <tbody id="promoTableBody"></tbody></table>
+        <table class="table table-hover">
+          <thead><tr><th>ชื่อ</th><th>ช่วงเวลา</th><th>คำอธิบาย</th><th class="text-end">จัดการ</th></tr></thead>
+          <tbody id="promoTableBody"></tbody>
+        </table>
       </div>
 
+      <!-- แบนเนอร์ -->
       <div class="tab-pane fade" id="tab-banners">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <h5 class="mb-0">แบนเนอร์สไลด์ (Carousel)</h5>
           <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#bannerModal"><i class="bi bi-plus-lg me-1"></i>เพิ่มสไลด์</button>
         </div>
-        <table class="table table-hover"><thead><tr><th>หัวเรื่อง</th><th>คำอธิบาย</th><th>ภาพ</th><th class="text-end">จัดการ</th></tr></thead>
-        <tbody id="bannerTableBody"></tbody></table>
+        <table class="table table-hover">
+          <thead><tr><th>หัวเรื่อง</th><th>คำอธิบาย</th><th>ภาพ</th><th class="text-end">จัดการ</th></tr></thead>
+          <tbody id="bannerTableBody"></tbody>
+        </table>
       </div>
 
+      <!-- FAQ -->
       <div class="tab-pane fade" id="tab-faq">
         <h5>คำถามที่พบบ่อย (FAQ)</h5>
         <div class="card card-clean p-3">
@@ -257,6 +279,7 @@
         </div>
       </div>
 
+      <!-- ตั้งค่า -->
       <div class="tab-pane fade" id="tab-settings">
         <h5>ตั้งค่าทั่วไปของเว็บไซต์</h5>
         <div class="row g-3">
@@ -271,6 +294,7 @@
         </div>
       </div>
 
+      <!-- แชทสด -->
       <div class="tab-pane fade" id="tab-chat">
         <div class="row g-3">
           <div class="col-md-4">
@@ -292,10 +316,11 @@
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
+    </div><!-- /.tab-content -->
+  </div><!-- /.content -->
+</div><!-- /.layout -->
 
+<!-- โมดอลบริการ -->
 <div class="modal fade" id="svcModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -311,13 +336,13 @@
         <label class="form-label mt-2">แกลเลอรีผลงาน (1 ลิงก์ต่อ 1 บรรทัด)</label>
         <textarea id="svcGallery" rows="4" class="form-control" placeholder="https://...1.jpg
 https://...2.jpg"></textarea>
-        
       </div>
       <div class="modal-footer"><button id="svcSave" class="btn btn-primary">บันทึก</button></div>
     </div>
   </div>
 </div>
 
+<!-- โมดอลโปรโมชัน -->
 <div class="modal fade" id="promoModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -337,6 +362,7 @@ https://...2.jpg"></textarea>
   </div>
 </div>
 
+<!-- โมดอลแบนเนอร์ -->
 <div class="modal fade" id="bannerModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
