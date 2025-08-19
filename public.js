@@ -687,33 +687,3 @@ window.SITE_FB_URL   = 'https://www.facebook.com/yourpage'; // ลิงก์�
       '_blank','noopener,noreferrer,width=640,height=480');
   });
 })();
-
-// === PAGE LOADER (แสดงจนกว่าบริการจะเรนเดอร์) ===
-(function(){
-  const LOADER_ID = 'pageLoader';
-  const q = (sel, root=document)=> root.querySelector(sel);
-  const showLoader = (show)=>{
-    const el = q('#'+LOADER_ID);
-    if(!el) return;
-    el.classList[show ? 'remove' : 'add']('hidden');
-  };
-
-  // โชว์ทันทีเมื่อ DOM พร้อม (กันจอกระพริบ)
-  document.addEventListener('DOMContentLoaded', ()=> showLoader(true));
-
-  // ซ่อนเมื่อการ์ดบริการตัวแรกโผล่ (ไม่ต้องแก้ onSnapshot)
-  const mo = new MutationObserver(()=>{
-    const wrap = q('#service-cards');
-    if (wrap && wrap.querySelector('.card')) {
-      showLoader(false);
-      mo.disconnect();
-    }
-  });
-  mo.observe(document.documentElement, { childList:true, subtree:true });
-
-  // กันเคสไฟล์/รูปโหลดช้า: ซ่อนเมื่อหน้าโหลดครบ
-  window.addEventListener('load', ()=> showLoader(false));
-
-  // safety: ถ้าอะไรสักอย่างผิดพลาด อย่าให้ค้างเกิน 8 วิ
-  setTimeout(()=> showLoader(false), 8000);
-})();
