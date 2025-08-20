@@ -85,3 +85,16 @@ a{color:var(--primary)}a:hover{filter:brightness(.9)}
   z-index: 3;
   pointer-events: none;
 }
+
+/* Gradient ม่วงสำหรับปุ่ม */
+.btn.btn-gradient{
+  background-image: linear-gradient(90deg,#6f3ccf,#9b6bff) !important;
+  border: 0 !important;
+  color: #fff !important;
+  /* กัน Bootstrap ทับ */
+  --bs-btn-bg: transparent;
+  --bs-btn-hover-bg: transparent;
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-border-color: transparent;
+}
+.btn.btn-gradient:hover{ filter: brightness(1.06); color:#fff !important; }
