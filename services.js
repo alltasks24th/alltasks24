@@ -100,7 +100,7 @@ function modalHtml(svc) {
             ${tagBlock}
           </div>
           <div class="modal-footer">
-            <div class="d-flex gap-2 flex-wrap">
+            <div class="d-flex gap-2 flex-wrap justify-content-start">
               ${contactButtons()}
             </div>
           </div>
