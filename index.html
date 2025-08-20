@@ -91,38 +91,38 @@
   <div class="container">
     <div class="d-flex align-items-center justify-content-between mb-3">
       <h3 class="section-title mb-0">สินค้าแนะนำ</h3>
-      <a href="/shop.html" class="btn btn-outline-primary btn-sm">ดูสินค้าทั้งหมด</a>
+      <a href="shop.html" class="btn btn-outline-primary btn-sm">ดูสินค้าทั้งหมด</a>
     </div>
-    <div id="homeProducts" class="row g-3"></div>
+
+    <div class="row g-3" id="product-cards"></div>
   </div>
-</section>
+</section> 
 
 <script>
-  // ใช้ตัวเรนเดอร์เดียวกับ shop (ประกาศอยู่ใน public.js)
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      // ดึง “สินค้าแนะนำ” เหมือนหน้า shop (isActive+featured, sort ตาม rank)
-      const db = firebase.firestore();
-      const q = db.collection('products')
-        .where('isActive','==', true)
-        .where('featured','==', true)
-        .orderBy('rank','desc')
-        .limit(3);
+document.addEventListener('DOMContentLoaded', async () => {
+  const listEl = document.getElementById('product-cards');
+  try {
+    const db = firebase.firestore();
+    // เหมือน shop: เอาเฉพาะ isActive และเรียงตาม rank
+    const q = db.collection('products')
+      .where('isActive','==',true)
+      .orderBy('rank','desc')
+      .limit(3);                     // แสดงแค่ 3 ชิ้นบนหน้าแรก
 
-      const snap = await q.get();
-      const html = [];
-      snap.forEach(doc => {
-        const p = { id: doc.id, ...doc.data() };
-        // ⬇️ ใช้เรนเดอร์เดียวกับหน้า shop
-        html.push(window.renderProductCard(p));
-      });
-      document.getElementById('homeProducts').innerHTML = html.join('');
-    } catch(e){
-      console.error(e);
-      document.getElementById('homeProducts').innerHTML =
-        `<div class="text-danger small">โหลดข้อมูลไม่สำเร็จ</div>`;
-    }
-  });
+    const snap = await q.get();
+    listEl.innerHTML = '';
+    snap.forEach(doc => {
+      const p = { id: doc.id, ...doc.data() };
+      const col = document.createElement('div');
+      col.className = 'col-12 col-md-6 col-lg-4';
+      col.innerHTML = window.renderProductCard(p); // ใช้การ์ดเดียวกับ shop
+      listEl.appendChild(col);
+    });
+  } catch (e) {
+    console.error(e);
+    listEl.innerHTML = '<div class="text-danger small">โหลดข้อมูลไม่สำเร็จ</div>';
+  }
+});
 </script>
     
     <section id="map" class="mb-5">
