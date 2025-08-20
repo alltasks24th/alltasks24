@@ -1,3 +1,4 @@
+<!-- services.html -->
 <!doctype html>
 <html lang="th">
 <head>
@@ -16,14 +17,13 @@
     .sticky-header{position:sticky;top:0;z-index:1000;background:#fff;border-bottom:1px solid var(--border,#e9ecef)}
   </style>
 
-<!-- Favicons -->
-<link rel="icon" href="/icons/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="manifest" href="/icons/site.webmanifest">
-<meta name="theme-color" content="#6C37FF">
-  
+  <!-- Favicons -->
+  <link rel="icon" href="/icons/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/icons/site.webmanifest">
+  <meta name="theme-color" content="#6C37FF">
 </head>
 <body>
   <!-- Header -->
@@ -36,7 +36,7 @@
   </header>
 
   <main class="container my-4">
-    <!-- Search / Filter (optional,ไม่บังคับ ผูกไว้ให้แล้ว) -->
+    <!-- Search / Filter -->
     <div class="row g-2 align-items-end mb-3">
       <div class="col-md-5">
         <label class="form-label">ค้นหาบริการ</label>
@@ -60,9 +60,17 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- โหลด config เดิมของโปรเจกต์ (ห้ามลบ) -->
+  <!-- โหลด config (ห้ามลบ) -->
   <script type="module" src="firebase-init.js"></script>
+
+  <!-- ✅ เพิ่มค่าติดต่อให้หน้านี้ (ต้องอยู่ก่อน services.js) -->
+  <script>
+    window.SITE_PHONE    = '094-173-1710';
+    window.SITE_LINE_URL = 'https://line.me/R/ti/p/@243zoeey';
+    window.SITE_FB_URL   = 'https://www.facebook.com/share/16Qd9wh7h4/';
+  </script>
+
   <!-- โค้ดหน้านี้ -->
-  <script type="module" src="services.js?v=1"></script>
+  <script type="module" src="services.js?v=2"></script>
 </body>
 </html>
