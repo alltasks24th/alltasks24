@@ -47,25 +47,50 @@ function bindRealtime(){
     });
   });
 
-  onSnapshot(collection(db,'promotions'), snap=>{
-    const list = document.getElementById('promo-cards'); if(!list) return; list.innerHTML='';
-    let count=0, now=new Date();
-    snap.forEach(docu=>{
-      const p=docu.data();
-      const start = p.start?.toDate?.() ? p.start.toDate() : (p.start? new Date(p.start): new Date(0));
-      const end   = p.end?.toDate?.()   ? p.end.toDate()   : (p.end? new Date(p.end): new Date(0));
-      if(now>=start && now<=end){
-        count++;
-        list.insertAdjacentHTML('beforeend', `<div class="col-md-4">
-          <div class="card card-clean h-100">
-            <img src="${p.imageUrl||'assets/img/promo.png'}" class="svc-thumb card-img-top" alt="">
-            <div class="card-body"><h5 class="card-title">${p.title||'โปรโมชัน'}</h5><p class="card-text">${p.description||''}</p></div>
-            <div class="card-footer small text-muted">ถึง ${end.toLocaleDateString('th-TH')}</div>
-          </div></div>`);
-      }
-    });
-    const lbl = document.getElementById('promo-range-label'); if(lbl) lbl.textContent = count? `แสดงโปรโมชันที่ใช้งานอยู่ (${count})` : 'ยังไม่มีโปรโมชันที่ใช้งาน';
+  onSnapshot(collection(db, 'promotions'), snap => {
+  const home = document.getElementById('promo-cards');      // หน้าแรก
+  const all  = document.getElementById('promo-cards-all');  // หน้าโปรโมชันทั้งหมด
+  if (!home && !all) return;
+
+  const now = new Date();
+  const items = [];
+
+  snap.forEach(docu => {
+    const p = docu.data() || {};
+    const start = p.start?.toDate?.() ? p.start.toDate() : (p.start ? new Date(p.start) : new Date(0));
+    const end   = p.end?.toDate?.()   ? p.end.toDate()   : (p.end   ? new Date(p.end)   : new Date(0));
+    if (now >= start && now <= end) items.push({ ...p, _end: end });
   });
+
+  const card = p => `
+    <div class="col-md-4">
+      <div class="card card-clean h-100">
+        <img src="${p.imageUrl || 'assets/img/promo.png'}" class="svc-thumb card-img-top" alt="">
+        <div class="card-body">
+          <h5 class="card-title">${p.title || 'โปรโมชัน'}</h5>
+          <p class="card-text">${p.description || ''}</p>
+        </div>
+        <div class="card-footer small text-muted">ถึง ${p._end.toLocaleDateString('th-TH')}</div>
+      </div>
+    </div>
+  `;
+
+  // หน้าแรก: แสดงแค่ 3
+  if (home) {
+    home.innerHTML = items.slice(0, 3).map(card).join('');
+    const lbl = document.getElementById('promo-range-label');
+    if (lbl) lbl.textContent = items.length
+      ? `แสดงโปรโมชันที่ใช้งานอยู่ (${items.length})`
+      : 'ยังไม่มีโปรโมชันที่ใช้งาน';
+  }
+
+  // หน้าโปรโมชันทั้งหมด: แสดงทั้งหมด
+  if (all) {
+    all.innerHTML = items.map(card).join('');
+    const cnt = document.getElementById('promo-all-count');
+    if (cnt) cnt.textContent = items.length ? `ทั้งหมด ${items.length} รายการ` : 'ไม่มีโปรโมชันที่ใช้งาน';
+  }
+});
 
   // ===== Services (หน้าแรก) =====
   onSnapshot(collection(db,'services'), snap=>{
