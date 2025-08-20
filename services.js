@@ -1,11 +1,40 @@
 // services.js — หน้า "บริการทั้งหมด"
-// ใช้ Firebase app เดิม (firebase-init.js ต้องโหลดก่อนไฟล์นี้ใน services.html)
 import { getApps, getApp, initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 const app = getApps().length ? getApp() : (window.firebaseConfig ? initializeApp(window.firebaseConfig) : null);
 if (!app) console.warn("[services.js] Firebase app not found. Ensure firebase-init.js is loaded first.");
 const db = app ? getFirestore(app) : null;
+
+// ------- CONTACT & ปุ่มติดต่อ (เพิ่มใหม่) -------
+const CONTACT = window.CONTACT || { phone: "", line: "", facebook: "" };
+
+function contactButtons(){
+  const phone = (CONTACT.phone || "").trim();
+  const line  = (CONTACT.line || "").trim();
+  const fb    = (CONTACT.facebook || "").trim();
+  let html = "";
+  if (phone) {
+    html += `<a href="tel:${phone}" class="btn btn-outline-success">
+              <i class="bi bi-telephone"></i> โทร
+            </a>`;
+  }
+  if (line){
+    const link = line.startsWith("http")
+      ? line
+      : `https://line.me/R/ti/p/${line.startsWith("@") ? line : "@"+line}`;
+    html += `<a href="${link}" target="_blank" rel="noopener" class="btn btn-outline-success">
+              <i class="bi bi-chat-dots"></i> LINE
+            </a>`;
+  }
+  if (fb){
+    html += `<a href="${fb}" target="_blank" rel="noopener" class="btn btn-outline-primary">
+              <i class="bi bi-facebook"></i> Facebook
+            </a>`;
+  }
+  return html;
+}
+// -----------------------------------------------
 
 // ---- DOM refs ----
 const listEl = document.getElementById("servicesList");
@@ -72,6 +101,7 @@ function modalHtml(svc) {
     ? `<div class="mt-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join("")}</div>`
     : "";
 
+  // ✨ เพิ่ม modal-footer + ปุ่มติดต่อที่นี่
   return `
     <div class="modal fade" id="svc-${id}" tabindex="-1" aria-labelledby="svc-label-${id}" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -85,6 +115,11 @@ function modalHtml(svc) {
             <div class="text-muted small mb-2">${category || ""}</div>
             <p style="white-space:pre-line">${description || ""}</p>
             ${tagBlock}
+          </div>
+          <div class="modal-footer">
+            <div class="d-flex gap-2 flex-wrap">
+              ${contactButtons()}
+            </div>
           </div>
         </div>
       </div>
