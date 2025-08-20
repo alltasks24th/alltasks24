@@ -99,11 +99,12 @@ function modalHtml(svc) {
             <p style="white-space:pre-line">${description || ""}</p>
             ${tagBlock}
           </div>
-          <div class="modal-footer">
-            <div class="d-flex gap-2 flex-wrap justify-content-start">
-              ${contactButtons()}
-            </div>
+          - <div class="modal-footer">
+          + <div class="modal-footer justify-content-start">
+          <div class="d-flex gap-2 flex-wrap">
+          ${contactButtons()}
           </div>
+         </div>
         </div>
       </div>
     </div>
