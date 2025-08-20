@@ -632,7 +632,7 @@ async function renderHomeProducts() {
                   && (!d.saleEnd   || now <= toDate(d.saleEnd));
 
       const percent = saleOn && d.price ? Math.round((1 - d.salePrice / d.price) * 100) : 0;
-      const chips   = (d.tags || []).slice(0,5).map(t => `<span class="badge text-bg-light border me-1 mb-1">#${t}</span>`).join('');
+      const chips   = (d.tags || []).slice(0,5).map(t => `<span class="badge badge-outline me-1 mb-1">#${t}</span>`).join('');
       const stock   = (d.stock ?? null);
       const startStr= d.saleStart ? toDate(d.saleStart).toLocaleString('th-TH') : '';
 
