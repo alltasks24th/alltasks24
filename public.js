@@ -243,7 +243,7 @@ function bindRealtime(){
 
       // หน้าแรก
       if (homeWrap){
-        const limitN = Number(homeWrap.dataset.limit || 3);
+        const limitN = Number(homeWrap.dataset.limit || 4);
         const subset = list.slice(0, limitN);
         homeWrap.innerHTML = subset.map(renderReviewCard).join('');
 
