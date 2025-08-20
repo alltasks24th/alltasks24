@@ -87,22 +87,14 @@
       <div class="row g-3" id="service-cards"></div>
     </section>
 
-<section id="products" class="py-5 bg-light">
-  <div class="container">
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <h3 class="section-title mb-0">สินค้าแนะนำ</h3>
-      <a href="shop.html" class="btn btn-outline-primary btn-sm">ดูสินค้าทั้งหมด</a>
-    </div>
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h3 class="section-title mb-0">สินค้าแนะนำ</h3>
+  <a href="shop.html" class="btn btn-outline-primary btn-sm">ดูสินค้าทั้งหมด</a>
+</div>
 
-    <div class="row g-3" id="product-cards"></div>
-  </div>
-</section> 
-
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    window.loadHomeProducts();
-  });
-</script>
+<div class="row g-3" id="home-products"></div>
+<div id="home-products-error" class="text-danger small d-none">โหลดข้อมูลไม่สำเร็จ</div>
+<div id="home-products-empty" class="text-muted small d-none">ยังไม่มีสินค้าแนะนำ</div>
     
     <section id="map" class="mb-5">
       <h2 class="section-title mb-3">พื้นที่ให้บริการ + แผนที่</h2>
