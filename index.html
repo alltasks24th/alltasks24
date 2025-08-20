@@ -78,62 +78,15 @@
       <div class="row g-3" id="service-cards"></div>
     </section>
 
-<!-- =============== สินค้าแนะนำ (หน้าแรก) =============== -->
 <section id="products" class="mb-5">
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <h2 class="section-title mb-0">สินค้าแนะนำ</h2>
-    <a href="shop.html" class="btn btn-outline-primary btn-sm">ดูสินค้าทั้งหมด</a>
+    <h2 class="section-title m-0">สินค้าแนะนำ</h2>
+    <a href="/shop.html" class="btn btn-outline-primary btn-sm">ดูสินค้าทั้งหมด</a>
   </div>
 
-  <!-- SKELETON โหลดข้อมูล -->
-  <div id="home-products-skeleton" class="row g-3">
-    <div class="col-12 col-md-4">
-      <div class="card shadow-sm placeholder-glow">
-        <div class="ratio ratio-16x9"><span class="placeholder w-100 h-100"></span></div>
-        <div class="card-body">
-          <h6 class="card-title placeholder col-8"></h6>
-          <p class="placeholder col-6"></p>
-          <p class="placeholder col-5"></p>
-          <button class="btn btn-primary disabled placeholder col-6"></button>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-4">
-      <div class="card shadow-sm placeholder-glow">
-        <div class="ratio ratio-16x9"><span class="placeholder w-100 h-100"></span></div>
-        <div class="card-body">
-          <h6 class="card-title placeholder col-8"></h6>
-          <p class="placeholder col-6"></p>
-          <p class="placeholder col-5"></p>
-          <button class="btn btn-primary disabled placeholder col-6"></button>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-4">
-      <div class="card shadow-sm placeholder-glow">
-        <div class="ratio ratio-16x9"><span class="placeholder w-100 h-100"></span></div>
-        <div class="card-body">
-          <h6 class="card-title placeholder col-8"></h6>
-          <p class="placeholder col-6"></p>
-          <p class="placeholder col-5"></p>
-          <button class="btn btn-primary disabled placeholder col-6"></button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- กล่องแสดงผลจริง -->
-  <div id="home-products"></div>
-
-  <!-- แจ้งสถานะ -->
-  <div id="home-products-empty" class="alert alert-light border d-none mt-3">ไม่มีสินค้าแนะนำ</div>
-  <div id="home-products-error" class="alert alert-danger d-none mt-3">โหลดข้อมูลไม่สำเร็จ</div>
+  <!-- ผลลัพธ์จะถูกใส่ตรงนี้ -->
+  <div id="home-products" class="row g-3"></div>
 </section>
-
-<!-- ช่วยเรื่องภาพครอป -->
-<style>
-  .object-fit-cover{ object-fit: cover; }
-</style>
     
     <section id="map" class="mb-5">
       <h2 class="section-title mb-3">พื้นที่ให้บริการ + แผนที่</h2>
