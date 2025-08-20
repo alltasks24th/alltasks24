@@ -3,51 +3,207 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>เข้าสู่ระบบแอดมิน</title>
+  <title>เข้าสู่ระบบแอดมิน • alltasks24</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>body{font-family:'Kanit',system-ui,Arial;background:#F7F5FF}</style>
-
-<!-- Favicons -->
-<link rel="icon" href="/icons/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="manifest" href="/icons/site.webmanifest">
-<meta name="theme-color" content="#6C37FF">
-  
+  <!-- Favicons -->
+  <link rel="icon" href="/icons/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/icons/site.webmanifest">
+  <meta name="theme-color" content="#6D28D9">
+  <style>
+    :root{
+      --primary:#6D28D9;         /* Indigo/Violet ให้เข้ากับหลังบ้าน */
+      --accent:#22c55e;          /* Neon Green accent */
+      --bg:#0b0720;              /* Midnight */
+    }
+    html,body{height:100%}
+    body{
+      font-family:'Kanit',system-ui,Arial,Helvetica,sans-serif;
+      background: radial-gradient(1200px 600px at 10% -20%, rgba(109,40,217,.35), transparent),
+                  radial-gradient(800px 400px at 110% 0%, rgba(34,197,94,.25), transparent),
+                  linear-gradient(180deg,#0f0b2a 0%, #0b0720 100%);
+      color:#fff;
+      overflow-x:hidden;
+    }
+    /* floating glow blobs */
+    .orb{
+      position:fixed; filter:blur(70px); opacity:.35; z-index:0; pointer-events:none;
+      border-radius:50%;
+    }
+    .orb.purple{background:radial-gradient(circle at 30% 30%, rgba(109,40,217,.8), transparent 60%); width:360px; height:360px; left:-120px; top:-80px; animation:float1 12s ease-in-out infinite;}
+    .orb.green{background:radial-gradient(circle at 30% 30%, rgba(34,197,94,.8), transparent 60%); width:300px; height:300px; right:-80px; bottom:-60px; animation:float2 14s ease-in-out infinite;}
+    @keyframes float1{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(18px)} }
+    @keyframes float2{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+    /* auth card */
+    .auth-card{
+      position:relative; z-index:2;
+      width:min(460px, 92vw);
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    .brand-badge{
+      width:52px; height:52px; border-radius:14px;
+      display:grid; place-items:center; color:#fff; font-size:26px;
+      background:linear-gradient(135deg, var(--primary), #8b5cf6);
+      box-shadow:0 6px 16px rgba(109,40,217,.45);
+    }
+    .brand-title{ color:#fff }
+    .brand-sub{ color:rgba(255,255,255,.7) }
+    .form-control, .form-check-input{ background-color:rgba(255,255,255,.07); color:#fff; border-color:rgba(255,255,255,.2) }
+    .form-control::placeholder{ color:rgba(255,255,255,.55) }
+    .form-control:focus{ border-color:var(--accent); box-shadow:0 0 0 .2rem rgba(34,197,94,.25) }
+    .input-group-text{ background-color:rgba(255,255,255,.07); color:#fff; border-color:rgba(255,255,255,.2) }
+    .btn-primary{
+      --bs-btn-bg: var(--primary);
+      --bs-btn-border-color: var(--primary);
+      --bs-btn-hover-bg:#7c3aed;
+      --bs-btn-hover-border-color:#7c3aed;
+      --bs-btn-active-bg:#5b21b6;
+      --bs-btn-active-border-color:#5b21b6;
+      box-shadow: 0 10px 20px rgba(109,40,217,.35);
+    }
+    .btn-ghost{
+      border:1px dashed rgba(255,255,255,.35); color:#fff;
+    }
+    .link{ color:var(--accent); text-decoration:none}
+    .link:hover{ text-decoration:underline }
+    .footer-note{ color:#a1a1aa }
+  </style>
 </head>
-<body class="d-flex align-items-center justify-content-center" style="min-height:100vh">
-  <div class="card shadow-sm" style="width:420px;max-width:94vw">
-    <div class="card-body p-4">
-      <h3 class="fw-bold mb-3 text-center" style="color:#6D28D9">alltasks24 — Admin</h3>
+<body class="d-flex align-items-center justify-content-center">
+  <div class="orb purple"></div>
+  <div class="orb green"></div>
+
+  <div class="auth-card p-4 p-md-5 mx-auto">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <div class="brand-badge"><i class="bi bi-stars"></i></div>
+      <div>
+        <h3 class="brand-title fw-bold mb-0">alltasks24 — Admin</h3>
+        <div class="brand-sub small">เข้าสู่หลังบ้านเพื่อจัดการระบบ</div>
+      </div>
+    </div>
+
+    <form id="loginForm" class="mt-2">
       <div class="mb-3">
         <label class="form-label">อีเมล</label>
-        <input id="email" type="email" class="form-control" placeholder="admin@site.com">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+          <input id="email" type="email" class="form-control" placeholder="admin@site.com" autocomplete="username" required>
+        </div>
       </div>
-      <div class="mb-3">
+      <div class="mb-2">
         <label class="form-label">รหัสผ่าน</label>
-        <input id="password" type="password" class="form-control" placeholder="••••••••">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input id="password" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
+          <button class="btn btn-ghost" type="button" id="togglePw" aria-label="แสดง/ซ่อนรหัสผ่าน"><i class="bi bi-eye"></i></button>
+        </div>
       </div>
-      <button id="loginBtn" class="btn btn-primary w-100">เข้าสู่ระบบ</button>
-      <div id="msg" class="small text-danger mt-2"></div>
-    </div>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="remember">
+          <label class="form-check-label" for="remember">จำฉันไว้ในอุปกรณ์นี้</label>
+        </div>
+        <a href="#" id="resetLink" class="link small">ลืมรหัสผ่าน?</a>
+      </div>
+
+      <div id="msg" class="alert d-none mb-3" role="alert"></div>
+
+      <button id="loginBtn" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" type="submit">
+        <span class="spinner-border spinner-border-sm d-none" id="spin" role="status" aria-hidden="true"></span>
+        <span>เข้าสู่ระบบ</span>
+      </button>
+    </form>
+
+    <div class="text-center mt-3 footer-note small">ต้องมีสิทธิ์ <span class="text-white">owner</span> หรือ <span class="text-white">admin</span> จึงจะเข้าถึงได้</div>
   </div>
 
-<script type="module">
-import { loginWithEmail } from './auth.js';
-document.getElementById('loginBtn').addEventListener('click', async ()=>{
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value.trim();
-  try{
-    const { role } = await loginWithEmail(email, password);
-    if(role==='owner' || role==='admin') window.location.href='admin.html';
-    else document.getElementById('msg').textContent='บัญชีนี้ไม่มีสิทธิ์แอดมิน';
-  }catch(err){
-    document.getElementById('msg').textContent='เข้าสู่ระบบไม่สำเร็จ';
-    console.error(err);
-  }
-});
-</script>
+  <script type="module">
+    import { loginWithEmail } from './auth.js';
+    import { auth } from './firebase-init.js';
+    import {
+      setPersistence, browserLocalPersistence, browserSessionPersistence,
+      sendPasswordResetEmail
+    } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+
+    const $ = (s, r=document)=> r.querySelector(s);
+    const msg = $('#msg');
+    const emailEl = $('#email');
+    const pwEl = $('#password');
+    const rememberEl = $('#remember');
+    const btn = $('#loginBtn');
+    const spin = $('#spin');
+
+    // Prefill email if previously stored
+    const savedEmail = localStorage.getItem('lastEmail') || '';
+    if(savedEmail){ emailEl.value = savedEmail; rememberEl.checked = true; }
+
+    $('#togglePw').addEventListener('click', ()=>{
+      const t = pwEl.getAttribute('type') === 'password' ? 'text' : 'password';
+      pwEl.setAttribute('type', t);
+      $('#togglePw i').className = 'bi ' + (t==='text' ? 'bi-eye-slash' : 'bi-eye');
+    });
+
+    $('#loginForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      clearMsg();
+      setLoading(true);
+      try{
+        // persistence
+        await setPersistence(auth, rememberEl.checked ? browserLocalPersistence : browserSessionPersistence);
+        const email = emailEl.value.trim();
+        const password = pwEl.value.trim();
+        const { role } = await loginWithEmail(email, password);
+        if(rememberEl.checked) localStorage.setItem('lastEmail', email);
+        else localStorage.removeItem('lastEmail');
+
+        if(role==='owner' || role==='admin'){
+          window.location.href = 'admin.html';
+        }else{
+          showMsg('บัญชีนี้ไม่มีสิทธิ์แอดมิน', 'warning');
+        }
+      }catch(err){
+        console.error(err);
+        const code = err?.code || '';
+        if(code.includes('wrong-password')) showMsg('รหัสผ่านไม่ถูกต้อง', 'danger');
+        else if(code.includes('user-not-found')) showMsg('ไม่พบบัญชีผู้ใช้', 'danger');
+        else showMsg('เข้าสู่ระบบไม่สำเร็จ โปรดลองใหม่', 'danger');
+      }finally{
+        setLoading(false);
+      }
+    });
+
+    $('#resetLink').addEventListener('click', async (e)=>{
+      e.preventDefault(); clearMsg();
+      const email = emailEl.value.trim();
+      if(!email){ showMsg('กรอกอีเมลก่อน เพื่อส่งลิงก์รีเซ็ตรหัสผ่าน', 'info'); return; }
+      try{
+        await sendPasswordResetEmail(auth, email);
+        showMsg('ส่งอีเมลสำหรับรีเซ็ตรหัสผ่านแล้ว', 'success');
+      }catch(err){
+        console.error(err);
+        showMsg('ส่งลิงก์รีเซ็ตไม่สำเร็จ', 'danger');
+      }
+    });
+
+    function showMsg(text, type='info'){
+      msg.className = 'alert alert-'+type;
+      msg.textContent = text;
+      msg.classList.remove('d-none');
+    }
+    function clearMsg(){ msg.classList.add('d-none'); msg.textContent=''; }
+    function setLoading(v){
+      btn.disabled = v;
+      spin.classList.toggle('d-none', !v);
+    }
+  </script>
 </body>
 </html>
