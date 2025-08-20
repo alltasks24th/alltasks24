@@ -1,4 +1,5 @@
 // services.js — หน้า "บริการทั้งหมด"
+// ใช้ Firebase app เดิม (firebase-init.js ต้องโหลดก่อนไฟล์นี้ใน services.html)
 import { getApps, getApp, initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
@@ -7,6 +8,7 @@ if (!app) console.warn("[services.js] Firebase app not found. Ensure firebase-in
 const db = app ? getFirestore(app) : null;
 
 // ------- CONTACT & ปุ่มติดต่อ (เพิ่มใหม่) -------
+// ถ้ามี window.CONTACT อยู่แล้ว (เช่นกำหนดจาก public.js) จะใช้ค่านั้นก่อน
 const CONTACT = window.CONTACT || { phone: "", line: "", facebook: "" };
 
 function contactButtons(){
@@ -15,7 +17,7 @@ function contactButtons(){
   const fb    = (CONTACT.facebook || "").trim();
   let html = "";
   if (phone) {
-    html += `<a href="tel:${phone}" class="btn btn-outline-success">
+    html += `<a href="tel:${phone}" class="btn btn-outline-success btn-sm">
               <i class="bi bi-telephone"></i> โทร
             </a>`;
   }
@@ -23,12 +25,12 @@ function contactButtons(){
     const link = line.startsWith("http")
       ? line
       : `https://line.me/R/ti/p/${line.startsWith("@") ? line : "@"+line}`;
-    html += `<a href="${link}" target="_blank" rel="noopener" class="btn btn-outline-success">
+    html += `<a href="${link}" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm">
               <i class="bi bi-chat-dots"></i> LINE
             </a>`;
   }
   if (fb){
-    html += `<a href="${fb}" target="_blank" rel="noopener" class="btn btn-outline-primary">
+    html += `<a href="${fb}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
               <i class="bi bi-facebook"></i> Facebook
             </a>`;
   }
@@ -101,7 +103,7 @@ function modalHtml(svc) {
     ? `<div class="mt-2">${tags.map(t=>`<span class="badge bg-secondary me-1">${t}</span>`).join("")}</div>`
     : "";
 
-  // ✨ เพิ่ม modal-footer + ปุ่มติดต่อที่นี่
+  // ✨ ใส่ modal-footer + ปุ่มติดต่อ
   return `
     <div class="modal fade" id="svc-${id}" tabindex="-1" aria-labelledby="svc-label-${id}" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
