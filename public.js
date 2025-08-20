@@ -584,7 +584,10 @@ window.SITE_FB_URL  = 'https://www.facebook.com/share/16Qd9wh7h4/';
 
 /* ===== HOME: เรนเดอร์สินค้า 3 ชิ้น (ถัดจากบริการ) ===== */
 async function renderHomeProducts() {
-  const list = document.getElementById('home-products');
+  // รองรับทั้ง #home-products-list (ใหม่) และ #home-products (เดิม)
+  const list = document.getElementById('home-products-list')
+           || document.getElementById('home-products');
+  const skel = document.getElementById('home-products-skeleton');
   const err  = document.getElementById('home-products-error');
   const empty= document.getElementById('home-products-empty');
 
@@ -596,6 +599,10 @@ async function renderHomeProducts() {
     document.body.appendChild(mods);
   }
 
+  // show skeleton
+  skel?.classList.remove('d-none');
+  err?.classList.add('d-none');
+  empty?.classList.add('d-none');
   list.innerHTML = '';
   mods.innerHTML = '';
 
@@ -603,9 +610,9 @@ async function renderHomeProducts() {
     const snap = await getDocs(query(
       collection(db, 'products'),
       where('isActive','==', true),
-      where('featured','==', true),  // ติ๊ก “แนะนำ” ถึงจะขึ้นหน้าแรก
+      where('featured','==', true),
       orderBy('rank','asc'),
-      limit(3)
+      limit(3) // โชว์ 3 รายการ
     ));
 
     if (snap.empty) {
@@ -629,7 +636,12 @@ async function renderHomeProducts() {
       const stock   = (d.stock ?? null);
       const startStr= d.saleStart ? toDate(d.saleStart).toLocaleString('th-TH') : '';
 
+      // การ์ดบนหน้าแรก (ป้าย "ลด xx%" จะยังแสดงแม้มีรูป)
       list.insertAdjacentHTML('beforeend', `
+        <div class="row g-3"></div>`); // สร้างแถวหากยังไม่มี
+      const row = list.querySelector('.row') || list;
+
+      row.insertAdjacentHTML('beforeend', `
         <div class="col-md-4">
           <div class="card h-100 shadow-sm position-relative">
             ${saleOn ? `<span class="badge bg-danger position-absolute top-0 start-0 m-2">ลด ${percent}%</span>` : ``}
@@ -657,6 +669,7 @@ async function renderHomeProducts() {
         </div>
       `);
 
+      // โมดอลรายละเอียด + แกลเลอรี
       const gal = Array.isArray(d.gallery) ? d.gallery : [];
       mods.insertAdjacentHTML('beforeend', `
         <div class="modal fade" id="prod-${id}" tabindex="-1" aria-hidden="true">
@@ -692,15 +705,27 @@ async function renderHomeProducts() {
                 ${saleOn && startStr ? `<div class="small text-muted mb-1">เริ่มโปรโมชัน: ${startStr}</div>` : ``}
                 <div class="small text-muted mb-2">${(d.tags||[]).join(' · ')}</div>
                 <p style="white-space:pre-line">${d.desc || ''}</p>
+
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                  ${window.SITE_PHONE   ? `<a href="tel:${window.SITE_PHONE}" class="btn btn-outline-success"><i class="bi bi-telephone"></i> โทร</a>` : ``}
+                  ${window.SITE_LINE_URL? `<a href="${window.SITE_LINE_URL}" target="_blank" rel="noopener" class="btn btn-outline-success"><i class="bi bi-chat-dots"></i> LINE</a>` : ``}
+                  ${window.SITE_FB_URL  ? `<a href="${window.SITE_FB_URL}" target="_blank" rel="noopener" class="btn btn-outline-primary"><i class="bi bi-facebook"></i> Facebook</a>`
+                                         : `<button type="button" class="btn btn-outline-primary" data-share="facebook"><i class="bi bi-facebook"></i> แชร์ Facebook</button>`}
+                </div>
               </div>
             </div>
           </div>
         </div>
       `);
     });
+
   } catch (e) {
     console.error(e);
     err?.classList.remove('d-none');
+  } finally {
+    skel?.classList.add('d-none');
   }
 }
+
+// เรียกเมื่อ DOM พร้อม
 document.addEventListener('DOMContentLoaded', renderHomeProducts);
