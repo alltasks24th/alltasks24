@@ -63,3 +63,8 @@ a{color:var(--primary)}a:hover{filter:brightness(.9)}
 .chat-row.admin .bubble{background:#eaf7ea}
 .chat-row.user .bubble{background:#eef4ff}
 .chat-row .meta{font-size:.75rem;color:#6c757d;margin:0 0 .25rem}
+
+/* ให้กรอบรูปเป็นตำแหน่งอ้างอิง และบังคับป้ายอยู่เหนือรูป */
+.product-card .ratio { position: relative; }
+.product-card .ratio img { position: relative; z-index: 1; object-fit: cover; }
+.product-card .sale-badge { position: absolute; top: .5rem; left: .5rem; z-index: 3; }
