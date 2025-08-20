@@ -27,8 +27,95 @@
     .form-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .form-head .toggle{border-radius:10px}
   </style>
+
+<style>
+  /* ==== Dark Midnight Theme (additive, non-destructive) ==== */
+  :root{
+    --bg:#0b0720;              /* พื้นหลัง */
+    --card:rgba(255,255,255,.07);
+    --ink:#eaeaf6;             /* สีตัวอักษร */
+    --muted:#b6b7c5;
+    --primary:#6D28D9;         /* Indigo */
+    --accent:#22c55e;          /* Neon Green */
+    --soft:rgba(109,40,217,.12);
+    --border:rgba(255,255,255,.16);
+  }
+  body{
+    background:
+      radial-gradient(1100px 420px at 7% -10%, rgba(109,40,217,.33), transparent 60%),
+      radial-gradient(840px 360px at 105% -8%, rgba(34,197,94,.22), transparent 60%),
+      linear-gradient(180deg,#0f0b2a 0%, #0b0720 100%);
+    color:var(--ink);
+  }
+  .orb{position:fixed;filter:blur(80px);opacity:.35;pointer-events:none;border-radius:50%;z-index:0}
+  .orb.purple{background:radial-gradient(circle at 30% 30%, rgba(109,40,217,.8), transparent 60%); width:360px;height:360px;left:-120px;top:-80px;animation:float1 12s ease-in-out infinite;}
+  .orb.green{background:radial-gradient(circle at 30% 30%, rgba(34,197,94,.8), transparent 60%); width:300px;height:300px;right:-80px;bottom:-60px;animation:float2 14s ease-in-out infinite;}
+  @keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(18px)}}
+  @keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+
+  /* Navbar override (assets/styles.css ใช้ !important อยู่) */
+  .navbar{ background:rgba(17,12,42,.7)!important; border-bottom:1px solid var(--border)!important; backdrop-filter:saturate(140%) blur(8px)!important }
+  .navbar .navbar-brand{ color:#fff !important }
+  .navbar .nav-link{ color:#e6e6f7 !important }
+  .navbar .nav-link:hover{ color:#c7bdfc !important }
+  .navbar .navbar-toggler{ border-color:rgba(255,255,255,.5) }
+  .navbar .navbar-toggler-icon{ filter: invert(1) grayscale(1) brightness(1.2) }
+
+  /* Hero เปลี่ยนเป็นโทนเข้ม แต่คงโครงสร้างเดิม */
+  .hero{
+    background:
+      radial-gradient(1200px 420px at 10% -20%, rgba(109,40,217,.25), transparent 60%),
+      radial-gradient(900px 360px at 90% -10%, rgba(67,56,202,.22), transparent 60%),
+      linear-gradient(180deg,#121034 0%, #0b0720 100%) !important;
+    color:var(--ink);
+  }
+  .hero .eyebrow{ color:#c7bdfc }
+
+  /* Cards & sections */
+  .card, .card-clean{ background:var(--card)!important; border:1px solid var(--border)!important; color:var(--ink) }
+  .table thead th{ background:rgba(255,255,255,.06)!important; color:#e9e9fb }
+  .list-group-item{ background:var(--card)!important; color:var(--ink)!important; border-color:var(--border)!important }
+
+  /* Forms */
+  .form-control, .form-select{ background-color:rgba(255,255,255,.08); border-color:var(--border); color:var(--ink) }
+  .form-control::placeholder{ color:rgba(255,255,255,.55) }
+  .form-control:focus{ border-color:var(--accent); box-shadow:0 0 0 .2rem rgba(34,197,94,.25) }
+
+  /* Buttons */
+  .btn-primary{
+    --bs-btn-bg: var(--primary);
+    --bs-btn-border-color: var(--primary);
+    --bs-btn-hover-bg:#7c3aed;
+    --bs-btn-hover-border-color:#7c3aed;
+    --bs-btn-active-bg:#5b21b6;
+    --bs-btn-active-border-color:#5b21b6;
+    color:#fff;
+    box-shadow: 0 10px 20px rgba(109,40,217,.35);
+  }
+  .btn-outline-primary{ --bs-btn-color:#fff; --bs-btn-border-color:rgba(255,255,255,.35); --bs-btn-hover-bg:rgba(255,255,255,.1); --bs-btn-hover-border-color:#fff }
+  .btn-soft{ background:rgba(109,40,217,.16); color:#e7e2ff; border-color:var(--border) }
+
+  /* Footer */
+  .site-footer{ background:rgba(255,255,255,.05)!important; border-top:1px solid var(--border)!important; color:var(--ink) }
+
+  /* FABs & Chat */
+  .fab{ background:rgba(255,255,255,.08); color:#fff; border-color:var(--border) }
+  .fab-primary{ background:var(--primary); border-color:#5b21b6 }
+  .chat-widget .chat-header{ background:rgba(255,255,255,.08); border-bottom:1px solid var(--border) }
+  .chat-body{ background:rgba(255,255,255,.05) }
+  .chat-input{ background:rgba(255,255,255,.08); border-top:1px solid var(--border) }
+  .chat-msg.agent{ background:rgba(109,40,217,.14); border:1px solid var(--border); color:#eaeaf6 }
+  .chat-msg.user{ background:rgba(255,215,128,.1); border:1px solid rgba(255,215,128,.35); color:#ffecc2 }
+
+  /* Utility */
+  .text-muted{ color:var(--muted)!important }
+</style>
 </head>
 <body>
+<!-- THEME ORBS -->
+<div class="orb purple"></div>
+<div class="orb green"></div>
+<!-- /THEME ORBS -->
 <nav class="navbar navbar-expand-lg sticky-top">
   <div class="container">
     <a class="navbar-brand fw-bold" style="color:var(--primary)" href="#">alltasks24.online</a>
