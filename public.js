@@ -637,18 +637,15 @@ async function renderHomeProducts() {
       const startStr= d.saleStart ? toDate(d.saleStart).toLocaleString('th-TH') : '';
 
       // การ์ดบนหน้าแรก (ป้าย "ลด xx%" จะยังแสดงแม้มีรูป)
-      list.insertAdjacentHTML('beforeend', `
-        <div class="row g-3"></div>`); // สร้างแถวหากยังไม่มี
-      const row = list.querySelector('.row') || list;
+      const row = list;
 
       row.insertAdjacentHTML('beforeend', `
         <div class="col-md-4">
-          <div class="card h-100 shadow-sm position-relative">
-            ${saleOn ? `<span class="badge bg-danger position-absolute top-0 start-0 m-2">ลด ${percent}%</span>` : ``}
-            ${d.cover ? `
-              <div class="ratio ratio-16x9">
-                <img src="${d.cover}" class="w-100 h-100 object-fit-cover rounded-top" alt="">
-              </div>` : ``}
+          <div class="card product-card h-100 shadow-sm">
+          <div class="ratio ratio-16x9">
+          ${saleOn ? `<span class="sale-badge badge bg-danger">ลด ${percent}%</span>` : ``}
+          <img src="${d.cover}" class="w-100 h-100 object-fit-cover" alt="">
+          </div>
             <div class="card-body d-flex flex-column">
               <h5 class="mb-1">${d.name || ''}</h5>
               <div class="fw-semibold mb-1">
