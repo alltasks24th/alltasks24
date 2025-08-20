@@ -5,6 +5,8 @@ import {
   collection, doc, addDoc, updateDoc, deleteDoc, getDoc, getDocs, onSnapshot,
   query, orderBy, serverTimestamp, Timestamp, where, increment, setDoc // <-- ใช้ setDoc ด้วย
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+import { limit } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
 
 const $ = (s, r=document)=> r.querySelector(s);
 const $$ = (s, r=document)=> Array.from(r.querySelectorAll(s));
@@ -633,3 +635,170 @@ document.getElementById('bannerModal')?.addEventListener('hidden.bs.modal', rese
     }
   });
 })();
+
+
+/* Dashboard Enhancements injected */
+requireAdmin(async (user, role) => {
+  // 1) Counters
+  onSnapshot(collection(db,'services'), snap => {
+    const el = document.getElementById('countServices'); if (el) el.textContent = snap.size;
+  });
+  onSnapshot(collection(db,'reviews'), snap => {
+    const el = document.getElementById('countReviewsAll'); if (el) el.textContent = snap.size;
+  });
+  onSnapshot(collection(db,'promotions'), snap => {
+    const el = document.getElementById('countPromosActive'); if (!el) return;
+    const now = Date.now(); let active = 0;
+    snap.forEach(d => {
+      const p = d.data() || {};
+      const st = p.start?.toDate?.()?.getTime?.();
+      const en = p.end?.toDate?.()?.getTime?.();
+      if ((st==null || st <= now) && (en==null || en >= now)) active++;
+    });
+    el.textContent = active;
+  });
+
+  // 2) Latest bookings (5-10)
+  onSnapshot(query(collection(db,'bookings'), orderBy('createdAt','desc'), limit(10)), snap => {
+    const body = document.getElementById('latestBookingsBody'); if (!body) return;
+    body.innerHTML='';
+    snap.forEach(d => {
+      const b = d.data() || {};
+      const dateText = [b.date, b.time].filter(Boolean).join(' ') || (b.createdAt?.toDate?.()?.toLocaleString?.('th-TH') || '-');
+      const note = (b.note ?? '').toString();
+      body.insertAdjacentHTML('beforeend', `<tr>
+        <td>${(b.service||'').toString()}</td>
+        <td>${(b.name||'').toString()}</td>
+        <td>${dateText}</td>
+        <td class="small text-wrap" style="max-width:320px;white-space:pre-line">${note || '-'}</td>
+      </tr>`);
+    });
+    if (!body.children.length) body.innerHTML = '<tr><td colspan="4" class="text-muted small">ยังไม่มีข้อมูล</td></tr>';
+  });
+
+  // 3) Active promotions
+  onSnapshot(collection(db,'promotions'), snap => {
+    const ul = document.getElementById('activePromoList'); if (!ul) return;
+    const now = Date.now(); const items = [];
+    snap.forEach(d => {
+      const p = d.data() || {};
+      const st = p.start?.toDate?.()?.getTime?.();
+      const en = p.end?.toDate?.()?.getTime?.();
+      const active = (st==null || st <= now) && (en==null || en >= now);
+      if (active) items.push({ id:d.id, ...p, endTs: en ?? Number.POSITIVE_INFINITY });
+    });
+    items.sort((a,b)=> (a.endTs||Infinity) - (b.endTs||Infinity));
+    ul.innerHTML = items.map(p => `
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span class="text-truncate">${(p.title||'-').toString()}</span>
+        <span class="small text-muted">${p.end?.toDate?.()?.toLocaleDateString?.('th-TH') ?? '—'}</span>
+      </li>`).join('');
+  });
+
+  // 4) Top services from bookings
+  onSnapshot(collection(db,'bookings'), snap => {
+    const body = document.getElementById('topServicesBody'); if (!body) return;
+    const cnt = {};
+    snap.forEach(d=> {
+      const svc = (d.data()?.service || '').toString().trim();
+      if (!svc) return; cnt[svc] = (cnt[svc]||0)+1;
+    });
+    const top = Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    body.innerHTML = top.map(([name,total], idx) => `
+      <tr><td>${idx+1}</td><td>${name}</td>
+      <td class="text-end">${total}</td><td class="text-end">—</td></tr>`).join('');
+    if (!body.children.length) body.innerHTML = '<tr><td colspan="4" class="text-muted small">ยังไม่มีข้อมูล</td></tr>';
+  });
+
+  // 5) Statistics (daily & monthly)
+  async function bookingDaily(days=30) {
+    try {
+      const since = new Date(); since.setDate(since.getDate() - days);
+      const qs = query(collection(db,'bookings'), where('createdAt','>=', Timestamp.fromDate(since)), orderBy('createdAt','asc'));
+      const snap = await getDocs(qs);
+      const bucket = {};
+      snap.forEach(d => {
+        const t = d.data()?.createdAt?.toDate?.(); if(!t) return;
+        const key = t.toISOString().slice(0,10);
+        bucket[key] = (bucket[key]||0) + 1;
+      });
+      const labels = Array.from({length:days}, (_,i)=> {
+        const dt = new Date(since); dt.setDate(since.getDate()+i);
+        return dt.toISOString().slice(0,10);
+      });
+      const data = labels.map(k=> bucket[k] || 0);
+      return {labels, data};
+    } catch(e){ console.error(e); return {labels:[], data:[]}; }
+  }
+
+  async function drawDailyChart(){
+    if (!window.Chart) return;
+    const el = document.getElementById('chartDaily'); if (!el) return;
+    const {labels, data} = await bookingDaily(30);
+    new Chart(el.getContext('2d'), { type:'line', data:{ labels, datasets:[{ label:'การจอง/วัน', data }] } });
+  }
+
+  async function drawMonthlyChart(){
+    if (!window.Chart) return;
+    const el = document.getElementById('chartMonthly'); if (!el) return;
+    const snap = await getDocs(query(collection(db,'bookings'), orderBy('createdAt','asc')));
+    const buckets = {};
+    snap.forEach(d=>{
+      const t = d.data()?.createdAt?.toDate?.(); if(!t) return;
+      const key = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}`;
+      buckets[key] = (buckets[key]||0)+1;
+    });
+    const labels = Object.keys(buckets).sort();
+    const data = labels.map(k=> buckets[k]);
+    new Chart(el.getContext('2d'), { type:'bar', data:{ labels, datasets:[{ label:'การจอง/เดือน', data }] } });
+  }
+
+  drawDailyChart(); drawMonthlyChart();
+
+  // 6) Notifications
+  function notify(title, text){
+    const box = document.getElementById('notifBox'); if(!box) return;
+    box.insertAdjacentHTML('afterbegin', `
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>${title}</strong> — ${text}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>`);
+  }
+
+  // booking new
+  {
+    const key='lastSeenBookingTsV2';
+    let primed=false;
+    onSnapshot(query(collection(db,'bookings'), orderBy('createdAt','desc'), limit(1)), snap=>{
+      const d = snap.docs[0]; if(!d) return;
+      const ts = d.data()?.createdAt?.toMillis?.() ?? Date.now();
+      const last = Number(localStorage.getItem(key)||0);
+      if(!primed){ localStorage.setItem(key, String(ts)); primed=true; return; }
+      if(ts>last){ notify('การจองใหม่', `${d.data()?.name||'ลูกค้า'} • ${d.data()?.service||'-'}`); localStorage.setItem(key, String(ts)); }
+    });
+  }
+
+  // review new (pending approval)
+  {
+    const key='lastSeenReviewTsV2';
+    let primed=false;
+    onSnapshot(collection(db,'reviews'), snap=>{
+      const docs = snap.docs.map(x=>x.data()).filter(v=>v && v.approved===false);
+      const latest = docs.map(v => v.createdAt?.toMillis?.() ?? 0).reduce((a,b)=>Math.max(a,b), 0);
+      const last = Number(localStorage.getItem(key)||0);
+      if(!primed){ if(latest) localStorage.setItem(key, String(latest)); primed=true; return; }
+      if(latest>last){ notify('รีวิวใหม่', `มีรีวิวรออนุมัติ`); localStorage.setItem(key, String(latest)); }
+    });
+  }
+
+  // promotions expiring soon (7 days)
+  onSnapshot(collection(db,'promotions'), snap=>{
+    const soon = Date.now() + 7*24*3600*1000;
+    snap.forEach(d => {
+      const p = d.data() || {}; const end = p.end?.toDate?.()?.getTime?.();
+      if(end && end < soon && end >= Date.now()){
+        notify('โปรโมชันใกล้หมดอายุ', p.title || d.id);
+      }
+    });
+  });
+});
