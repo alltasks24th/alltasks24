@@ -99,30 +99,9 @@
 </section> 
 
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
-  const listEl = document.getElementById('product-cards');
-  try {
-    const db = firebase.firestore();
-    // เหมือน shop: เอาเฉพาะ isActive และเรียงตาม rank
-    const q = db.collection('products')
-      .where('isActive','==',true)
-      .orderBy('rank','desc')
-      .limit(3);                     // แสดงแค่ 3 ชิ้นบนหน้าแรก
-
-    const snap = await q.get();
-    listEl.innerHTML = '';
-    snap.forEach(doc => {
-      const p = { id: doc.id, ...doc.data() };
-      const col = document.createElement('div');
-      col.className = 'col-12 col-md-6 col-lg-4';
-      col.innerHTML = window.renderProductCard(p); // ใช้การ์ดเดียวกับ shop
-      listEl.appendChild(col);
-    });
-  } catch (e) {
-    console.error(e);
-    listEl.innerHTML = '<div class="text-danger small">โหลดข้อมูลไม่สำเร็จ</div>';
-  }
-});
+  window.addEventListener('DOMContentLoaded', () => {
+    window.loadHomeProducts();
+  });
 </script>
     
     <section id="map" class="mb-5">
