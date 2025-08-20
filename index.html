@@ -78,15 +78,43 @@
       <div class="row g-3" id="service-cards"></div>
     </section>
 
-<section id="products" class="mb-5">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h2 class="section-title m-0">สินค้าแนะนำ</h2>
-    <a href="/shop.html" class="btn btn-outline-primary btn-sm">ดูสินค้าทั้งหมด</a>
+<section id="products" class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h3 class="section-title mb-0">สินค้าแนะนำ</h3>
+      <a href="/shop.html" class="btn btn-outline-primary btn-sm">ดูสินค้าทั้งหมด</a>
+    </div>
+    <div id="homeProducts" class="row g-3"></div>
   </div>
-
-  <!-- ผลลัพธ์จะถูกใส่ตรงนี้ -->
-  <div id="home-products" class="row g-3"></div>
 </section>
+
+<script>
+  // ใช้ตัวเรนเดอร์เดียวกับ shop (ประกาศอยู่ใน public.js)
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      // ดึง “สินค้าแนะนำ” เหมือนหน้า shop (isActive+featured, sort ตาม rank)
+      const db = firebase.firestore();
+      const q = db.collection('products')
+        .where('isActive','==', true)
+        .where('featured','==', true)
+        .orderBy('rank','desc')
+        .limit(3);
+
+      const snap = await q.get();
+      const html = [];
+      snap.forEach(doc => {
+        const p = { id: doc.id, ...doc.data() };
+        // ⬇️ ใช้เรนเดอร์เดียวกับหน้า shop
+        html.push(window.renderProductCard(p));
+      });
+      document.getElementById('homeProducts').innerHTML = html.join('');
+    } catch(e){
+      console.error(e);
+      document.getElementById('homeProducts').innerHTML =
+        `<div class="text-danger small">โหลดข้อมูลไม่สำเร็จ</div>`;
+    }
+  });
+</script>
     
     <section id="map" class="mb-5">
       <h2 class="section-title mb-3">พื้นที่ให้บริการ + แผนที่</h2>
