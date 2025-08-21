@@ -40,20 +40,15 @@
     [data-theme="dark"] .table-receipt thead th{background:rgba(155,135,255,.09)}
     .toolbar-sticky{position:sticky;top:70px;z-index:10}
 
-    /* ====== แถบสรุปเต็มขอบการ์ด (เดสก์ท็อป) ====== */
+    /* แถบสรุปเต็มขอบ (เดสก์ท็อป) */
     #summaryBar{
-      position: sticky; bottom: 0; z-index: 5;
-      display: none;
-      align-items: center; justify-content:space-between; gap:12px;
-      background: var(--card);
-      border-top: 1px solid var(--border);
-      padding: .75rem 1rem;
-      margin-left:-1rem; margin-right:-1rem;
+      position: sticky; bottom: 0; z-index: 5; display: none;
+      align-items:center; justify-content:space-between; gap:12px;
+      background:var(--card); border-top:1px solid var(--border);
+      padding:.75rem 1rem; margin-left:-1rem; margin-right:-1rem;
       border-bottom-left-radius:12px; border-bottom-right-radius:12px;
     }
-    @media (min-width:768px){
-      #summaryBar{ display:flex; margin-left:-1.5rem; margin-right:-1.5rem; }
-    }
+    @media (min-width:768px){ #summaryBar{display:flex; margin-left:-1.5rem; margin-right:-1.5rem;} }
 
     .total-dock{display:none}
     .logo{max-height:54px;object-fit:contain}
@@ -66,7 +61,7 @@
       }
     }
 
-    /* Print base */
+    /* Print */
     @media print{
       .no-print{display:none!important}
       body{background:#fff}
@@ -81,17 +76,12 @@
       body.print-only-receipt *{ visibility: hidden !important; }
       body.print-only-receipt #receipt,
       body.print-only-receipt #receipt *{ visibility: visible !important; }
-      body.print-only-receipt #receipt{
-        position:absolute; left:0; top:0; width:100%;
-        margin:0; border:0; box-shadow:none;
-      }
+      body.print-only-receipt #receipt{ position:absolute; left:0; top:0; width:100%; margin:0; border:0; box-shadow:none; }
     }
 
     input.is-invalid, select.is-invalid{border-color:#dc3545}
-    .history-list .item{border:1px dashed var(--border); border-radius:10px; padding:.5rem .75rem; cursor:pointer}
-    .history-list .item:hover{background:rgba(109,40,217,.06)}
 
-    /* แชร์การ์ด (สำหรับ export เป็นรูป) */
+    /* Export Card (สรุปเป็นรูป) */
     #exportStage{ position:fixed; left:-200vw; top:0; width:0; height:0; overflow:visible; z-index:-1; }
     .share-card{
       width:860px; background:#fff; color:#111827;
@@ -109,6 +99,14 @@
     .share-card .row.total{font-size:18px; font-weight:800}
     .share-card .foot{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-top:14px}
     .share-card .qr{height:96px}
+
+    /* คลังบิล */
+    .mgr-toolbar{display:flex; gap:.5rem; align-items:center}
+    .mgr-list .mgr-item{border:1px dashed var(--border); border-radius:12px; padding:.6rem .75rem; background:var(--card)}
+    .mgr-list .mgr-item:hover{background:rgba(109,40,217,.06)}
+    .mgr-row{display:grid; grid-template-columns: 1.1fr .8fr .8fr .7fr auto; gap:.5rem; align-items:center}
+    .badge-soft{background:rgba(109,40,217,.1); color:#4c1d95; border:1px solid var(--border); padding:.2rem .5rem; border-radius:999px; font-size:.75rem}
+    .mgr-actions .btn{padding:.2rem .45rem}
   </style>
 </head>
 <body class="print-a4">
@@ -147,23 +145,17 @@
         </div>
 
         <hr>
-
         <div class="row g-2">
           <div class="col-6"><label class="form-label">ฐานในเมือง (บาท)</label><input id="cfg_base" type="number" class="form-control" value="59"></div>
           <div class="col-6"><label class="form-label">ระยะรวมในฐาน (กม.)</label><input id="cfg_incKm" type="number" class="form-control" value="3"></div>
-
           <div class="col-6"><label class="form-label">เกินระยะ/กม. (ชั้น 1)</label><input id="cfg_perKm1" type="number" class="form-control" value="8"></div>
           <div class="col-6"><label class="form-label">เริ่มชั้น 2 ที่ (กม.)</label><input id="cfg_tier2Start" type="number" class="form-control" value="15"></div>
-
           <div class="col-6"><label class="form-label">เกินระยะ/กม. (ชั้น 2)</label><input id="cfg_perKm2" type="number" class="form-control" value="6"></div>
           <div class="col-6"><label class="form-label">ขั้นต่ำค่าบริการ</label><input id="cfg_minCharge" type="number" class="form-control" value="49"></div>
-
           <div class="col-6"><label class="form-label">ค่าจุดแวะ/จุด</label><input id="cfg_stop" type="number" class="form-control" value="10"></div>
           <div class="col-6"><label class="form-label">รอคิว/ชม.</label><input id="cfg_wait" type="number" class="form-control" value="100"></div>
-
           <div class="col-6"><label class="form-label">กลางคืน (บาท)</label><input id="cfg_night" type="number" class="form-control" value="10"></div>
           <div class="col-6"><label class="form-label">ฝนตก (บาท)</label><input id="cfg_rain" type="number" class="form-control" value="8"></div>
-
           <div class="col-6"><label class="form-label">เสาร์–อาทิตย์/นักขัต</label><input id="cfg_weekend" type="number" class="form-control" value="10"></div>
           <div class="col-6"><label class="form-label">ปัดเศษ (บาท)</label>
             <select id="cfg_roundTo" class="form-select">
@@ -172,10 +164,8 @@
               <option value="10">ปัดขั้นละ 10</option>
             </select>
           </div>
-
           <div class="col-6"><label class="form-label">คูณขนาด: กลาง</label><input id="cfg_multSize" type="number" class="form-control" step="0.01" value="1.05"></div>
           <div class="col-6"><label class="form-label">คูณแรงงาน: 2 คน</label><input id="cfg_multLabor" type="number" class="form-control" step="0.01" value="1.30"></div>
-
           <div class="col-6"><label class="form-label">เพดานระยะ (กม.)</label><input id="cfg_maxKm" type="number" class="form-control" value="25"></div>
           <div class="col-6"><label class="form-label">เพดานน้ำหนัก (กก.)</label><input id="cfg_maxW" type="number" class="form-control" value="12"></div>
         </div>
@@ -208,8 +198,19 @@
         </div>
 
         <hr class="my-4">
-        <div class="eyebrow mb-2">ประวัติใบเสร็จล่าสุด</div>
-        <div id="history" class="history-list vstack gap-2"></div>
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="eyebrow">คลังบิล/ใบเสร็จ</div>
+          <span class="pill small">จัดการ, ค้นหา, ลบ</span>
+        </div>
+        <div class="mgr-toolbar my-2">
+          <input id="invSearch" class="form-control form-control-sm" placeholder="ค้นหา (ลูกค้า/เลขบิล/งาน)">
+          <select id="invFilter" class="form-select form-select-sm" style="width:auto">
+            <option value="all">ทั้งหมด</option>
+            <option value="paid">ชำระแล้ว</option>
+            <option value="unpaid">ค้างชำระ</option>
+          </select>
+        </div>
+        <div id="invList" class="mgr-list vstack gap-2"></div>
       </div>
     </div>
 
@@ -328,6 +329,8 @@
           <div class="eyebrow">ใบเสร็จ/บิล</div>
           <div class="d-flex gap-2 no-print">
             <button id="btnAddItem" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>เพิ่มบรรทัด</button>
+            <button id="btnSaveInvoice" class="btn btn-sm btn-success"><i class="bi bi-save2 me-1"></i>บันทึก/อัปเดตบิล</button>
+            <button id="btnNewInvoice" class="btn btn-sm btn-outline-secondary"><i class="bi bi-file-earmark-plus me-1"></i>สร้างใหม่</button>
             <button id="btnExportSummary" class="btn btn-sm btn-outline-secondary"><i class="bi bi-image me-1"></i>บันทึกภาพสรุป</button>
             <button id="btnExportReceipt" class="btn btn-sm btn-outline-secondary"><i class="bi bi-card-image me-1"></i>บันทึกภาพบิล</button>
             <button id="btnPrint" class="btn btn-sm btn-primary"><i class="bi bi-printer me-1"></i>พิมพ์/PDF</button>
@@ -377,8 +380,8 @@
             <div class="col-md-3">
               <div class="small muted">วันที่/เวลา</div>
               <div class="d-flex gap-1">
-                <input id="inv_date" class="form-control form-control-sm" readonly>
-                <input id="inv_time" class="form-control form-control-sm" readonly>
+                <input id="inv_date" class="form-control form-control-sm">
+                <input id="inv_time" class="form-control form-control-sm">
               </div>
             </div>
           </div>
@@ -625,7 +628,7 @@ function calc(saveDraft=false){
     $('#alertBox').classList.remove('d-none');
   }
 
-  // คิดค่าบริการ (เก็บเป็นรายการย่อย)
+  // คิดค่าบริการเป็นส่วนๆ
   const items = [];
   const addItem = (label, amt)=>{ if(amt>0) items.push({label, amt}); };
 
@@ -650,22 +653,17 @@ function calc(saveDraft=false){
   if(isWeekend) addItem('เสาร์–อาทิตย์/นักขัต', c.weekend);
 
   const preSum = items.reduce((s,x)=> s + Math.round(x.amt), 0);
-
   const sizeMult = (size==='medium'? c.multSize : 1);
   const laborMult = (workers==='2'? c.multLabor : 1);
   const factor = sizeMult * laborMult;
 
-  // รวมหลังคูณแล้วปัดเป็นจำนวนเต็ม (ให้ตรงกับฟุตเตอร์)
   const afterMultiRoundedInt = Math.round(preSum * factor);
-  const multiAdj = afterMultiRoundedInt - preSum; // รวมผลคูณ + ปัดทศนิยมเข้าจำนวนเต็ม
-
-  // ขั้นต่ำ + ปัดตาม step
+  const multiAdj = afterMultiRoundedInt - preSum;
   const minAdj = Math.max(0, c.minCharge - afterMultiRoundedInt);
   const afterMin = afterMultiRoundedInt + minAdj;
   const roundAdj = Math.max(0, roundToStep(afterMin, c.roundTo) - afterMin);
   const serviceTotal = afterMin + roundAdj;
 
-  // Breakdown (ฝั่งจอคำนวณ)
   const breakdown = [
     ...items.map(x=>[x.label, Math.round(x.amt)]),
   ];
@@ -676,7 +674,7 @@ function calc(saveDraft=false){
   const vat = vatYes ? Math.round(serviceTotal * 0.07) : 0;
   const grand = serviceTotal + otherCost - discount + vat;
 
-  // UI อัปเดต
+  // UI
   const gtxt = currency(grand);
   $('#grandLabel').textContent = gtxt;
   $('#grandDock').textContent = gtxt;
@@ -691,7 +689,6 @@ function calc(saveDraft=false){
     otherCost, discount, vat, grand,
     serviceTotal, preSum, factor, multiAdj, minAdj, roundAdj,
     breakdown,
-    // รายการสำหรับลงตารางบิล (ให้ยอดรวม = serviceTotal)
     itemsForReceipt: [
       ...items.map(x=>({desc:x.label, qty:1, unit:'รายการ', price:Math.round(x.amt)})),
       ...(multiAdj>0 ? [{desc:'ปรับตามตัวคูณ (ขนาด/แรงงาน) & ปัดทศนิยม', qty:1, unit:'ครั้ง', price:multiAdj}] : []),
@@ -747,7 +744,7 @@ $('#btnLoadLast').addEventListener('click', ()=>{
   calc(); toast('โหลดฉบับร่างแล้ว');
 });
 
-// ===== Receipt =====
+// ===== Receipt table helpers =====
 function makeRow({desc, qty=1, unit='รายการ', price=0}){
   const tr = document.createElement('tr');
   tr.className = 'rc-row';
@@ -758,7 +755,6 @@ function makeRow({desc, qty=1, unit='รายการ', price=0}){
     <td class="text-end"><input type="number" class="form-control form-control-sm text-end rc-price" min="0" step="1" value="${Math.round(price)}"></td>
     <td class="text-end"><input type="number" class="form-control form-control-sm text-end rc-amt" min="0" step="1" value="${Math.round(qty*price)}"></td>
   `;
-  // auto calc when qty/price change
   const qtyEl = $('.rc-qty', tr);
   const priceEl = $('.rc-price', tr);
   const amtEl = $('.rc-amt', tr);
@@ -768,9 +764,23 @@ function makeRow({desc, qty=1, unit='รายการ', price=0}){
   amtEl.addEventListener('input', ()=> recomputeReceiptTotal());
   return tr;
 }
+function recomputeReceiptTotal(){
+  const rows = $$('#rc_items .rc-row');
+  const sum = rows.map(tr=> +$('.rc-amt', tr).value || 0).reduce((a,b)=>a+b,0);
+  const other = parseFloat($('#otherCost').value||0);
+  const disc = parseFloat($('#discount').value||0);
+  const vat = ($('#vat').value==='yes')? Math.round(sum*0.07) : 0;
+  const grand = sum + other - disc + vat;
+  $('#rc_other').textContent = currency(other);
+  $('#rc_discount').textContent = '-'+currency(disc).replace('฿','฿');
+  $('#rc_vat').textContent = currency(vat);
+  $('#rc_total').textContent = currency(grand);
+  return {sum, other, disc, vat, grand};
+}
 
-function fillReceipt(out){
-  // biz
+// ===== Build / Fill Receipt =====
+function startNewInvoiceFromCalc(out){
+  // header biz
   $('#bizNameView').textContent = $('#biz_name').value.trim() || 'ผู้ให้บริการ';
   $('#bizContactView').textContent = `โทร ${$('#biz_phone').value.trim()||'-'} • ${$('#biz_line').value.trim()||''}`;
   $('#bizAddrView').textContent = $('#biz_addr').value.trim()||'';
@@ -787,110 +797,21 @@ function fillReceipt(out){
   $('#inv_date').value = d.toLocaleDateString('th-TH');
   $('#inv_time').value = d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
   $('#inv_job').value = out.job;
+  $('#inv_note').value = '';
 
-  // items
+  // table
   const tbody = $('#rc_items'); tbody.innerHTML='';
   out.itemsForReceipt.forEach(it=> tbody.appendChild(makeRow(it)));
 
-  // footer summary
+  // footer
   $('#rc_other').textContent = currency(out.otherCost);
   $('#rc_discount').textContent = '-'+currency(out.discount).replace('฿','฿');
   $('#rc_vat').textContent = currency(out.vat);
   $('#rc_total').textContent = currency(out.grand);
   $('#pay_method').value = $('#biz_pay').value;
-
-  // save history (top 5)
-  const history = JSON.parse(localStorage.getItem('receiptHistory')||'[]');
-  history.unshift({ no: $('#inv_no').value, date: $('#inv_date').value, job: out.job, total: out.grand });
-  localStorage.setItem('receiptHistory', JSON.stringify(history.slice(0,5)));
-  renderHistory();
 }
 
-function recomputeReceiptTotal(){
-  const rows = $$('#rc_items .rc-row');
-  const sum = rows.map(tr=> +$('.rc-amt', tr).value || 0).reduce((a,b)=>a+b,0);
-  const other = parseFloat($('#otherCost').value||0);
-  const disc = parseFloat($('#discount').value||0);
-  const vat = ($('#vat').value==='yes')? Math.round(sum*0.07) : 0;
-  const grand = sum + other - disc + vat;
-  $('#rc_other').textContent = currency(other);
-  $('#rc_discount').textContent = '-'+currency(disc).replace('฿','฿');
-  $('#rc_vat').textContent = currency(vat);
-  $('#rc_total').textContent = currency(grand);
-}
-
-function renderHistory(){
-  const box = $('#history'); box.innerHTML='';
-  const list = JSON.parse(localStorage.getItem('receiptHistory')||'[]');
-  if(!list.length){ box.innerHTML = '<div class="text-muted small">— ยังไม่มีรายการ —</div>'; return; }
-  list.forEach(it=>{
-    const div = document.createElement('div');
-    div.className = 'item d-flex justify-content-between align-items-center';
-    div.innerHTML = `<div><div class="fw-semibold">${it.no}</div><div class="small muted">${it.date} • ${it.job}</div></div><div class="fw-bold">${currency(it.total)}</div>`;
-    div.addEventListener('click', ()=> alert(`เลขที่: ${it.no}\nวันที่: ${it.date}\nงาน: ${it.job}\nรวม: ${currency(it.total)}`));
-    box.appendChild(div);
-  });
-}
-
-$('#btnCreateReceipt').addEventListener('click', ()=>{
-  const out = calc(true); if(!out) return;
-  fillReceipt(out);
-  toast('สร้างใบเสร็จแล้ว — แก้ไขรายการได้');
-});
-$('#summaryCreate').addEventListener('click', ()=> $('#btnCreateReceipt').click() );
-
-$('#btnAddItem').addEventListener('click', ()=>{
-  const tr = makeRow({desc:'รายการเพิ่มเติม', qty:1, unit:'รายการ', price:0});
-  $('#rc_items').appendChild(tr);
-  recomputeReceiptTotal();
-});
-
-/* พิมพ์เฉพาะใบเสร็จ */
-function printReceiptOnly(){
-  document.body.classList.add('print-only-receipt');
-  setTimeout(()=> window.print(), 20);
-}
-window.addEventListener('afterprint', ()=> document.body.classList.remove('print-only-receipt'));
-const mq = window.matchMedia && window.matchMedia('print');
-if(mq && mq.addEventListener){
-  mq.addEventListener('change', e=>{
-    if(!e.matches) document.body.classList.remove('print-only-receipt');
-  });
-}
-$('#btnPrint').addEventListener('click', printReceiptOnly);
-$('#summaryPrint').addEventListener('click', printReceiptOnly);
-$('#dockPrint').addEventListener('click', printReceiptOnly);
-
-$('#dockReceipt').addEventListener('click', ()=> $('#btnCreateReceipt').click() );
-
-// total dock visibility
-function handleDock(){ $('.total-dock').style.display = (window.innerWidth<=768)? 'flex' : 'none'; }
-window.addEventListener('resize', handleDock); handleDock();
-
-// open maps
-$('#openMaps').addEventListener('click', (e)=>{
-  e.preventDefault();
-  window.open('https://www.google.com/maps/@15.7047,100.1372,13z', '_blank');
-});
-
-// reset all
-$('#btnResetAll').addEventListener('click', ()=>{
-  if(!confirm('ลบการตั้งค่าและฉบับร่างทั้งหมด?')) return;
-  ['pricingCfgPlus','pricingProfilesPlus','bizInfoPlus','calcDraftPlus','theme','printMode','receiptHistory'].forEach(k=> localStorage.removeItem(k));
-  location.reload();
-});
-
-// Toast helper
-function toast(msg){
-  const el = document.createElement('div');
-  el.className = 'toast align-items-center text-bg-dark border-0 show position-fixed bottom-0 end-0 m-3';
-  el.setAttribute('role','alert');
-  el.innerHTML = `<div class="d-flex"><div class="toast-body">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
-  document.body.appendChild(el);
-  setTimeout(()=> el.remove(), 2200);
-}
-
-// ===== Export Image =====
+// ====== Export Image =====
 async function exportNodeAsPNG(node, filename, scale=2){
   const canvas = await html2canvas(node, { backgroundColor:'#ffffff', scale, useCORS:true, allowTaint:false, imageTimeout:0, logging:false });
   const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
@@ -906,9 +827,8 @@ function filename(prefix='BILL'){
   const stamp = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
   return `${prefix}-${no||stamp}.png`;
 }
-
-// แชร์การ์ด (ย่อ)
-function buildShareCard(out){
+// สรุปแบบการ์ด
+function buildShareCardFromInvoice(inv){
   const stage = $('#exportStage'); stage.innerHTML='';
   const card = document.createElement('div'); card.className = 'share-card';
   const bizName = $('#biz_name').value.trim() || 'ผู้ให้บริการ';
@@ -917,12 +837,6 @@ function buildShareCard(out){
   const addr = $('#biz_addr').value.trim() || '';
   const logo = $('#biz_logo').value.trim();
   const qr = $('#biz_qr').value.trim();
-  const invNo = $('#inv_no').value || nextInvNo();
-  const date = $('#inv_date').value || new Date().toLocaleDateString('th-TH');
-  const time = $('#inv_time').value || new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-  const cust = $('#cust_name').value.trim() || '';
-  const vat = $('#vat').value==='yes' ? Math.round(out.serviceTotal*0.07) : 0;
-  const lines = out.breakdown.slice(0,8);
 
   card.innerHTML = `
     <div class="head">
@@ -933,37 +847,291 @@ function buildShareCard(out){
           <div class="meta">${bizPhone?`โทร ${bizPhone}`:''}${bizLine?` • LINE ${bizLine}`:''}${addr?` • ${addr}`:''}</div>
         </div>
       </div>
-      <div class="meta text-end">เลขที่บิล: ${invNo}<br>วันที่: ${date} • เวลา: ${time}</div>
+      <div class="meta text-end">เลขที่บิล: ${inv.invNo}<br>วันที่: ${inv.date} • เวลา: ${inv.time}</div>
     </div>
-    <div class="title">สรุปบิล — ${out.job}${cust?` • ลูกค้า: ${cust}`:''}</div>
+    <div class="title">สรุปบิล — ${inv.job}${inv.cust?.name?` • ลูกค้า: ${inv.cust.name}`:''}</div>
     <div class="list">
-      ${lines.map(([k,v])=>{
-        const val = (typeof v==='number')? currency(v) : v;
-        return `<div class="row"><div>${k}</div><div><strong>${val}</strong></div></div>`;
-      }).join('')}
-      <div class="row"><div>ค่าสินค้าตามจริง</div><div><strong>${currency(out.otherCost)}</strong></div></div>
-      <div class="row"><div>ส่วนลด</div><div><strong>-${currency(out.discount).replace('฿','฿')}</strong></div></div>
-      ${vat?`<div class="row"><div>Vat 7%</div><div><strong>${currency(vat)}</strong></div></div>`:''}
-      <div class="row total"><div>รวมทั้งสิ้น</div><div>${currency(out.grand)}</div></div>
+      ${inv.items.slice(0,8).map(it=>`<div class="row"><div>${it.desc}</div><div><strong>${currency(it.amount)}</strong></div></div>`).join('')}
+      <div class="row"><div>ค่าสินค้าตามจริง</div><div><strong>${currency(inv.otherCost)}</strong></div></div>
+      <div class="row"><div>ส่วนลด</div><div><strong>-${currency(inv.discount).replace('฿','฿')}</strong></div></div>
+      ${inv.vat>0?`<div class="row"><div>Vat 7%</div><div><strong>${currency(inv.vat)}</strong></div></div>`:''}
+      <div class="row total"><div>รวมทั้งสิ้น</div><div>${currency(inv.grand)}</div></div>
     </div>
     <div class="foot">
       <div class="meta">*สร้างด้วยเครื่องมือคำนวณราคา</div>
       ${qr? `<img id="scQR" class="qr" alt="qr">` : ''}
     </div>
   `;
-  $('#exportStage').appendChild(card);
+  stage.appendChild(card);
   if(logo){ const img = $('#scLogo', card); img.crossOrigin='anonymous'; img.src = logo; }
   if(qr){ const img = $('#scQR', card); img.crossOrigin='anonymous'; img.src = qr; }
   return card;
 }
 
-// ปุ่ม Export
+// ====== Store (คลังบิล) ======
+const STORE_KEY = 'invoiceStorePlus';
+let currentEditingId = null; // invNo ที่กำลังแก้
+
+function loadStore(){ return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); }
+function saveStore(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }
+function upsertInvoice(inv, asNew=false){
+  let list = loadStore();
+  const idx = list.findIndex(x=> x.id===inv.id);
+  if(asNew || idx<0){ list.unshift(inv); }
+  else{ list[idx] = inv; }
+  saveStore(list);
+  renderInvList();
+}
+
+function serializeInvoiceFromUI(){
+  const rows = $$('#rc_items .rc-row');
+  const items = rows.map(tr=>{
+    const desc = $('.rc-desc', tr).innerText.trim();
+    const qty = +$('.rc-qty', tr).value||0;
+    const unit = $('.rc-unit', tr).value.trim();
+    const price = +$('.rc-price', tr).value||0;
+    const amount = +$('.rc-amt', tr).value||0;
+    return {desc, qty, unit, price, amount};
+  });
+  const totals = recomputeReceiptTotal();
+  const inv = {
+    id: ($('#inv_no').value||'').trim(),
+    invNo: ($('#inv_no').value||'').trim(),
+    date: $('#inv_date').value.trim(),
+    time: $('#inv_time').value.trim(),
+    job: $('#inv_job').value.trim(),
+    note: $('#inv_note').value.trim(),
+    cust: {
+      name: $('#cust_name').value.trim(),
+      phone: $('#cust_phone').value.trim(),
+      addr: $('#cust_addr').value.trim(),
+      taxid: $('#cust_taxid').value.trim()
+    },
+    items,
+    serviceTotal: totals.sum,
+    otherCost: +($('#otherCost').value||0),
+    discount: +($('#discount').value||0),
+    vat: totals.vat,
+    grand: totals.grand,
+    pay: {
+      method: $('#pay_method').value.trim(),
+      status: $('#pay_status').value,
+      ref: $('#pay_ref').value.trim(),
+      due: $('#pay_due').value
+    },
+    meta: {
+      createdAt: (getWorkingInvoice()?.meta?.createdAt) || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  };
+  return inv;
+}
+
+function getWorkingInvoice(){
+  const list = loadStore();
+  return list.find(x=> x.id===currentEditingId) || null;
+}
+
+function loadInvoiceToUI(inv){
+  currentEditingId = inv.id;
+  // Header fields
+  $('#inv_no').value = inv.invNo;
+  $('#inv_date').value = inv.date;
+  $('#inv_time').value = inv.time;
+  $('#inv_job').value = inv.job;
+  $('#inv_note').value = inv.note||'';
+  $('#cust_name').value = inv.cust?.name||'';
+  $('#cust_phone').value = inv.cust?.phone||'';
+  $('#cust_addr').value = inv.cust?.addr||'';
+  $('#cust_taxid').value = inv.cust?.taxid||'';
+  $('#pay_method').value = inv.pay?.method||$('#biz_pay').value;
+  $('#pay_status').value = inv.pay?.status||'ชำระแล้ว';
+  $('#pay_ref').value = inv.pay?.ref||'';
+  $('#pay_due').value = inv.pay?.due||'';
+  // Items
+  const tbody = $('#rc_items'); tbody.innerHTML='';
+  inv.items.forEach(it=> tbody.appendChild(makeRow(it)));
+  // Footer numbers & top controls
+  $('#otherCost').value = inv.otherCost||0;
+  $('#discount').value = inv.discount||0;
+  $('#vat').value = inv.vat>0 ? 'yes' : 'no';
+  $('#rc_other').textContent = currency(inv.otherCost||0);
+  $('#rc_discount').textContent = '-'+currency(inv.discount||0).replace('฿','฿');
+  $('#rc_vat').textContent = currency(inv.vat||0);
+  $('#rc_total').textContent = currency(inv.grand||0);
+  // Biz snapshot to header (already handled by loadBiz)
+  recomputeReceiptTotal();
+  toast('โหลดบิลสำหรับแก้ไขแล้ว');
+}
+
+function deleteInvoice(id){
+  const list = loadStore();
+  const idx = list.findIndex(x=> x.id===id);
+  if(idx<0) return;
+  if(!confirm('ยืนยันลบบิลนี้?')) return;
+  list.splice(idx,1);
+  saveStore(list);
+  renderInvList();
+  if(currentEditingId===id){ currentEditingId=null; }
+  toast('ลบบิลแล้ว');
+}
+
+function duplicateInvoice(id){
+  const base = loadStore().find(x=> x.id===id);
+  if(!base) return;
+  // ทำสำเนาเลขบิลใหม่
+  const newNo = nextInvNo();
+  const copy = JSON.parse(JSON.stringify(base));
+  copy.id = copy.invNo = newNo;
+  copy.meta.createdAt = new Date().toISOString();
+  copy.meta.updatedAt = new Date().toISOString();
+  upsertInvoice(copy, true);
+  loadInvoiceToUI(copy);
+  toast('คัดลอกเป็นบิลใหม่แล้ว');
+}
+
+function renderInvList(){
+  const list = loadStore();
+  const q = ($('#invSearch').value||'').trim().toLowerCase();
+  const f = $('#invFilter').value;
+  const box = $('#invList'); box.innerHTML='';
+  const filtered = list.filter(it=>{
+    const hay = [it.invNo, it.cust?.name||'', it.job||''].join(' ').toLowerCase();
+    const hitQ = !q || hay.includes(q);
+    const hitF = (f==='all') || (f==='paid' && it.pay?.status==='ชำระแล้ว') || (f==='unpaid' && it.pay?.status==='ค้างชำระ');
+    return hitQ && hitF;
+  });
+  if(!filtered.length){ box.innerHTML = '<div class="text-muted small">— ยังไม่มีบิล —</div>'; return; }
+  filtered.forEach(it=>{
+    const div = document.createElement('div'); div.className='mgr-item';
+    div.innerHTML = `
+      <div class="mgr-row">
+        <div>
+          <div class="fw-semibold">${it.cust?.name||'-'} <span class="text-muted">• ${it.job||'-'}</span></div>
+          <div class="small text-muted">เลขที่: ${it.invNo} • ${it.date} ${it.time}</div>
+        </div>
+        <div><span class="badge-soft">${it.pay?.status||'-'}</span></div>
+        <div class="text-end"><span class="fw-semibold">${currency(it.grand||0)}</span></div>
+        <div class="text-muted small">${it.pay?.method||''}${it.pay?.ref? ' • '+it.pay.ref : ''}</div>
+        <div class="mgr-actions text-end">
+          <button class="btn btn-outline-primary btn-sm" title="ดู/แก้"><i class="bi bi-pencil"></i></button>
+          <button class="btn btn-outline-secondary btn-sm" title="คัดลอกเป็นบิลใหม่"><i class="bi bi-files"></i></button>
+          <button class="btn btn-outline-secondary btn-sm" title="ภาพบิล"><i class="bi bi-card-image"></i></button>
+          <button class="btn btn-outline-secondary btn-sm" title="พิมพ์"><i class="bi bi-printer"></i></button>
+          <button class="btn btn-outline-danger btn-sm" title="ลบ"><i class="bi bi-trash3"></i></button>
+        </div>
+      </div>
+    `;
+    const [btnEdit, btnCopy, btnImg, btnPrint, btnDel] = $$('button', div);
+    btnEdit.addEventListener('click', ()=> loadInvoiceToUI(it));
+    btnCopy.addEventListener('click', ()=> duplicateInvoice(it.id));
+    btnDel.addEventListener('click', ()=> deleteInvoice(it.id));
+    btnImg.addEventListener('click', async ()=>{
+      loadInvoiceToUI(it);
+      setTimeout(async()=>{ await exportNodeAsPNG($('#receipt'), filename('RECEIPT')); }, 150);
+    });
+    btnPrint.addEventListener('click', ()=>{
+      loadInvoiceToUI(it);
+      setTimeout(()=> printReceiptOnly(), 150);
+    });
+    box.appendChild(div);
+  });
+}
+$('#invSearch').addEventListener('input', renderInvList);
+$('#invFilter').addEventListener('change', renderInvList);
+
+// ===== Actions =====
+$('#btnCreateReceipt').addEventListener('click', ()=>{
+  const out = calc(true); if(!out) return;
+  startNewInvoiceFromCalc(out);
+  currentEditingId = $('#inv_no').value.trim(); // เริ่มแก้ไขบิลใหม่
+  // autosave บิลที่พึ่งสร้าง
+  const inv = serializeInvoiceFromUI();
+  upsertInvoice(inv, true);
+  toast('สร้างบิลแล้ว — บันทึกเข้าคลังบิล');
+});
+$('#summaryCreate').addEventListener('click', ()=> $('#btnCreateReceipt').click() );
+
+$('#btnAddItem').addEventListener('click', ()=>{
+  const tr = makeRow({desc:'รายการเพิ่มเติม', qty:1, unit:'รายการ', price:0});
+  $('#rc_items').appendChild(tr);
+  recomputeReceiptTotal();
+});
+
+$('#btnSaveInvoice').addEventListener('click', ()=>{
+  const inv = serializeInvoiceFromUI();
+  if(!inv.id){ alert('ยังไม่มีเลขบิล'); return; }
+  // ถ้ากำลังแก้บิลเดิม ให้ upsert แบบอัปเดต
+  upsertInvoice(inv, false);
+  currentEditingId = inv.id;
+  toast('บันทึก/อัปเดตบิลแล้ว');
+});
+$('#btnNewInvoice').addEventListener('click', ()=>{
+  // ล้างฟอร์มใบเสร็จเพื่อเริ่มบิลใหม่ (จำนวนคงสูตรเดิม)
+  $('#cust_name').value=''; $('#cust_phone').value=''; $('#cust_addr').value=''; $('#cust_taxid').value='';
+  $('#inv_no').value = nextInvNo();
+  const d = new Date();
+  $('#inv_date').value = d.toLocaleDateString('th-TH');
+  $('#inv_time').value = d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  $('#inv_job').value = $('#jobName').value || '';
+  $('#inv_note').value='';
+  const tbody = $('#rc_items'); tbody.innerHTML='';
+  $('#rc_other').textContent = '฿0'; $('#rc_discount').textContent = '฿0'; $('#rc_vat').textContent = '฿0'; $('#rc_total').textContent = '฿0';
+  $('#pay_method').value = $('#biz_pay').value; $('#pay_status').value='ชำระแล้ว'; $('#pay_ref').value=''; $('#pay_due').value='';
+  currentEditingId = $('#inv_no').value.trim();
+  toast('เริ่มบิลใหม่แล้ว');
+});
+
+/* พิมพ์เฉพาะใบเสร็จ */
+function printReceiptOnly(){
+  document.body.classList.add('print-only-receipt');
+  setTimeout(()=> window.print(), 20);
+}
+window.addEventListener('afterprint', ()=> document.body.classList.remove('print-only-receipt'));
+const mq = window.matchMedia && window.matchMedia('print');
+if(mq && mq.addEventListener){
+  mq.addEventListener('change', e=>{
+    if(!e.matches) document.body.classList.remove('print-only-receipt');
+  });
+}
+$('#btnPrint').addEventListener('click', printReceiptOnly);
+$('#dockPrint').addEventListener('click', printReceiptOnly);
+$('#dockReceipt').addEventListener('click', ()=> $('#btnCreateReceipt').click() );
+
+// total dock visibility
+function handleDock(){ $('.total-dock').style.display = (window.innerWidth<=768)? 'flex' : 'none'; }
+window.addEventListener('resize', handleDock); handleDock();
+
+// open maps
+$('#openMaps').addEventListener('click', (e)=>{
+  e.preventDefault();
+  window.open('https://www.google.com/maps/@15.7047,100.1372,13z', '_blank');
+});
+
+// reset all
+$('#btnResetAll').addEventListener('click', ()=>{
+  if(!confirm('ลบการตั้งค่า+คลังบิล+ฉบับร่างทั้งหมด?')) return;
+  ['pricingCfgPlus','pricingProfilesPlus','bizInfoPlus','calcDraftPlus','theme','printMode',STORE_KEY].forEach(k=> localStorage.removeItem(k));
+  location.reload();
+});
+
+// Toast helper
+function toast(msg){
+  const el = document.createElement('div');
+  el.className = 'toast align-items-center text-bg-dark border-0 show position-fixed bottom-0 end-0 m-3';
+  el.setAttribute('role','alert');
+  el.innerHTML = `<div class="d-flex"><div class="toast-body">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+  document.body.appendChild(el);
+  setTimeout(()=> el.remove(), 2200);
+}
+
+// Export buttons
 async function ensureReceiptReady(){
   const hasPlaceholder = $('#rc_items').children.length===1 &&
     $('#rc_items').children[0].querySelector('.text-muted');
   if(hasPlaceholder){
     const out = calc(true);
-    if(out) fillReceipt(out);
+    if(out) startNewInvoiceFromCalc(out);
   }
 }
 $('#btnExportReceipt').addEventListener('click', async ()=>{
@@ -971,19 +1139,20 @@ $('#btnExportReceipt').addEventListener('click', async ()=>{
   await exportNodeAsPNG($('#receipt'), filename('RECEIPT'));
 });
 $('#btnExportSummary').addEventListener('click', async ()=>{
-  const out = calc(true); if(!out){ toast('กรอกข้อมูลให้ครบก่อนนะ'); return; }
-  const card = buildShareCard(out);
+  const inv = serializeInvoiceFromUI();
+  const card = buildShareCardFromInvoice(inv);
   await new Promise(r=> setTimeout(r, 200));
   await exportNodeAsPNG(card, filename('SUMMARY'));
 });
 
 // init
-loadCfg(); loadBiz(); renderHistory();
+loadCfg(); loadBiz();
 $('#inv_no').value = nextInvNo();
 const d0 = new Date();
 $('#inv_date').value = d0.toLocaleDateString('th-TH');
 $('#inv_time').value = d0.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
 calc(true);
+renderInvList();
 </script>
 </body>
 </html>
