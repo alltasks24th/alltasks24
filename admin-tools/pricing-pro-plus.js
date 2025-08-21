@@ -163,25 +163,31 @@ function renderInvList(){
 
   const pager=[];
   pager.push(`<li class="page-item ${invPage===1?'disabled':''}"><a class="page-link" href="#" data-p="${invPage-1}">ก่อนหน้า</a></li>`);
-  for(let p=1;p<=pages;p++){ if(p===1||p===pages||Math.abs(p-invPage)<=1){ pager.push(`<li class="page-item ${p===invPage?'active':''}"><a class="page-link" href="#" data-p="${p}">${p}</a></li>`); }
-    else if(Math.abs(p-invPage)===2){ pager.push('<li class="page-item disabled"><span class="page-link">…</span></li>'); } }
+  for(let p=1;p<=pages;p++){
+    if(p===1||p===pages||Math.abs(p-invPage)<=1){
+      pager.push(`<li class="page-item ${p===invPage?'active':''}"><a class="page-link" href="#" data-p="${p}">${p}</a></li>`);
+    }else if(Math.abs(p-invPage)===2){
+      pager.push('<li class="page-item disabled"><span class="page-link">…</span></li>');
+    }
+  }
   pager.push(`<li class="page-item ${invPage===pages?'disabled':''}"><a class="page-link" href="#" data-p="${invPage+1}">ถัดไป</a></li>`);
   $('#invPager').innerHTML=pager.join('');
 }
 
-// ===== biz preview/persist =====
-function applyBiz(){
-  $('#bizNameView').textContent=$('#biz_name').value||'';
-  $('#bizContactView').textContent='โทร '+($('#biz_phone').value||'')+' • LINE '+($('#biz_line').value||'');
-  $('#bizAddrView').textContent=$('#biz_addr').value||'';
-}
-function saveBiz(){
-  const b={name:$('#biz_name').value, phone:$('#biz_phone').value, line:$('#biz_line').value, addr:$('#biz_addr').value, pay:$('#biz_pay').value, note:$('#biz_note').value, logo:$('#biz_logo').value, qr:$('#biz_qr').value};
-  localStorage.setItem('bizInfoPlus', JSON.stringify(b)); applyBiz(); alert('บันทึกข้อมูลร้านแล้ว');
-}
-function loadBiz(){
-  const b=JSON.parse(localStorage.getItem('bizInfoPlus')||'{}'); if(Object.keys(b).length){ $('#biz_name').value=b.name||''; $('#biz_phone').value=b.phone||''; $('#biz_line').value=b.line||''; $('#biz_addr').value=b.addr||''; $('#biz_pay').value=b.pay||'เงินสด'; $('#biz_note').value=b.note||''; $('#biz_logo').value=b.logo||''; $('#biz_qr').value=b.qr||''; }
-  applyBiz();
+// ===== Capture helpers (บันทึกภาพบิล) =====
+async function captureElement(el, filename, modeClass){
+  try{
+    if(modeClass) el.classList.add(modeClass);
+    const canvas = await html2canvas(el, { scale:2, useCORS:true, backgroundColor:'#ffffff' });
+    if(modeClass) el.classList.remove(modeClass);
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = filename || 'receipt.png';
+    a.click();
+  }catch(err){
+    alert('ไม่สามารถบันทึกรูปได้ — ตรวจสอบการโหลด html2canvas หรือ CSP');
+    if(modeClass) el.classList.remove(modeClass);
+  }
 }
 
 // ===== init & events =====
@@ -201,7 +207,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   // biz
   $('#btnSaveBiz').addEventListener('click', saveBiz);
-  ['biz_name','biz_phone','biz_line','biz_addr','biz_note','biz_logo','biz_qr'].forEach(id=>{ const el=$('#'+id); el && el.addEventListener('input', applyBiz); });
+  ['biz_name','biz_phone','biz_line','biz_addr','biz_note','biz_logo','biz_qr'].forEach(id=>{ const el=$('#'+id); el && el.addEventListener('input', ()=>{ $('#bizNameView').textContent=$('#biz_name').value||''; $('#bizContactView').textContent='โทร '+($('#biz_phone').value||'')+' • LINE '+($('#biz_line').value||''); $('#bizAddrView').textContent=$('#biz_addr').value||''; }); });
 
   // actions
   $('#btnCopySummary').addEventListener('click',()=>{ const t=$('#breakdownBox').innerText+'\nรวม: '+$('#grandLabel').innerText; navigator.clipboard.writeText(t).then(()=>alert('คัดลอกแล้ว')).catch(()=>alert('คัดลอกไม่สำเร็จ')); });
@@ -219,4 +225,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
   $('#invFilter').addEventListener('change',()=>{ invPage=1; renderInvList(); });
   $('#invPager').addEventListener('click',e=>{ const a=e.target.closest('a.page-link'); if(!a) return; e.preventDefault(); invPage=Math.max(1, +a.dataset.p||1); renderInvList(); });
   $('#invList').addEventListener('click',e=>{ const o=e.target.closest('.btn-open'); const d=e.target.closest('.btn-del'); if(o) openInvoice(o.dataset.id); if(d) deleteInvoice(d.dataset.id); });
+
+  // บันทึกภาพบิล
+  const receiptEl = document.getElementById('receipt');
+  document.getElementById('btnCapBill')?.addEventListener('click', ()=> captureElement(receiptEl, 'receipt.png', 'mode-clean'));
+  document.getElementById('btnCapForm')?.addEventListener('click', ()=> captureElement(receiptEl, 'receipt-form.png', 'mode-form'));
 });
