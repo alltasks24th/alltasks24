@@ -43,22 +43,22 @@
     /* ====== แถบสรุปเต็มขอบการ์ด (เดสก์ท็อป) ====== */
     #summaryBar{
       position: sticky; bottom: 0; z-index: 5;
-      display: none; /* มือถือใช้ total-dock แทน */
-      align-items: center; justify-content: space-between; gap: 12px;
+      display: none;
+      align-items: center; justify-content:space-between; gap:12px;
       background: var(--card);
       border-top: 1px solid var(--border);
       padding: .75rem 1rem;
-      margin-left: -1rem; margin-right: -1rem;        /* สำหรับ p-3 */
-      border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
+      margin-left:-1rem; margin-right:-1rem;
+      border-bottom-left-radius:12px; border-bottom-right-radius:12px;
     }
     @media (min-width:768px){
-      #summaryBar{ display:flex; margin-left:-1.5rem; margin-right:-1.5rem; }  /* สำหรับ p-md-4 */
+      #summaryBar{ display:flex; margin-left:-1.5rem; margin-right:-1.5rem; }
     }
 
     .total-dock{display:none}
     .logo{max-height:54px;object-fit:contain}
     .qr{max-height:96px}
-    @media (max-width: 768px){
+    @media (max-width:768px){
       .total-dock{
         position:fixed;left:0;right:0;bottom:0;display:flex;gap:.6rem;
         align-items:center;justify-content:space-between;background:var(--card);
@@ -76,7 +76,7 @@
     body.print-a5 @page { size: A5; margin: 10mm; }
     body.print-80mm @page { size: 80mm auto; margin: 5mm; }
 
-    /* === โหมดพิมพ์เฉพาะใบเสร็จ (#receipt) === */
+    /* พิมพ์เฉพาะใบเสร็จ */
     @media print{
       body.print-only-receipt *{ visibility: hidden !important; }
       body.print-only-receipt #receipt,
@@ -91,7 +91,7 @@
     .history-list .item{border:1px dashed var(--border); border-radius:10px; padding:.5rem .75rem; cursor:pointer}
     .history-list .item:hover{background:rgba(109,40,217,.06)}
 
-    /* ====== การ์ดสรุปแบบแชร์ (เรนเดอร์เป็นรูป) ====== */
+    /* แชร์การ์ด (สำหรับ export เป็นรูป) */
     #exportStage{ position:fixed; left:-200vw; top:0; width:0; height:0; overflow:visible; z-index:-1; }
     .share-card{
       width:860px; background:#fff; color:#111827;
@@ -129,11 +129,11 @@
 
 <main class="container my-4">
   <div class="row g-3">
-    <!-- LEFT: Settings -->
+    <!-- LEFT -->
     <div class="col-lg-5">
       <div class="card-clean p-3 p-md-4">
         <div class="d-flex align-items-center justify-content-between mb-2">
-          <div><div class="eyebrow mb-1">ตั้งค่าสูตรราคา</div><div class="muted small">รองรับระยะทางแบบขั้นบันได + ขั้นต่ำ + ปัดเศษ</div></div>
+          <div><div class="eyebrow mb-1">ตั้งค่าสูตรราคา</div><div class="muted small">ขั้นบันได + ขั้นต่ำ + ปัดเศษ</div></div>
           <span class="pill small">โปรไฟล์สูตร</span>
         </div>
 
@@ -192,7 +192,7 @@
           <div class="col-6"><label class="form-label">โทร</label><input id="biz_phone" class="form-control" value="080-000-0000"></div>
           <div class="col-6"><label class="form-label">LINE/Facebook</label><input id="biz_line" class="form-control" value="@yourline"></div>
           <div class="col-12"><label class="form-label">ที่อยู่/บันทึกย่อ</label><input id="biz_addr" class="form-control" placeholder="เช่น ตัวเมืองนครสวรรค์"></div>
-          <div class="col-6"><label class="form-label">วิธีชำระเงิน</label>
+          <div class="col-6"><label class="form-label">วิธีชำระเงิน (ค่าเริ่มต้น)</label>
             <select id="biz_pay" class="form-select">
               <option value="เงินสด" selected>เงินสด</option>
               <option value="โอน">โอน</option>
@@ -213,7 +213,7 @@
       </div>
     </div>
 
-    <!-- RIGHT: Calculator & Receipt -->
+    <!-- RIGHT -->
     <div class="col-lg-7">
       <div class="card-clean p-3 p-md-4 toolbar-sticky">
         <div class="d-flex align-items-center justify-content-between mb-2">
@@ -313,7 +313,6 @@
           <button id="btnSaveDraft" class="btn btn-outline-primary">บันทึกฉบับร่าง</button>
         </div>
 
-        <!-- แถบสรุปเต็มขอบการ์ด (เดสก์ท็อป) -->
         <div id="summaryBar" class="no-print mt-3">
           <div class="fw-bold">รวม: <span id="grandSummary">฿0</span></div>
           <div class="d-flex gap-2">
@@ -368,62 +367,81 @@
 
           <div class="row g-2 mt-1">
             <div class="col-md-6">
+              <div class="small muted">ที่อยู่ลูกค้า</div>
+              <input id="cust_addr" class="form-control form-control-sm" placeholder="ที่อยู่สำหรับใบเสร็จ">
+            </div>
+            <div class="col-md-3">
+              <div class="small muted">เลขผู้เสียภาษี</div>
+              <input id="cust_taxid" class="form-control form-control-sm" placeholder="(ถ้ามี)">
+            </div>
+            <div class="col-md-3">
+              <div class="small muted">วันที่/เวลา</div>
+              <div class="d-flex gap-1">
+                <input id="inv_date" class="form-control form-control-sm" readonly>
+                <input id="inv_time" class="form-control form-control-sm" readonly>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-2 mt-1">
+            <div class="col-md-9">
               <div class="small muted">งาน/รายละเอียด</div>
               <input id="inv_job" class="form-control form-control-sm" placeholder="เช่น ฝากซื้อของ/ส่งพัสดุ">
             </div>
             <div class="col-md-3">
-              <div class="small muted">วันที่</div>
-              <input id="inv_date" class="form-control form-control-sm" readonly>
-            </div>
-            <div class="col-md-3">
-              <div class="small muted">เวลา</div>
-              <input id="inv_time" class="form-control form-control-sm" readonly>
+              <div class="small muted">หมายเหตุในบิล</div>
+              <input id="inv_note" class="form-control form-control-sm" placeholder="(ถ้ามี)">
             </div>
           </div>
 
           <div class="table-responsive mt-3">
             <table class="table table-receipt align-middle" id="rc_table">
-              <thead><tr><th style="width:65%">รายการ</th><th class="text-end" style="width:35%">จำนวนเงิน (บาท)</th></tr></thead>
+              <thead>
+                <tr>
+                  <th style="width:45%">รายการ</th>
+                  <th class="text-center" style="width:10%">จำนวน</th>
+                  <th class="text-center" style="width:12%">หน่วย</th>
+                  <th class="text-end" style="width:16%">ราคา/หน่วย</th>
+                  <th class="text-end" style="width:17%">จำนวนเงิน</th>
+                </tr>
+              </thead>
               <tbody id="rc_items">
-                <tr><td class="text-muted">— กด “สร้างใบเสร็จ” เพื่อใส่รายการอัตโนมัติ หรือ “เพิ่มบรรทัด” เพื่อใส่เอง —</td><td class="text-end text-muted">0</td></tr>
+                <tr><td class="text-muted" colspan="5">— กด “สร้างใบเสร็จ” เพื่อใส่รายการอัตโนมัติ หรือ “เพิ่มบรรทัด” เพื่อใส่เอง —</td></tr>
               </tbody>
               <tfoot>
-                <tr><th class="text-end">ค่าสินค้าตามจริง</th><th class="text-end" id="rc_other">฿0</th></tr>
-                <tr><th class="text-end">ส่วนลด</th><th class="text-end" id="rc_discount">฿0</th></tr>
-                <tr><th class="text-end">Vat 7%</th><th class="text-end" id="rc_vat">฿0</th></tr>
-                <tr><th class="text-end">รวมทั้งสิ้น</th><th class="text-end" id="rc_total" style="font-size:1.2rem">฿0</th></tr>
+                <tr><th class="text-end" colspan="4">ค่าสินค้าตามจริง</th><th class="text-end" id="rc_other">฿0</th></tr>
+                <tr><th class="text-end" colspan="4">ส่วนลด</th><th class="text-end" id="rc_discount">฿0</th></tr>
+                <tr><th class="text-end" colspan="4">Vat 7%</th><th class="text-end" id="rc_vat">฿0</th></tr>
+                <tr><th class="text-end" colspan="4">รวมทั้งสิ้น</th><th class="text-end" id="rc_total" style="font-size:1.2rem">฿0</th></tr>
               </tfoot>
             </table>
           </div>
 
           <div class="row g-2 mt-2">
-            <div class="col-md-6">
+            <div class="col-md-3">
               <div class="small muted">วิธีชำระเงิน</div>
               <input id="pay_method" class="form-control form-control-sm" value="เงินสด">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
               <div class="small muted">สถานะ</div>
               <select id="pay_status" class="form-select form-select-sm">
                 <option value="ค้างชำระ">ค้างชำระ</option>
                 <option value="ชำระแล้ว" selected>ชำระแล้ว</option>
               </select>
             </div>
+            <div class="col-md-3">
+              <div class="small muted">เลขอ้างอิงชำระ</div>
+              <input id="pay_ref" class="form-control form-control-sm" placeholder="เช่น TX1234">
+            </div>
+            <div class="col-md-3">
+              <div class="small muted">กำหนดชำระ (ถ้ามี)</div>
+              <input id="pay_due" type="date" class="form-control form-control-sm">
+            </div>
           </div>
 
           <div class="d-flex justify-content-between align-items-end mt-3">
             <div class="small muted" id="bizNoteView">ขอบคุณที่ใช้บริการ</div>
             <img id="bizQrView" class="qr d-none" alt="qr">
-          </div>
-
-          <div class="row mt-4">
-            <div class="col-6">
-              <div class="small muted">ลายเซ็นผู้รับเงิน</div>
-              <div style="height:40px;border-bottom:1px solid var(--border)"></div>
-            </div>
-            <div class="col-6 text-end">
-              <div class="small muted">ลายเซ็นผู้รับสินค้า/บริการ</div>
-              <div style="height:40px;border-bottom:1px solid var(--border);margin-left:auto"></div>
-            </div>
           </div>
         </section>
       </div>
@@ -443,7 +461,6 @@
   </div>
 </div>
 
-<!-- html2canvas สำหรับแปลง DOM เป็นรูป -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
@@ -452,18 +469,16 @@ const $ = (s, r=document)=>r.querySelector(s);
 const $$ = (s, r=document)=>[...r.querySelectorAll(s)];
 const currency = n => '฿'+Math.round(+n||0).toLocaleString('th-TH');
 const ceilToStep = (val, step=15)=> Math.ceil((+val||0)/step)*step;
-const ceilKm = km => Math.max(0, Math.ceil((+km||0)));
 const now = ()=> new Date();
 const pad = (n,l=2)=> String(n).padStart(l,'0');
 
 // Invoice seq (daily)
 function nextInvNo(){
-  const today = new Date();
-  const key = 'invSeq-'+today.getFullYear()+pad(today.getMonth()+1)+pad(today.getDate());
+  const t = new Date();
+  const key = 'invSeq-'+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate());
   let seq = +localStorage.getItem(key) || 0;
-  seq += 1;
-  localStorage.setItem(key, seq);
-  return `INV-${today.getFullYear()}${pad(today.getMonth()+1)}${pad(today.getDate())}-${pad(seq,4)}`;
+  seq += 1; localStorage.setItem(key, seq);
+  return `INV-${t.getFullYear()}${pad(t.getMonth()+1)}${pad(t.getDate())}-${pad(seq,4)}`;
 }
 
 // ===== Theme & Print Mode =====
@@ -517,9 +532,9 @@ $('#btnResetCfg').addEventListener('click', ()=>{ localStorage.removeItem('prici
 
 // Profiles
 function refreshProfileList(){
-  const listEl = $('#cfg_profile_list');
+  const sel = $('#cfg_profile_list');
   const list = JSON.parse(localStorage.getItem('pricingProfilesPlus')||'[]');
-  listEl.innerHTML = list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
+  sel.innerHTML = list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
 }
 $('#cfg_profile_save').addEventListener('click', ()=>{
   const name = $('#cfg_profile_name').value.trim() || 'โปรไฟล์ใหม่';
@@ -556,9 +571,7 @@ function loadBiz(){
   $('#bizNoteView').textContent = $('#biz_note').value || '';
   const logo = $('#biz_logo').value.trim(); const qr = $('#biz_qr').value.trim();
   const logoEl = $('#bizLogoView'); const qrEl = $('#bizQrView');
-  // ตั้งค่า CORS ก่อนใส่ src
-  logoEl.crossOrigin = 'anonymous';
-  qrEl.crossOrigin = 'anonymous';
+  logoEl.crossOrigin = 'anonymous'; qrEl.crossOrigin = 'anonymous';
   if(logo){ logoEl.src = logo; logoEl.classList.remove('d-none'); } else logoEl.classList.add('d-none');
   if(qr){ qrEl.src = qr; qrEl.classList.remove('d-none'); } else qrEl.classList.add('d-none');
 }
@@ -581,10 +594,9 @@ $('#btnSaveBiz').addEventListener('click', saveBiz);
 
 // ===== Calculator =====
 function validate(){
-  let ok = true;
   const kmEl = $('#km');
-  if(kmEl.value==='' || +kmEl.value<0){ kmEl.classList.add('is-invalid'); ok=false; }
-  else kmEl.classList.remove('is-invalid');
+  const ok = !(kmEl.value==='' || +kmEl.value<0);
+  kmEl.classList.toggle('is-invalid', !ok);
   return ok;
 }
 function roundToStep(n, step){ if(step<=1) return Math.round(n); return Math.round(n/step)*step; }
@@ -613,66 +625,82 @@ function calc(saveDraft=false){
     $('#alertBox').classList.remove('d-none');
   }
 
-  let total = 0; let breakdown = [];
+  // คิดค่าบริการ (เก็บเป็นรายการย่อย)
+  const items = [];
+  const addItem = (label, amt)=>{ if(amt>0) items.push({label, amt}); };
 
-  total += c.base; breakdown.push([`ฐานในเมือง (0–${c.incKm} กม.)`, c.base]);
+  addItem(`ฐานในเมือง (0–${c.incKm} กม.)`, c.base);
 
   const extraDist = Math.max(0, km - c.incKm);
   if(extraDist>0){
-    const tier1 = Math.max(0, Math.min(extraDist, Math.max(0, c.tier2Start - c.incKm)));
-    const tier2 = Math.max(0, extraDist - tier1);
-    if(tier1>0){ const fee1 = Math.ceil(tier1) * c.perKm1; total += fee1; breakdown.push([`ระยะชั้น 1 (${Math.ceil(tier1)} กม.)`, fee1]); }
-    if(tier2>0){ const fee2 = Math.ceil(tier2) * c.perKm2; total += fee2; breakdown.push([`ระยะชั้น 2 (${Math.ceil(tier2)} กม.)`, fee2]); }
+    const tier1Km = Math.max(0, Math.min(extraDist, Math.max(0, c.tier2Start - c.incKm)));
+    const tier2Km = Math.max(0, extraDist - tier1Km);
+    if(tier1Km>0) addItem(`ระยะชั้น 1 (${Math.ceil(tier1Km)} กม.)`, Math.ceil(tier1Km) * c.perKm1);
+    if(tier2Km>0) addItem(`ระยะชั้น 2 (${Math.ceil(tier2Km)} กม.)`, Math.ceil(tier2Km) * c.perKm2);
   }
 
-  if(stops>0){ const fee = stops * c.stop; total += fee; breakdown.push([`จุดแวะ ${stops} จุด`, fee]); }
+  if(stops>0) addItem(`จุดแวะ ${stops} จุด`, stops * c.stop);
+
   if(waitMin>0){
-    const waitRounded = ceilToStep(waitMin, 15)/60;
-    const fee = waitRounded * c.wait; total += fee;
-    breakdown.push([`รอคิว (${waitMin} → ${waitRounded.toFixed(2)} ชม.)`, fee]);
+    const waitRoundedHr = ceilToStep(waitMin, 15)/60;
+    addItem(`รอคิว (${waitMin} → ${waitRoundedHr.toFixed(2)} ชม.)`, waitRoundedHr * c.wait);
   }
-  if(isNight){ total += c.night; breakdown.push(['กลางคืน', c.night]); }
-  if(isRain){ total += c.rain; breakdown.push(['ฝนตก', c.rain]); }
-  if(isWeekend){ total += c.weekend; breakdown.push(['เสาร์–อาทิตย์/นักขัต', c.weekend]); }
+  if(isNight) addItem('กลางคืน', c.night);
+  if(isRain) addItem('ฝนตก', c.rain);
+  if(isWeekend) addItem('เสาร์–อาทิตย์/นักขัต', c.weekend);
 
-  // ตัวคูณ
+  const preSum = items.reduce((s,x)=> s + Math.round(x.amt), 0);
+
   const sizeMult = (size==='medium'? c.multSize : 1);
   const laborMult = (workers==='2'? c.multLabor : 1);
-  total = total * sizeMult * laborMult;
-  if(sizeMult!==1) breakdown.push([`ตัวคูณขนาด (กลาง)`, `×${sizeMult.toFixed(2)}`]);
-  if(laborMult!==1) breakdown.push([`ตัวคูณแรงงาน (2 คน)`, `×${laborMult.toFixed(2)}`]);
+  const factor = sizeMult * laborMult;
 
-  // ขั้นต่ำ & ปัดเศษ (เฉพาะค่าบริการ)
-  let serviceTotalRaw = Math.round(total);
-  if(serviceTotalRaw < c.minCharge){
-    breakdown.push([`ขั้นต่ำค่าบริการ`, `${currency(c.minCharge)} (แทน ${currency(serviceTotalRaw)})`]);
-    serviceTotalRaw = c.minCharge;
-  }
-  const rounded = roundToStep(serviceTotalRaw, c.roundTo);
-  if(rounded !== serviceTotalRaw){
-    breakdown.push([`ปัดเศษตามนโยบาย`, `${currency(rounded)} (แทน ${currency(serviceTotalRaw)})`]);
-  }
-  const serviceTotal = rounded;
+  // รวมหลังคูณแล้วปัดเป็นจำนวนเต็ม (ให้ตรงกับฟุตเตอร์)
+  const afterMultiRoundedInt = Math.round(preSum * factor);
+  const multiAdj = afterMultiRoundedInt - preSum; // รวมผลคูณ + ปัดทศนิยมเข้าจำนวนเต็ม
 
-  // VAT & grand
+  // ขั้นต่ำ + ปัดตาม step
+  const minAdj = Math.max(0, c.minCharge - afterMultiRoundedInt);
+  const afterMin = afterMultiRoundedInt + minAdj;
+  const roundAdj = Math.max(0, roundToStep(afterMin, c.roundTo) - afterMin);
+  const serviceTotal = afterMin + roundAdj;
+
+  // Breakdown (ฝั่งจอคำนวณ)
+  const breakdown = [
+    ...items.map(x=>[x.label, Math.round(x.amt)]),
+  ];
+  if(factor!==1) breakdown.push([`ตัวคูณขนาด/แรงงาน`, `×${factor.toFixed(2)}`]);
+  if(minAdj>0) breakdown.push([`ขั้นต่ำค่าบริการ`, `+${currency(minAdj)}`]);
+  if(roundAdj>0) breakdown.push([`ปัดเศษตามนโยบาย`, `+${currency(roundAdj)}`]);
+
   const vat = vatYes ? Math.round(serviceTotal * 0.07) : 0;
   const grand = serviceTotal + otherCost - discount + vat;
 
-  // UI
+  // UI อัปเดต
   const gtxt = currency(grand);
   $('#grandLabel').textContent = gtxt;
   $('#grandDock').textContent = gtxt;
   const gs = $('#grandSummary'); if(gs) gs.textContent = gtxt;
-
   $('#breakdownBox').innerHTML = breakdown.map(([k,v])=>{
     const val = (typeof v==='number')? currency(v) : v;
     return `<div class="d-flex justify-content-between"><span>${k}</span><span>${val}</span></div>`;
   }).join('');
 
-  const out = { job, km, roundtrip, stops, waitMin, size, workers, isNight, isRain, isWeekend, serviceTotal, otherCost, discount, vat, grand, breakdown };
-  if(saveDraft){
-    localStorage.setItem('calcDraftPlus', JSON.stringify(out));
-  }
+  const out = {
+    job, km, roundtrip, stops, waitMin, size, workers, isNight, isRain, isWeekend,
+    otherCost, discount, vat, grand,
+    serviceTotal, preSum, factor, multiAdj, minAdj, roundAdj,
+    breakdown,
+    // รายการสำหรับลงตารางบิล (ให้ยอดรวม = serviceTotal)
+    itemsForReceipt: [
+      ...items.map(x=>({desc:x.label, qty:1, unit:'รายการ', price:Math.round(x.amt)})),
+      ...(multiAdj>0 ? [{desc:'ปรับตามตัวคูณ (ขนาด/แรงงาน) & ปัดทศนิยม', qty:1, unit:'ครั้ง', price:multiAdj}] : []),
+      ...(minAdj>0 ? [{desc:'ปรับขั้นต่ำค่าบริการ', qty:1, unit:'ครั้ง', price:minAdj}] : []),
+      ...(roundAdj>0 ? [{desc:'ปรับปัดเศษตามนโยบาย', qty:1, unit:'ครั้ง', price:roundAdj}] : []),
+    ]
+  };
+
+  if(saveDraft){ localStorage.setItem('calcDraftPlus', JSON.stringify(out)); }
   return out;
 }
 
@@ -708,9 +736,7 @@ $('#btnClear').addEventListener('click', ()=>{
   toast('ล้างค่าแล้ว');
 });
 
-$('#btnSaveDraft').addEventListener('click', ()=>{
-  const out = calc(true); if(out) toast('บันทึกฉบับร่างแล้ว');
-});
+$('#btnSaveDraft').addEventListener('click', ()=>{ const out = calc(true); if(out) toast('บันทึกฉบับร่างแล้ว'); });
 $('#btnLoadLast').addEventListener('click', ()=>{
   const d = JSON.parse(localStorage.getItem('calcDraftPlus')||'null');
   if(!d) return toast('ยังไม่มีฉบับร่าง');
@@ -718,11 +744,31 @@ $('#btnLoadLast').addEventListener('click', ()=>{
   $('#stops').value = d.stops; $('#wait').value = d.waitMin; $('#size').value = d.size; $('#workers').value = d.workers;
   $('#night').checked = !!d.isNight; $('#rain').checked = !!d.isRain; $('#weekend').checked = !!d.isWeekend;
   $('#otherCost').value = d.otherCost; $('#discount').value = d.discount; $('#vat').value = d.vat? 'yes':'no';
-  calc();
-  toast('โหลดฉบับร่างแล้ว');
+  calc(); toast('โหลดฉบับร่างแล้ว');
 });
 
 // ===== Receipt =====
+function makeRow({desc, qty=1, unit='รายการ', price=0}){
+  const tr = document.createElement('tr');
+  tr.className = 'rc-row';
+  tr.innerHTML = `
+    <td contenteditable="true" class="rc-desc">${desc}</td>
+    <td class="text-center"><input type="number" class="form-control form-control-sm text-center rc-qty" min="0" step="1" value="${qty}"></td>
+    <td class="text-center"><input class="form-control form-control-sm text-center rc-unit" value="${unit}"></td>
+    <td class="text-end"><input type="number" class="form-control form-control-sm text-end rc-price" min="0" step="1" value="${Math.round(price)}"></td>
+    <td class="text-end"><input type="number" class="form-control form-control-sm text-end rc-amt" min="0" step="1" value="${Math.round(qty*price)}"></td>
+  `;
+  // auto calc when qty/price change
+  const qtyEl = $('.rc-qty', tr);
+  const priceEl = $('.rc-price', tr);
+  const amtEl = $('.rc-amt', tr);
+  function syncAmt(){ amtEl.value = Math.round((+qtyEl.value||0) * (+priceEl.value||0)); recomputeReceiptTotal(); }
+  qtyEl.addEventListener('input', syncAmt);
+  priceEl.addEventListener('input', syncAmt);
+  amtEl.addEventListener('input', ()=> recomputeReceiptTotal());
+  return tr;
+}
+
 function fillReceipt(out){
   // biz
   $('#bizNameView').textContent = $('#biz_name').value.trim() || 'ผู้ให้บริการ';
@@ -731,8 +777,7 @@ function fillReceipt(out){
   $('#bizNoteView').textContent = $('#biz_note').value.trim()||'';
   const logo = $('#biz_logo').value.trim(); const qr = $('#biz_qr').value.trim();
   const logoEl = $('#bizLogoView'); const qrEl = $('#bizQrView');
-  logoEl.crossOrigin = 'anonymous';
-  qrEl.crossOrigin = 'anonymous';
+  logoEl.crossOrigin='anonymous'; qrEl.crossOrigin='anonymous';
   if(logo){ logoEl.src = logo; logoEl.classList.remove('d-none'); } else logoEl.classList.add('d-none');
   if(qr){ qrEl.src = qr; qrEl.classList.remove('d-none'); } else qrEl.classList.add('d-none');
 
@@ -745,15 +790,7 @@ function fillReceipt(out){
 
   // items
   const tbody = $('#rc_items'); tbody.innerHTML='';
-  out.breakdown.forEach(([k,v])=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td contenteditable="true">${k}</td>
-                    <td class="text-end"><input type="number" class="form-control form-control-sm text-end rc-amt" value="${(typeof v==='number')? Math.round(v): ''}" placeholder="${(typeof v==='number')? '' : '0'}"></td>`;
-    tbody.appendChild(tr);
-  });
-  const trSum = document.createElement('tr');
-  trSum.innerHTML = `<td><strong>ค่าบริการรวม</strong></td><td class="text-end"><input type="number" class="form-control form-control-sm text-end rc-amt" value="${Math.round(out.serviceTotal)}"></td>`;
-  tbody.appendChild(trSum);
+  out.itemsForReceipt.forEach(it=> tbody.appendChild(makeRow(it)));
 
   // footer summary
   $('#rc_other').textContent = currency(out.otherCost);
@@ -764,26 +801,18 @@ function fillReceipt(out){
 
   // save history (top 5)
   const history = JSON.parse(localStorage.getItem('receiptHistory')||'[]');
-  const item = {
-    no: $('#inv_no').value,
-    date: $('#inv_date').value,
-    job: out.job,
-    total: out.grand
-  };
-  history.unshift(item);
-  const short = history.slice(0,5);
-  localStorage.setItem('receiptHistory', JSON.stringify(short));
+  history.unshift({ no: $('#inv_no').value, date: $('#inv_date').value, job: out.job, total: out.grand });
+  localStorage.setItem('receiptHistory', JSON.stringify(history.slice(0,5)));
   renderHistory();
-  setTimeout(()=>{
-    $$('#rc_table .rc-amt').forEach(el=> el.addEventListener('input', recomputeReceiptTotal));
-  }, 0);
 }
+
 function recomputeReceiptTotal(){
-  const amts = $$('.rc-amt').map(el=> parseFloat(el.value||0) ).reduce((a,b)=>a+b,0);
+  const rows = $$('#rc_items .rc-row');
+  const sum = rows.map(tr=> +$('.rc-amt', tr).value || 0).reduce((a,b)=>a+b,0);
   const other = parseFloat($('#otherCost').value||0);
   const disc = parseFloat($('#discount').value||0);
-  const vat = ($('#vat').value==='yes')? Math.round(amts*0.07) : 0;
-  const grand = amts + other - disc + vat;
+  const vat = ($('#vat').value==='yes')? Math.round(sum*0.07) : 0;
+  const grand = sum + other - disc + vat;
   $('#rc_other').textContent = currency(other);
   $('#rc_discount').textContent = '-'+currency(disc).replace('฿','฿');
   $('#rc_vat').textContent = currency(vat);
@@ -809,15 +838,14 @@ $('#btnCreateReceipt').addEventListener('click', ()=>{
   toast('สร้างใบเสร็จแล้ว — แก้ไขรายการได้');
 });
 $('#summaryCreate').addEventListener('click', ()=> $('#btnCreateReceipt').click() );
+
 $('#btnAddItem').addEventListener('click', ()=>{
-  const tr = document.createElement('tr');
-  tr.innerHTML = `<td contenteditable="true">รายการเพิ่มเติม</td>
-                  <td class="text-end"><input type="number" class="form-control form-control-sm text-end rc-amt" placeholder="0"></td>`;
+  const tr = makeRow({desc:'รายการเพิ่มเติม', qty:1, unit:'รายการ', price:0});
   $('#rc_items').appendChild(tr);
-  tr.querySelector('.rc-amt').addEventListener('input', recomputeReceiptTotal);
+  recomputeReceiptTotal();
 });
 
-/* === พิมพ์เฉพาะใบเสร็จ (#receipt) === */
+/* พิมพ์เฉพาะใบเสร็จ */
 function printReceiptOnly(){
   document.body.classList.add('print-only-receipt');
   setTimeout(()=> window.print(), 20);
@@ -862,27 +890,16 @@ function toast(msg){
   setTimeout(()=> el.remove(), 2200);
 }
 
-// ===== Export Image Utilities =====
+// ===== Export Image =====
 async function exportNodeAsPNG(node, filename, scale=2){
-  const canvas = await html2canvas(node, {
-    backgroundColor:'#ffffff',
-    scale,
-    useCORS:true,
-    allowTaint:false,
-    imageTimeout:0,
-    logging:false
-  });
+  const canvas = await html2canvas(node, { backgroundColor:'#ffffff', scale, useCORS:true, allowTaint:false, imageTimeout:0, logging:false });
   const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename || 'export.png';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  const a = document.createElement('a'); a.href = url; a.download = filename || 'export.png';
+  document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=> URL.revokeObjectURL(url), 1000);
   toast('บันทึกเป็นรูปภาพแล้ว');
 }
-
 function filename(prefix='BILL'){
   const no = ($('#inv_no').value||'').replace(/\s+/g,'');
   const d = new Date();
@@ -890,13 +907,10 @@ function filename(prefix='BILL'){
   return `${prefix}-${no||stamp}.png`;
 }
 
-// ====== สร้างการ์ดสรุป (ย่อ) สำหรับแชร์ ======
+// แชร์การ์ด (ย่อ)
 function buildShareCard(out){
-  const stage = $('#exportStage');
-  stage.innerHTML = ''; // clear
-  const card = document.createElement('div');
-  card.className = 'share-card';
-  // เตรียมข้อมูล
+  const stage = $('#exportStage'); stage.innerHTML='';
+  const card = document.createElement('div'); card.className = 'share-card';
   const bizName = $('#biz_name').value.trim() || 'ผู้ให้บริการ';
   const bizPhone = $('#biz_phone').value.trim();
   const bizLine = $('#biz_line').value.trim();
@@ -908,8 +922,6 @@ function buildShareCard(out){
   const time = $('#inv_time').value || new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
   const cust = $('#cust_name').value.trim() || '';
   const vat = $('#vat').value==='yes' ? Math.round(out.serviceTotal*0.07) : 0;
-
-  // จำกัดแถว breakdown ไม่ให้ยาวเกิน (เลือก 8 รายการแรก)
   const lines = out.breakdown.slice(0,8);
 
   card.innerHTML = `
@@ -921,10 +933,7 @@ function buildShareCard(out){
           <div class="meta">${bizPhone?`โทร ${bizPhone}`:''}${bizLine?` • LINE ${bizLine}`:''}${addr?` • ${addr}`:''}</div>
         </div>
       </div>
-      <div class="meta text-end">
-        เลขที่บิล: ${invNo}<br>
-        วันที่: ${date} • เวลา: ${time}
-      </div>
+      <div class="meta text-end">เลขที่บิล: ${invNo}<br>วันที่: ${date} • เวลา: ${time}</div>
     </div>
     <div class="title">สรุปบิล — ${out.job}${cust?` • ลูกค้า: ${cust}`:''}</div>
     <div class="list">
@@ -942,25 +951,14 @@ function buildShareCard(out){
       ${qr? `<img id="scQR" class="qr" alt="qr">` : ''}
     </div>
   `;
-  stage.appendChild(card);
-
-  // ใส่รูป (รองรับ CORS)
-  if(logo){
-    const img = $('#scLogo', card);
-    img.crossOrigin = 'anonymous';
-    img.src = logo;
-  }
-  if(qr){
-    const img = $('#scQR', card);
-    img.crossOrigin = 'anonymous';
-    img.src = qr;
-  }
+  $('#exportStage').appendChild(card);
+  if(logo){ const img = $('#scLogo', card); img.crossOrigin='anonymous'; img.src = logo; }
+  if(qr){ const img = $('#scQR', card); img.crossOrigin='anonymous'; img.src = qr; }
   return card;
 }
 
-// ====== ปุ่ม Export ======
+// ปุ่ม Export
 async function ensureReceiptReady(){
-  // ถ้ายังไม่ได้สร้างบิล ให้สร้างจากค่าปัจจุบัน
   const hasPlaceholder = $('#rc_items').children.length===1 &&
     $('#rc_items').children[0].querySelector('.text-muted');
   if(hasPlaceholder){
@@ -968,17 +966,13 @@ async function ensureReceiptReady(){
     if(out) fillReceipt(out);
   }
 }
-
 $('#btnExportReceipt').addEventListener('click', async ()=>{
   await ensureReceiptReady();
-  const node = $('#receipt');
-  await exportNodeAsPNG(node, filename('RECEIPT'));
+  await exportNodeAsPNG($('#receipt'), filename('RECEIPT'));
 });
-
 $('#btnExportSummary').addEventListener('click', async ()=>{
   const out = calc(true); if(!out){ toast('กรอกข้อมูลให้ครบก่อนนะ'); return; }
   const card = buildShareCard(out);
-  // รอให้ภาพโหลด (ถ้า cross-origin ไม่อนุญาต จะยังเรนเดอร์ได้โดยตัดรูปออก)
   await new Promise(r=> setTimeout(r, 200));
   await exportNodeAsPNG(card, filename('SUMMARY'));
 });
@@ -986,11 +980,9 @@ $('#btnExportSummary').addEventListener('click', async ()=>{
 // init
 loadCfg(); loadBiz(); renderHistory();
 $('#inv_no').value = nextInvNo();
-const d0 = now();
+const d0 = new Date();
 $('#inv_date').value = d0.toLocaleDateString('th-TH');
 $('#inv_time').value = d0.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-
-// first calc
 calc(true);
 </script>
 </body>
