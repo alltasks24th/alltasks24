@@ -24,9 +24,6 @@
   .stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
   .header{background:#fff;border-bottom:1px solid var(--border)}
 </style>
-
-<style>.tool-iframe{width:100%;min-height:150vh;border:0;border-radius:12px;background:#fff}</style>
-  
 </head>
 <body>
 <nav class="navbar navbar-light bg-white border-bottom sticky-top">
@@ -52,7 +49,7 @@
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-users"><i class="bi bi-people me-2"></i>ผู้ใช้/บทบาท</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-promos"><i class="bi bi-ticket-perforated me-2"></i>โปรโมชัน</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-banners"><i class="bi bi-images me-2"></i>แบนเนอร์</button>
-      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-pricing"><i class="bi bi-calculator me-2"></i>คำนวณราคา</button>
+
       <!-- ปุ่มเมนูร้านค้า/สินค้า (ใหม่ วางถูกตำแหน่งแล้ว) -->
       <button class="nav-link" id="tab-products-tab" data-bs-toggle="pill" data-bs-target="#tab-products">
         <i class="bi bi-bag me-2"></i>ร้านค้า
@@ -375,16 +372,6 @@
                 <button id="adminSend" class="btn btn-primary">ส่ง</button>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- คำนวณราคา (PRO PLUS) -->
-      <div class="tab-pane fade" id="tab-pricing">
-        <div class="card card-clean p-2">
-          <iframe class="tool-iframe" src="admin-tools/pricing-pro-plus.html" title="คำนวณราคา PRO PLUS" loading="lazy"></iframe>
-          <div class="small text-muted mt-2">
-            ถ้า iframe ไม่แสดง <a href="admin-tools/pricing-pro-plus.html" target="_blank" rel="noopener">เปิดในแท็บใหม่</a>
           </div>
         </div>
       </div>
