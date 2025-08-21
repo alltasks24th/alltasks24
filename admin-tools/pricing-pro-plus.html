@@ -39,11 +39,32 @@
     .table-receipt thead th{background:rgba(109,40,217,.08)}
     [data-theme="dark"] .table-receipt thead th{background:rgba(155,135,255,.09)}
     .toolbar-sticky{position:sticky;top:70px;z-index:10}
+
+    /* ====== แถบสรุปเต็มขอบการ์ด (เดสก์ท็อป) ====== */
+    #summaryBar{
+      position: sticky; bottom: 0; z-index: 5;
+      display: none; /* มือถือใช้ total-dock แทน */
+      align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: .75rem 1rem;
+      /* ชดเชย padding ของการ์ด: p-3 ที่จอเล็ก, p-md-4 ที่จอ >= md */
+      margin-left: -1rem; margin-right: -1rem;        /* สำหรับ p-3 */
+      border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
+    }
+    @media (min-width:768px){
+      #summaryBar{ display:flex; margin-left:-1.5rem; margin-right:-1.5rem; }  /* สำหรับ p-md-4 */
+    }
+
     .total-dock{display:none}
     .logo{max-height:54px;object-fit:contain}
     .qr{max-height:96px}
     @media (max-width: 768px){
-      .total-dock{position:fixed;left:0;right:0;bottom:0;display:flex;gap:.6rem;align-items:center;justify-content:space-between;background:var(--card);border-top:1px solid var(--border);padding:.6rem .9rem;z-index:1040}
+      .total-dock{
+        position:fixed;left:0;right:0;bottom:0;display:flex;gap:.6rem;
+        align-items:center;justify-content:space-between;background:var(--card);
+        border-top:1px solid var(--border);padding:.6rem .9rem;z-index:1040
+      }
     }
     /* Print modes */
     @media print{
@@ -260,6 +281,15 @@
           <button id="btnClear" class="btn btn-outline-secondary">ล้างค่า</button>
           <button id="btnSaveDraft" class="btn btn-outline-primary">บันทึกฉบับร่าง</button>
         </div>
+
+        <!-- แถบสรุปเต็มขอบการ์ด (เดสก์ท็อป) -->
+        <div id="summaryBar" class="no-print mt-3">
+          <div class="fw-bold">รวม: <span id="grandSummary">฿0</span></div>
+          <div class="d-flex gap-2">
+            <button id="summaryCreate" class="btn btn-primary btn-sm">สร้างใบเสร็จ</button>
+            <button id="summaryPrint" class="btn btn-outline-secondary btn-sm">พิมพ์</button>
+          </div>
+        </div>
       </div>
 
       <!-- RECEIPT -->
@@ -368,6 +398,7 @@
   </div>
 </main>
 
+<!-- แถบล่าง (มือถือ) -->
 <div class="total-dock no-print">
   <div class="fw-bold">รวม: <span id="grandDock">฿0</span></div>
   <div class="d-flex gap-2">
@@ -586,8 +617,11 @@ function calc(saveDraft=false){
   const grand = serviceTotal + otherCost - discount + vat;
 
   // UI
-  $('#grandLabel').textContent = currency(grand);
-  $('#grandDock').textContent = currency(grand);
+  const gtxt = currency(grand);
+  $('#grandLabel').textContent = gtxt;
+  $('#grandDock').textContent = gtxt;
+  const gs = $('#grandSummary'); if(gs) gs.textContent = gtxt;
+
   $('#breakdownBox').innerHTML = breakdown.map(([k,v])=>{
     const val = (typeof v==='number')? currency(v) : v;
     return `<div class="d-flex justify-content-between"><span>${k}</span><span>${val}</span></div>`;
@@ -731,6 +765,7 @@ $('#btnCreateReceipt').addEventListener('click', ()=>{
   fillReceipt(out);
   toast('สร้างใบเสร็จแล้ว — แก้ไขรายการได้');
 });
+$('#summaryCreate').addEventListener('click', ()=> $('#btnCreateReceipt').click() );
 $('#btnAddItem').addEventListener('click', ()=>{
   const tr = document.createElement('tr');
   tr.innerHTML = `<td contenteditable="true">รายการเพิ่มเติม</td>
@@ -739,6 +774,7 @@ $('#btnAddItem').addEventListener('click', ()=>{
   tr.querySelector('.rc-amt').addEventListener('input', recomputeReceiptTotal);
 });
 $('#btnPrint').addEventListener('click', ()=> window.print() );
+$('#summaryPrint').addEventListener('click', ()=> window.print() );
 $('#dockPrint').addEventListener('click', ()=> window.print() );
 $('#dockReceipt').addEventListener('click', ()=> $('#btnCreateReceipt').click() );
 
