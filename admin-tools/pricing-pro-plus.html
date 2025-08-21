@@ -66,7 +66,8 @@
         border-top:1px solid var(--border);padding:.6rem .9rem;z-index:1040
       }
     }
-    /* Print modes */
+
+    /* Print modes (ฐาน) */
     @media print{
       .no-print{display:none!important}
       body{background:#fff}
@@ -75,6 +76,22 @@
     body.print-a4 @page { size: A4; margin: 12mm; }
     body.print-a5 @page { size: A5; margin: 10mm; }
     body.print-80mm @page { size: 80mm auto; margin: 5mm; }
+
+    /* === โหมดพิมพ์เฉพาะใบเสร็จ (#receipt) === */
+    @media print{
+      body.print-only-receipt *{
+        visibility: hidden !important;
+      }
+      body.print-only-receipt #receipt,
+      body.print-only-receipt #receipt *{
+        visibility: visible !important;
+      }
+      body.print-only-receipt #receipt{
+        position:absolute; left:0; top:0; width:100%;
+        margin:0; border:0; box-shadow:none;
+      }
+    }
+
     input.is-invalid, select.is-invalid{border-color:#dc3545}
     .history-list .item{border:1px dashed var(--border); border-radius:10px; padding:.5rem .75rem; cursor:pointer}
     .history-list .item:hover{background:rgba(109,40,217,.06)}
@@ -702,7 +719,6 @@ function fillReceipt(out){
   // items
   const tbody = $('#rc_items'); tbody.innerHTML='';
   out.breakdown.forEach(([k,v])=>{
-    const val = (typeof v==='number')? currency(v) : v;
     const tr = document.createElement('tr');
     tr.innerHTML = `<td contenteditable="true">${k}</td>
                     <td class="text-end"><input type="number" class="form-control form-control-sm text-end rc-amt" value="${(typeof v==='number')? Math.round(v): ''}" placeholder="${(typeof v==='number')? '' : '0'}"></td>`;
@@ -773,9 +789,23 @@ $('#btnAddItem').addEventListener('click', ()=>{
   $('#rc_items').appendChild(tr);
   tr.querySelector('.rc-amt').addEventListener('input', recomputeReceiptTotal);
 });
-$('#btnPrint').addEventListener('click', ()=> window.print() );
-$('#summaryPrint').addEventListener('click', ()=> window.print() );
-$('#dockPrint').addEventListener('click', ()=> window.print() );
+
+/* === พิมพ์เฉพาะใบเสร็จ (#receipt) === */
+function printReceiptOnly(){
+  document.body.classList.add('print-only-receipt');
+  setTimeout(()=> window.print(), 20);
+}
+window.addEventListener('afterprint', ()=> document.body.classList.remove('print-only-receipt'));
+const mq = window.matchMedia && window.matchMedia('print');
+if(mq && mq.addEventListener){
+  mq.addEventListener('change', e=>{
+    if(!e.matches) document.body.classList.remove('print-only-receipt');
+  });
+}
+$('#btnPrint').addEventListener('click', printReceiptOnly);
+$('#summaryPrint').addEventListener('click', printReceiptOnly);
+$('#dockPrint').addEventListener('click', printReceiptOnly);
+
 $('#dockReceipt').addEventListener('click', ()=> $('#btnCreateReceipt').click() );
 
 // total dock visibility
@@ -817,3 +847,4 @@ calc(true);
 </script>
 </body>
 </html>
+```0
