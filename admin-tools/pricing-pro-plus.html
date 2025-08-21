@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="th">
 <head>
   <meta charset="utf-8">
@@ -38,75 +39,106 @@
     .table-receipt th, .table-receipt td{padding:.55rem .6rem;vertical-align:top}
     .table-receipt thead th{background:rgba(109,40,217,.08)}
     [data-theme="dark"] .table-receipt thead th{background:rgba(155,135,255,.09)}
-    .toolbar-sticky{position:sticky;top:70px;z-index:10}
+    .toolbar-sticky{position:sticky;top:70px;z-index:10}/* แถบสรุปเต็มขอบ (เดสก์ท็อป) */
+#summaryBar{
+  position: sticky; bottom: 0; z-index: 5; display: none;
+  align-items:center; justify-content:space-between; gap:12px;
+  background:var(--card); border-top:1px solid var(--border);
+  padding:.75rem 1rem; margin-left:-1rem; margin-right:-1rem;
+  border-bottom-left-radius:12px; border-bottom-right-radius:12px;
+}
+@media (min-width:768px){ #summaryBar{display:flex; margin-left:-1.5rem; margin-right:-1.5rem;} }
 
-    /* แถบสรุปเต็มขอบ (เดสก์ท็อป) */
-    #summaryBar{
-      position: sticky; bottom: 0; z-index: 5; display: none;
-      align-items:center; justify-content:space-between; gap:12px;
-      background:var(--card); border-top:1px solid var(--border);
-      padding:.75rem 1rem; margin-left:-1rem; margin-right:-1rem;
-      border-bottom-left-radius:12px; border-bottom-right-radius:12px;
-    }
-    @media (min-width:768px){ #summaryBar{display:flex; margin-left:-1.5rem; margin-right:-1.5rem;} }
+.total-dock{display:none}
+.logo{max-height:54px;object-fit:contain}
+.qr{max-height:96px}
+@media (max-width:768px){
+  .total-dock{
+    position:fixed;left:0;right:0;bottom:0;display:flex;gap:.6rem;
+    align-items:center;justify-content:space-between;background:var(--card);
+    border-top:1px solid var(--border);padding:.6rem .9rem;z-index:1040
+  }
+}
 
-    .total-dock{display:none}
-    .logo{max-height:54px;object-fit:contain}
-    .qr{max-height:96px}
-    @media (max-width:768px){
-      .total-dock{
-        position:fixed;left:0;right:0;bottom:0;display:flex;gap:.6rem;
-        align-items:center;justify-content:space-between;background:var(--card);
-        border-top:1px solid var(--border);padding:.6rem .9rem;z-index:1040
-      }
-    }
+/* Print */
+@media print{
+  .no-print{display:none!important}
+  body{background:#fff}
+  .receipt{box-shadow:none;border-color:#ddd}
+  /* แสดง input/select ให้ดูเป็นข้อความล้วน */
+  input.form-control, select.form-select, textarea.form-control{
+    border:0 !important; background:transparent !important; box-shadow:none !important; padding:0 !important; height:auto !important;
+    -webkit-appearance:none; appearance:none;
+  }
+}
+body.print-a4 @page { size: A4; margin: 12mm; }
+body.print-a5 @page { size: A5; margin: 10mm; }
+body.print-80mm @page { size: 80mm auto; margin: 5mm; }
 
-    /* Print */
-    @media print{
-      .no-print{display:none!important}
-      body{background:#fff}
-      .receipt{box-shadow:none;border-color:#ddd}
-    }
-    body.print-a4 @page { size: A4; margin: 12mm; }
-    body.print-a5 @page { size: A5; margin: 10mm; }
-    body.print-80mm @page { size: 80mm auto; margin: 5mm; }
+/* พิมพ์เฉพาะใบเสร็จ (ฟอร์ม) */
+@media print{
+  body.print-only-receipt *{ visibility: hidden !important; }
+  body.print-only-receipt #receipt,
+  body.print-only-receipt #receipt *{ visibility: visible !important; }
+  body.print-only-receipt #receipt{ position:absolute; left:0; top:0; width:100%; margin:0; border:0; box-shadow:none; }
+}
+/* พิมพ์เฉพาะบิลสะอาด */
+@media print{
+  body.print-only-clean *{ visibility: hidden !important; }
+  body.print-only-clean #exportStage,
+  body.print-only-clean #exportStage *{ visibility: visible !important; }
+  body.print-only-clean #exportStage{ position:absolute; left:0; top:0; width:100%; margin:0; border:0; box-shadow:none; }
+}
 
-    /* พิมพ์เฉพาะใบเสร็จ */
-    @media print{
-      body.print-only-receipt *{ visibility: hidden !important; }
-      body.print-only-receipt #receipt,
-      body.print-only-receipt #receipt *{ visibility: visible !important; }
-      body.print-only-receipt #receipt{ position:absolute; left:0; top:0; width:100%; margin:0; border:0; box-shadow:none; }
-    }
+input.is-invalid, select.is-invalid{border-color:#dc3545}
 
-    input.is-invalid, select.is-invalid{border-color:#dc3545}
+/* Export Card (สรุปเป็นรูป) */
+#exportStage{ position:fixed; left:-200vw; top:0; width:0; height:0; overflow:visible; z-index:-1; }
+.share-card{
+  width:860px; background:#fff; color:#111827;
+  border:1px solid #e5e7eb; border-radius:16px; padding:20px 22px;
+  font-family:'Kanit',system-ui,Arial; line-height:1.4;
+}
+.share-card .head{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+.share-card .brand{display:flex; align-items:center; gap:12px;}
+.share-card .brand img{height:54px; object-fit:contain}
+.share-card .biz{font-weight:700; color:#4c1d95}
+.share-card .meta{font-size:13px; color:#6b7280}
+.share-card .title{font-size:20px; font-weight:700; margin-top:10px; color:#111827}
+.share-card .list{margin-top:10px; border-top:1px dashed #e5e7eb}
+.share-card .row{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #f1f5f9}
+.share-card .row.total{font-size:18px; font-weight:800}
+.share-card .foot{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-top:14px}
+.share-card .qr{height:96px}
 
-    /* Export Card (สรุปเป็นรูป) */
-    #exportStage{ position:fixed; left:-200vw; top:0; width:0; height:0; overflow:visible; z-index:-1; }
-    .share-card{
-      width:860px; background:#fff; color:#111827;
-      border:1px solid #e5e7eb; border-radius:16px; padding:20px 22px;
-      font-family:'Kanit',system-ui,Arial; line-height:1.4;
-    }
-    .share-card .head{display:flex; align-items:center; justify-content:space-between; gap:12px;}
-    .share-card .brand{display:flex; align-items:center; gap:12px;}
-    .share-card .brand img{height:54px; object-fit:contain}
-    .share-card .biz{font-weight:700; color:#4c1d95}
-    .share-card .meta{font-size:13px; color:#6b7280}
-    .share-card .title{font-size:20px; font-weight:700; margin-top:10px; color:#111827}
-    .share-card .list{margin-top:10px; border-top:1px dashed #e5e7eb}
-    .share-card .row{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #f1f5f9}
-    .share-card .row.total{font-size:18px; font-weight:800}
-    .share-card .foot{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-top:14px}
-    .share-card .qr{height:96px}
+/* === บิลสะอาดสำหรับ export/print === */
+.clean-receipt{
+  width:860px; background:#fff; color:#111827;
+  border:1px solid #e5e7eb; border-radius:14px; padding:22px;
+  font-family:'Kanit',system-ui,Arial; line-height:1.45;
+}
+.clean-receipt .head{display:flex;justify-content:space-between;gap:12px}
+.clean-receipt .brand{display:flex;align-items:center;gap:12px}
+.clean-receipt .brand img{height:56px;object-fit:contain}
+.clean-receipt .biz{font-weight:800;color:#4c1d95}
+.clean-receipt .meta{font-size:13px;color:#6b7280}
+.clean-receipt .title{font-size:18px;font-weight:700;margin-top:6px}
+.clean-receipt table{width:100%;border-collapse:collapse;margin-top:10px}
+.clean-receipt th,.clean-receipt td{padding:8px 10px;border-bottom:1px dashed #e5e7eb;vertical-align:top}
+.clean-receipt thead th{background:#f6f7fb;font-weight:700}
+.clean-receipt tfoot th{font-weight:700}
+.clean-receipt .total{font-size:18px;font-weight:800}
+.clean-receipt .foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:12px}
+.clean-receipt .qr{height:96px}
 
-    /* คลังบิล */
-    .mgr-toolbar{display:flex; gap:.5rem; align-items:center}
-    .mgr-list .mgr-item{border:1px dashed var(--border); border-radius:12px; padding:.6rem .75rem; background:var(--card)}
-    .mgr-list .mgr-item:hover{background:rgba(109,40,217,.06)}
-    .mgr-row{display:grid; grid-template-columns: 1.1fr .8fr .8fr .7fr auto; gap:.5rem; align-items:center}
-    .badge-soft{background:rgba(109,40,217,.1); color:#4c1d95; border:1px solid var(--border); padding:.2rem .5rem; border-radius:999px; font-size:.75rem}
-    .mgr-actions .btn{padding:.2rem .45rem}
+/* คลังบิล */
+.mgr-toolbar{display:flex; gap:.5rem; align-items:center}
+.mgr-list .mgr-item{border:1px dashed var(--border); border-radius:12px; padding:.6rem .75rem; background:var(--card)}
+.mgr-list .mgr-item:hover{background:rgba(109,40,217,.06)}
+.mgr-row{display:grid; grid-template-columns: 1.1fr .8fr .8fr .7fr auto; gap:.5rem; align-items:center}
+.badge-soft{background:rgba(109,40,217,.1); color:#4c1d95; border:1px solid var(--border); padding:.2rem .5rem; border-radius:999px; font-size:.75rem}
+.mgr-actions .btn{padding:.2rem .45rem}
+
   </style>
 </head>
 <body class="print-a4">
@@ -123,9 +155,7 @@
       <button id="btnResetAll" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3 me-1"></i>รีเซ็ตทั้งหมด</button>
     </div>
   </div>
-</nav>
-
-<main class="container my-4">
+</nav><main class="container my-4">
   <div class="row g-3">
     <!-- LEFT -->
     <div class="col-lg-5">
@@ -133,340 +163,330 @@
         <div class="d-flex align-items-center justify-content-between mb-2">
           <div><div class="eyebrow mb-1">ตั้งค่าสูตรราคา</div><div class="muted small">ขั้นบันได + ขั้นต่ำ + ปัดเศษ</div></div>
           <span class="pill small">โปรไฟล์สูตร</span>
-        </div>
+        </div><div class="row g-2">
+      <div class="col-12 d-flex gap-2">
+        <input id="cfg_profile_name" class="form-control form-control-sm" placeholder="ชื่อโปรไฟล์สูตร เช่น Economy / Priority">
+        <button id="cfg_profile_save" class="btn btn-sm btn-primary">บันทึก</button>
+        <button id="cfg_profile_load" class="btn btn-sm btn-outline-primary">โหลด</button>
+      </div>
+      <div class="col-12"><select id="cfg_profile_list" class="form-select form-select-sm"></select></div>
+    </div>
 
-        <div class="row g-2">
-          <div class="col-12 d-flex gap-2">
-            <input id="cfg_profile_name" class="form-control form-control-sm" placeholder="ชื่อโปรไฟล์สูตร เช่น Economy / Priority">
-            <button id="cfg_profile_save" class="btn btn-sm btn-primary">บันทึก</button>
-            <button id="cfg_profile_load" class="btn btn-sm btn-outline-primary">โหลด</button>
-          </div>
-          <div class="col-12"><select id="cfg_profile_list" class="form-select form-select-sm"></select></div>
-        </div>
+    <hr>
+    <div class="row g-2">
+      <div class="col-6"><label class="form-label">ฐานในเมือง (บาท)</label><input id="cfg_base" type="number" class="form-control" value="59"></div>
+      <div class="col-6"><label class="form-label">ระยะรวมในฐาน (กม.)</label><input id="cfg_incKm" type="number" class="form-control" value="3"></div>
+      <div class="col-6"><label class="form-label">เกินระยะ/กม. (ชั้น 1)</label><input id="cfg_perKm1" type="number" class="form-control" value="8"></div>
+      <div class="col-6"><label class="form-label">เริ่มชั้น 2 ที่ (กม.)</label><input id="cfg_tier2Start" type="number" class="form-control" value="15"></div>
+      <div class="col-6"><label class="form-label">เกินระยะ/กม. (ชั้น 2)</label><input id="cfg_perKm2" type="number" class="form-control" value="6"></div>
+      <div class="col-6"><label class="form-label">ขั้นต่ำค่าบริการ</label><input id="cfg_minCharge" type="number" class="form-control" value="49"></div>
+      <div class="col-6"><label class="form-label">ค่าจุดแวะ/จุด</label><input id="cfg_stop" type="number" class="form-control" value="10"></div>
+      <div class="col-6"><label class="form-label">รอคิว/ชม.</label><input id="cfg_wait" type="number" class="form-control" value="100"></div>
+      <div class="col-6"><label class="form-label">กลางคืน (บาท)</label><input id="cfg_night" type="number" class="form-control" value="10"></div>
+      <div class="col-6"><label class="form-label">ฝนตก (บาท)</label><input id="cfg_rain" type="number" class="form-control" value="8"></div>
+      <div class="col-6"><label class="form-label">เสาร์–อาทิตย์/นักขัต</label><input id="cfg_weekend" type="number" class="form-control" value="10"></div>
+      <div class="col-6"><label class="form-label">ปัดเศษ (บาท)</label>
+        <select id="cfg_roundTo" class="form-select">
+          <option value="1" selected>ไม่ปัด</option>
+          <option value="5">ปัดขั้นละ 5</option>
+          <option value="10">ปัดขั้นละ 10</option>
+        </select>
+      </div>
+      <div class="col-6"><label class="form-label">คูณขนาด: กลาง</label><input id="cfg_multSize" type="number" class="form-control" step="0.01" value="1.05"></div>
+      <div class="col-6"><label class="form-label">คูณแรงงาน: 2 คน</label><input id="cfg_multLabor" type="number" class="form-control" step="0.01" value="1.30"></div>
+      <div class="col-6"><label class="form-label">เพดานระยะ (กม.)</label><input id="cfg_maxKm" type="number" class="form-control" value="25"></div>
+      <div class="col-6"><label class="form-label">เพดานน้ำหนัก (กก.)</label><input id="cfg_maxW" type="number" class="form-control" value="12"></div>
+    </div>
 
-        <hr>
-        <div class="row g-2">
-          <div class="col-6"><label class="form-label">ฐานในเมือง (บาท)</label><input id="cfg_base" type="number" class="form-control" value="59"></div>
-          <div class="col-6"><label class="form-label">ระยะรวมในฐาน (กม.)</label><input id="cfg_incKm" type="number" class="form-control" value="3"></div>
-          <div class="col-6"><label class="form-label">เกินระยะ/กม. (ชั้น 1)</label><input id="cfg_perKm1" type="number" class="form-control" value="8"></div>
-          <div class="col-6"><label class="form-label">เริ่มชั้น 2 ที่ (กม.)</label><input id="cfg_tier2Start" type="number" class="form-control" value="15"></div>
-          <div class="col-6"><label class="form-label">เกินระยะ/กม. (ชั้น 2)</label><input id="cfg_perKm2" type="number" class="form-control" value="6"></div>
-          <div class="col-6"><label class="form-label">ขั้นต่ำค่าบริการ</label><input id="cfg_minCharge" type="number" class="form-control" value="49"></div>
-          <div class="col-6"><label class="form-label">ค่าจุดแวะ/จุด</label><input id="cfg_stop" type="number" class="form-control" value="10"></div>
-          <div class="col-6"><label class="form-label">รอคิว/ชม.</label><input id="cfg_wait" type="number" class="form-control" value="100"></div>
-          <div class="col-6"><label class="form-label">กลางคืน (บาท)</label><input id="cfg_night" type="number" class="form-control" value="10"></div>
-          <div class="col-6"><label class="form-label">ฝนตก (บาท)</label><input id="cfg_rain" type="number" class="form-control" value="8"></div>
-          <div class="col-6"><label class="form-label">เสาร์–อาทิตย์/นักขัต</label><input id="cfg_weekend" type="number" class="form-control" value="10"></div>
-          <div class="col-6"><label class="form-label">ปัดเศษ (บาท)</label>
-            <select id="cfg_roundTo" class="form-select">
-              <option value="1" selected>ไม่ปัด</option>
-              <option value="5">ปัดขั้นละ 5</option>
-              <option value="10">ปัดขั้นละ 10</option>
-            </select>
-          </div>
-          <div class="col-6"><label class="form-label">คูณขนาด: กลาง</label><input id="cfg_multSize" type="number" class="form-control" step="0.01" value="1.05"></div>
-          <div class="col-6"><label class="form-label">คูณแรงงาน: 2 คน</label><input id="cfg_multLabor" type="number" class="form-control" step="0.01" value="1.30"></div>
-          <div class="col-6"><label class="form-label">เพดานระยะ (กม.)</label><input id="cfg_maxKm" type="number" class="form-control" value="25"></div>
-          <div class="col-6"><label class="form-label">เพดานน้ำหนัก (กก.)</label><input id="cfg_maxW" type="number" class="form-control" value="12"></div>
-        </div>
+    <div class="d-flex gap-2 mt-3">
+      <button id="btnSaveCfg" class="btn btn-primary"><i class="bi bi-save me-1"></i>บันทึกสูตร</button>
+      <button id="btnResetCfg" class="btn btn-outline-primary">รีเซ็ตค่าเริ่มต้น</button>
+    </div>
 
-        <div class="d-flex gap-2 mt-3">
-          <button id="btnSaveCfg" class="btn btn-primary"><i class="bi bi-save me-1"></i>บันทึกสูตร</button>
-          <button id="btnResetCfg" class="btn btn-outline-primary">รีเซ็ตค่าเริ่มต้น</button>
-        </div>
+    <hr class="my-4">
+    <div class="eyebrow mb-2">ข้อมูลร้าน & สื่อ</div>
+    <div class="row g-2">
+      <div class="col-12"><label class="form-label">ชื่อร้าน/ผู้ให้บริการ</label><input id="biz_name" class="form-control" value="alltasks24 — นครสวรรค์"></div>
+      <div class="col-6"><label class="form-label">โทร</label><input id="biz_phone" class="form-control" value="080-000-0000"></div>
+      <div class="col-6"><label class="form-label">LINE/Facebook</label><input id="biz_line" class="form-control" value="@yourline"></div>
+      <div class="col-12"><label class="form-label">ที่อยู่/บันทึกย่อ</label><input id="biz_addr" class="form-control" placeholder="เช่น ตัวเมืองนครสวรรค์"></div>
+      <div class="col-6"><label class="form-label">วิธีชำระเงิน (ค่าเริ่มต้น)</label>
+        <select id="biz_pay" class="form-select">
+          <option value="เงินสด" selected>เงินสด</option>
+          <option value="โอน">โอน</option>
+          <option value="PromptPay">PromptPay</option>
+        </select>
+      </div>
+      <div class="col-6"><label class="form-label">หมายเหตุท้ายใบเสร็จ</label><input id="biz_note" class="form-control" value="ขอบคุณที่ใช้บริการ"></div>
+      <div class="col-6"><label class="form-label">โลโก้ (URL)</label><input id="biz_logo" class="form-control" placeholder="https://..."></div>
+      <div class="col-6"><label class="form-label">QR/พร้อมเพย์ (URL)</label><input id="biz_qr" class="form-control" placeholder="https://..."></div>
+    </div>
+    <div class="d-flex gap-2 mt-3">
+      <button id="btnSaveBiz" class="btn btn-primary"><i class="bi bi-save me-1"></i>บันทึกข้อมูลร้าน</button>
+    </div>
 
-        <hr class="my-4">
-        <div class="eyebrow mb-2">ข้อมูลร้าน & สื่อ</div>
-        <div class="row g-2">
-          <div class="col-12"><label class="form-label">ชื่อร้าน/ผู้ให้บริการ</label><input id="biz_name" class="form-control" value="alltasks24 — นครสวรรค์"></div>
-          <div class="col-6"><label class="form-label">โทร</label><input id="biz_phone" class="form-control" value="080-000-0000"></div>
-          <div class="col-6"><label class="form-label">LINE/Facebook</label><input id="biz_line" class="form-control" value="@yourline"></div>
-          <div class="col-12"><label class="form-label">ที่อยู่/บันทึกย่อ</label><input id="biz_addr" class="form-control" placeholder="เช่น ตัวเมืองนครสวรรค์"></div>
-          <div class="col-6"><label class="form-label">วิธีชำระเงิน (ค่าเริ่มต้น)</label>
-            <select id="biz_pay" class="form-select">
-              <option value="เงินสด" selected>เงินสด</option>
-              <option value="โอน">โอน</option>
-              <option value="PromptPay">PromptPay</option>
-            </select>
-          </div>
-          <div class="col-6"><label class="form-label">หมายเหตุท้ายใบเสร็จ</label><input id="biz_note" class="form-control" value="ขอบคุณที่ใช้บริการ"></div>
-          <div class="col-6"><label class="form-label">โลโก้ (URL)</label><input id="biz_logo" class="form-control" placeholder="https://..."></div>
-          <div class="col-6"><label class="form-label">QR/พร้อมเพย์ (URL)</label><input id="biz_qr" class="form-control" placeholder="https://..."></div>
-        </div>
-        <div class="d-flex gap-2 mt-3">
-          <button id="btnSaveBiz" class="btn btn-primary"><i class="bi bi-save me-1"></i>บันทึกข้อมูลร้าน</button>
-        </div>
+    <hr class="my-4">
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="eyebrow">คลังบิล/ใบเสร็จ</div>
+      <span class="pill small">จัดการ, ค้นหา, ลบ</span>
+    </div>
+    <div class="mgr-toolbar my-2">
+      <input id="invSearch" class="form-control form-control-sm" placeholder="ค้นหา (ลูกค้า/เลขบิล/งาน)">
+      <select id="invFilter" class="form-select form-select-sm" style="width:auto">
+        <option value="all">ทั้งหมด</option>
+        <option value="paid">ชำระแล้ว</option>
+        <option value="unpaid">ค้างชำระ</option>
+      </select>
+    </div>
+    <div id="invList" class="mgr-list vstack gap-2"></div>
+  </div>
+</div>
 
-        <hr class="my-4">
-        <div class="d-flex align-items-center justify-content-between">
-          <div class="eyebrow">คลังบิล/ใบเสร็จ</div>
-          <span class="pill small">จัดการ, ค้นหา, ลบ</span>
-        </div>
-        <div class="mgr-toolbar my-2">
-          <input id="invSearch" class="form-control form-control-sm" placeholder="ค้นหา (ลูกค้า/เลขบิล/งาน)">
-          <select id="invFilter" class="form-select form-select-sm" style="width:auto">
-            <option value="all">ทั้งหมด</option>
-            <option value="paid">ชำระแล้ว</option>
-            <option value="unpaid">ค้างชำระ</option>
-          </select>
-        </div>
-        <div id="invList" class="mgr-list vstack gap-2"></div>
+<!-- RIGHT -->
+<div class="col-lg-7">
+  <div class="card-clean p-3 p-md-4 toolbar-sticky">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <div>
+        <div class="eyebrow mb-1">คำนวณราคา</div>
+        <div class="muted small">พิมพ์ประเภทงานเอง + ระยะทางไป-กลับ + ปัดเศษ + ขั้นต่ำ</div>
+      </div>
+      <div class="d-flex gap-2">
+        <button id="btnLoadLast" class="btn btn-sm btn-outline-secondary">โหลดครั้งล่าสุด</button>
+        <button id="btnCopySummary" class="btn btn-sm btn-outline-primary"><i class="bi bi-clipboard-check me-1"></i>คัดลอกสรุป</button>
       </div>
     </div>
 
-    <!-- RIGHT -->
-    <div class="col-lg-7">
-      <div class="card-clean p-3 p-md-4 toolbar-sticky">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-          <div>
-            <div class="eyebrow mb-1">คำนวณราคา</div>
-            <div class="muted small">พิมพ์ประเภทงานเอง + ระยะทางไป-กลับ + ปัดเศษ + ขั้นต่ำ</div>
-          </div>
-          <div class="d-flex gap-2">
-            <button id="btnLoadLast" class="btn btn-sm btn-outline-secondary">โหลดครั้งล่าสุด</button>
-            <button id="btnCopySummary" class="btn btn-sm btn-outline-primary"><i class="bi bi-clipboard-check me-1"></i>คัดลอกสรุป</button>
-          </div>
-        </div>
-
-        <div class="row g-3">
-          <div class="col-md-7">
-            <label class="form-label">ประเภทงาน (พิมพ์เอง)</label>
-            <input id="jobName" class="form-control" placeholder="เช่น ฝากซื้อของ/ส่งพัสดุ/เอกสาร">
-          </div>
-          <div class="col-md-5">
-            <label class="form-label">ค่าสินค้าตามจริง (ถ้ามี)</label>
-            <input id="otherCost" type="number" class="form-control" min="0" step="1" value="0">
-          </div>
-
-          <div class="col-md-3">
-            <label class="form-label">ระยะทาง (กม.)</label>
-            <input id="km" type="number" class="form-control" min="0" step="0.1" placeholder="เช่น 7.5">
-            <div class="form-help"><a id="openMaps" href="#" target="_blank">วัดระยะบน Google Maps</a></div>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">ไป-กลับ?</label>
-            <select id="roundtrip" class="form-select">
-              <option value="no" selected>เที่ยวเดียว</option>
-              <option value="yes">ไป-กลับ (×2 ระยะ)</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">จุดแวะ (จุด)</label>
-            <input id="stops" type="number" class="form-control" min="0" step="1" value="0">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">รอคิว (นาที)</label>
-            <input id="wait" type="number" class="form-control" min="0" step="5" value="0">
-            <div class="form-help">ปัดขึ้นทุก 15 นาที</div>
-          </div>
-
-          <div class="col-md-3">
-            <label class="form-label">ขนาด</label>
-            <select id="size" class="form-select">
-              <option value="small" selected>เล็ก (≤5 กก.)</option>
-              <option value="medium">กลาง (≤10–12 กก.)</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">คนทำงาน</label>
-            <select id="workers" class="form-select">
-              <option value="1" selected>1 คน</option>
-              <option value="2">2 คน</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label d-block">เงื่อนไข</label>
-            <div class="form-check form-check-inline">
-              <input id="night" class="form-check-input" type="checkbox"><label class="form-check-label" for="night">กลางคืน</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input id="rain" class="form-check-input" type="checkbox"><label class="form-check-label" for="rain">ฝนตก</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input id="weekend" class="form-check-input" type="checkbox"><label class="form-check-label" for="weekend">เสาร์–อาทิตย์/นักขัต</label>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">ส่วนลด (บาท)</label>
-            <input id="discount" type="number" class="form-control" min="0" step="1" value="0">
-          </div>
-
-          <div class="col-md-3">
-            <label class="form-label">VAT</label>
-            <select id="vat" class="form-select">
-              <option value="no" selected>ไม่คิด VAT</option>
-              <option value="yes">คิด VAT 7%</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="alertBox" class="alert alert-warning d-none mt-3 mb-0"></div>
-
-        <div id="resultBox" class="mt-3">
-          <div class="result-big fw-bold" id="grandLabel">฿0</div>
-          <div class="list-breakdown mt-2 small" id="breakdownBox"></div>
-          <div class="small-note mt-2">* ราคาโดยประมาณ อาจเปลี่ยนตามระยะจริง/สภาพจราจร/อากาศ</div>
-        </div>
-
-        <div class="d-flex gap-2 mt-3">
-          <button id="btnCreateReceipt" class="btn btn-primary"><i class="bi bi-receipt me-1"></i>สร้างใบเสร็จ</button>
-          <button id="btnClear" class="btn btn-outline-secondary">ล้างค่า</button>
-          <button id="btnSaveDraft" class="btn btn-outline-primary">บันทึกฉบับร่าง</button>
-        </div>
-
-        <div id="summaryBar" class="no-print mt-3">
-          <div class="fw-bold">รวม: <span id="grandSummary">฿0</span></div>
-          <div class="d-flex gap-2">
-            <button id="summaryCreate" class="btn btn-primary btn-sm">สร้างใบเสร็จ</button>
-            <button id="summaryPrint" class="btn btn-outline-secondary btn-sm">พิมพ์</button>
-          </div>
-        </div>
+    <div class="row g-3">
+      <div class="col-md-7">
+        <label class="form-label">ประเภทงาน (พิมพ์เอง)</label>
+        <input id="jobName" class="form-control" placeholder="เช่น ฝากซื้อของ/ส่งพัสดุ/เอกสาร">
+      </div>
+      <div class="col-md-5">
+        <label class="form-label">ค่าสินค้าตามจริง (ถ้ามี)</label>
+        <input id="otherCost" type="number" class="form-control" min="0" step="1" value="0">
       </div>
 
-      <!-- RECEIPT -->
-      <div class="card-clean p-3 p-md-4 mt-3">
-        <div class="d-flex align-items-center justify-content-between">
-          <div class="eyebrow">ใบเสร็จ/บิล</div>
-          <div class="d-flex gap-2 no-print">
-            <button id="btnAddItem" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>เพิ่มบรรทัด</button>
-            <button id="btnSaveInvoice" class="btn btn-sm btn-success"><i class="bi bi-save2 me-1"></i>บันทึก/อัปเดตบิล</button>
-            <button id="btnNewInvoice" class="btn btn-sm btn-outline-secondary"><i class="bi bi-file-earmark-plus me-1"></i>สร้างใหม่</button>
-            <button id="btnExportSummary" class="btn btn-sm btn-outline-secondary"><i class="bi bi-image me-1"></i>บันทึกภาพสรุป</button>
-            <button id="btnExportReceipt" class="btn btn-sm btn-outline-secondary"><i class="bi bi-card-image me-1"></i>บันทึกภาพบิล</button>
-            <button id="btnPrint" class="btn btn-sm btn-primary"><i class="bi bi-printer me-1"></i>พิมพ์/PDF</button>
-          </div>
+      <div class="col-md-3">
+        <label class="form-label">ระยะทาง (กม.)</label>
+        <input id="km" type="number" class="form-control" min="0" step="0.1" placeholder="เช่น 7.5">
+        <div class="form-help"><a id="openMaps" href="#" target="_blank">วัดระยะบน Google Maps</a></div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">ไป-กลับ?</label>
+        <select id="roundtrip" class="form-select">
+          <option value="no" selected>เที่ยวเดียว</option>
+          <option value="yes">ไป-กลับ (×2 ระยะ)</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">จุดแวะ (จุด)</label>
+        <input id="stops" type="number" class="form-control" min="0" step="1" value="0">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">รอคิว (นาที)</label>
+        <input id="wait" type="number" class="form-control" min="0" step="5" value="0">
+        <div class="form-help">ปัดขึ้นทุก 15 นาที</div>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">ขนาด</label>
+        <select id="size" class="form-select">
+          <option value="small" selected>เล็ก (≤5 กก.)</option>
+          <option value="medium">กลาง (≤10–12 กก.)</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">คนทำงาน</label>
+        <select id="workers" class="form-select">
+          <option value="1" selected>1 คน</option>
+          <option value="2">2 คน</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label d-block">เงื่อนไข</label>
+        <div class="form-check form-check-inline">
+          <input id="night" class="form-check-input" type="checkbox"><label class="form-check-label" for="night">กลางคืน</label>
         </div>
+        <div class="form-check form-check-inline">
+          <input id="rain" class="form-check-input" type="checkbox"><label class="form-check-label" for="rain">ฝนตก</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input id="weekend" class="form-check-input" type="checkbox"><label class="form-check-label" for="weekend">เสาร์–อาทิตย์/นักขัต</label>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">ส่วนลด (บาท)</label>
+        <input id="discount" type="number" class="form-control" min="0" step="1" value="0">
+      </div>
 
-        <section id="receipt" class="receipt p-3 p-md-4 mt-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="d-flex align-items-center gap-2">
-              <img id="bizLogoView" class="logo d-none" alt="logo">
-              <div>
-                <div class="h-title fw-bold">ใบเสร็จ/บิลรับงาน</div>
-                <div class="small muted">สร้างจากเครื่องมือคำนวณราคา</div>
-              </div>
-            </div>
-            <div class="text-end">
-              <div class="fw-semibold" id="bizNameView">alltasks24 — นครสวรรค์</div>
-              <div class="small" id="bizContactView">โทร 080-000-0000 • LINE @yourline</div>
-              <div class="small" id="bizAddrView"></div>
-            </div>
-          </div>
+      <div class="col-md-3">
+        <label class="form-label">VAT</label>
+        <select id="vat" class="form-select">
+          <option value="no" selected>ไม่คิด VAT</option>
+          <option value="yes">คิด VAT 7%</option>
+        </select>
+      </div>
+    </div>
 
-          <div class="row g-2 mt-2">
-            <div class="col-md-6">
-              <div class="small muted">ลูกค้า</div>
-              <input id="cust_name" class="form-control form-control-sm" placeholder="ชื่อลูกค้า/หน่วยงาน">
-            </div>
-            <div class="col-md-3">
-              <div class="small muted">เบอร์โทร</div>
-              <input id="cust_phone" class="form-control form-control-sm" placeholder="080-xxx-xxxx">
-            </div>
-            <div class="col-md-3">
-              <div class="small muted">เลขที่ใบเสร็จ</div>
-              <input id="inv_no" class="form-control form-control-sm" readonly>
-            </div>
-          </div>
+    <div id="alertBox" class="alert alert-warning d-none mt-3 mb-0"></div>
 
-          <div class="row g-2 mt-1">
-            <div class="col-md-6">
-              <div class="small muted">ที่อยู่ลูกค้า</div>
-              <input id="cust_addr" class="form-control form-control-sm" placeholder="ที่อยู่สำหรับใบเสร็จ">
-            </div>
-            <div class="col-md-3">
-              <div class="small muted">เลขผู้เสียภาษี</div>
-              <input id="cust_taxid" class="form-control form-control-sm" placeholder="(ถ้ามี)">
-            </div>
-            <div class="col-md-3">
-              <div class="small muted">วันที่/เวลา</div>
-              <div class="d-flex gap-1">
-                <input id="inv_date" class="form-control form-control-sm">
-                <input id="inv_time" class="form-control form-control-sm">
-              </div>
-            </div>
-          </div>
+    <div id="resultBox" class="mt-3">
+      <div class="result-big fw-bold" id="grandLabel">฿0</div>
+      <div class="list-breakdown mt-2 small" id="breakdownBox"></div>
+      <div class="small-note mt-2">* ราคาโดยประมาณ อาจเปลี่ยนตามระยะจริง/สภาพจราจร/อากาศ</div>
+    </div>
 
-          <div class="row g-2 mt-1">
-            <div class="col-md-9">
-              <div class="small muted">งาน/รายละเอียด</div>
-              <input id="inv_job" class="form-control form-control-sm" placeholder="เช่น ฝากซื้อของ/ส่งพัสดุ">
-            </div>
-            <div class="col-md-3">
-              <div class="small muted">หมายเหตุในบิล</div>
-              <input id="inv_note" class="form-control form-control-sm" placeholder="(ถ้ามี)">
-            </div>
-          </div>
+    <div class="d-flex gap-2 mt-3">
+      <button id="btnCreateReceipt" class="btn btn-primary"><i class="bi bi-receipt me-1"></i>สร้างใบเสร็จ</button>
+      <button id="btnClear" class="btn btn-outline-secondary">ล้างค่า</button>
+      <button id="btnSaveDraft" class="btn btn-outline-primary">บันทึกฉบับร่าง</button>
+    </div>
 
-          <div class="table-responsive mt-3">
-            <table class="table table-receipt align-middle" id="rc_table">
-              <thead>
-                <tr>
-                  <th style="width:45%">รายการ</th>
-                  <th class="text-center" style="width:10%">จำนวน</th>
-                  <th class="text-center" style="width:12%">หน่วย</th>
-                  <th class="text-end" style="width:16%">ราคา/หน่วย</th>
-                  <th class="text-end" style="width:17%">จำนวนเงิน</th>
-                </tr>
-              </thead>
-              <tbody id="rc_items">
-                <tr><td class="text-muted" colspan="5">— กด “สร้างใบเสร็จ” เพื่อใส่รายการอัตโนมัติ หรือ “เพิ่มบรรทัด” เพื่อใส่เอง —</td></tr>
-              </tbody>
-              <tfoot>
-                <tr><th class="text-end" colspan="4">ค่าสินค้าตามจริง</th><th class="text-end" id="rc_other">฿0</th></tr>
-                <tr><th class="text-end" colspan="4">ส่วนลด</th><th class="text-end" id="rc_discount">฿0</th></tr>
-                <tr><th class="text-end" colspan="4">Vat 7%</th><th class="text-end" id="rc_vat">฿0</th></tr>
-                <tr><th class="text-end" colspan="4">รวมทั้งสิ้น</th><th class="text-end" id="rc_total" style="font-size:1.2rem">฿0</th></tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <div class="row g-2 mt-2">
-            <div class="col-md-3">
-              <div class="small muted">วิธีชำระเงิน</div>
-              <input id="pay_method" class="form-control form-control-sm" value="เงินสด">
-            </div>
-            <div class="col-md-3">
-              <div class="small muted">สถานะ</div>
-              <select id="pay_status" class="form-select form-select-sm">
-                <option value="ค้างชำระ">ค้างชำระ</option>
-                <option value="ชำระแล้ว" selected>ชำระแล้ว</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <div class="small muted">เลขอ้างอิงชำระ</div>
-              <input id="pay_ref" class="form-control form-control-sm" placeholder="เช่น TX1234">
-            </div>
-            <div class="col-md-3">
-              <div class="small muted">กำหนดชำระ (ถ้ามี)</div>
-              <input id="pay_due" type="date" class="form-control form-control-sm">
-            </div>
-          </div>
-
-          <div class="d-flex justify-content-between align-items-end mt-3">
-            <div class="small muted" id="bizNoteView">ขอบคุณที่ใช้บริการ</div>
-            <img id="bizQrView" class="qr d-none" alt="qr">
-          </div>
-        </section>
+    <div id="summaryBar" class="no-print mt-3">
+      <div class="fw-bold">รวม: <span id="grandSummary">฿0</span></div>
+      <div class="d-flex gap-2">
+        <button id="summaryCreate" class="btn btn-primary btn-sm">สร้างใบเสร็จ</button>
+        <button id="summaryPrint" class="btn btn-outline-secondary btn-sm">พิมพ์</button>
       </div>
     </div>
   </div>
-</main>
 
-<!-- เวทีเรนเดอร์การ์ด (ซ่อน) -->
-<div id="exportStage" class="no-print"></div>
+  <!-- RECEIPT -->
+  <div class="card-clean p-3 p-md-4 mt-3">
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="eyebrow">ใบเสร็จ/บิล</div>
+      <div class="d-flex gap-2 no-print">
+        <button id="btnAddItem" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>เพิ่มบรรทัด</button>
+        <button id="btnSaveInvoice" class="btn btn-sm btn-success"><i class="bi bi-save2 me-1"></i>บันทึก/อัปเดตบิล</button>
+        <button id="btnNewInvoice" class="btn btn-sm btn-outline-secondary"><i class="bi bi-file-earmark-plus me-1"></i>สร้างใหม่</button>
+        <button id="btnExportSummary" class="btn btn-sm btn-outline-secondary"><i class="bi bi-image me-1"></i>บันทึกภาพสรุป</button>
+        <button id="btnExportReceiptClean" class="btn btn-sm btn-outline-secondary"><i class="bi bi-file-image me-1"></i>บันทึกภาพบิล (สะอาด)</button>
+        <button id="btnExportReceipt" class="btn btn-sm btn-outline-secondary"><i class="bi bi-card-image me-1"></i>บันทึกภาพบิล (แบบฟอร์ม)</button>
+        <button id="btnPrint" class="btn btn-sm btn-primary"><i class="bi bi-printer me-1"></i>พิมพ์/PDF</button>
+      </div>
+    </div>
 
-<!-- แถบล่าง (มือถือ) -->
-<div class="total-dock no-print">
+    <section id="receipt" class="receipt p-3 p-md-4 mt-3">
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="d-flex align-items-center gap-2">
+          <img id="bizLogoView" class="logo d-none" alt="logo">
+          <div>
+            <div class="h-title fw-bold">ใบเสร็จ/บิลรับงาน</div>
+            <div class="small muted">สร้างจากเครื่องมือคำนวณราคา</div>
+          </div>
+        </div>
+        <div class="text-end">
+          <div class="fw-semibold" id="bizNameView">alltasks24 — นครสวรรค์</div>
+          <div class="small" id="bizContactView">โทร 080-000-0000 • LINE @yourline</div>
+          <div class="small" id="bizAddrView"></div>
+        </div>
+      </div>
+
+      <div class="row g-2 mt-2">
+        <div class="col-md-6">
+          <div class="small muted">ลูกค้า</div>
+          <input id="cust_name" class="form-control form-control-sm" placeholder="ชื่อลูกค้า/หน่วยงาน">
+        </div>
+        <div class="col-md-3">
+          <div class="small muted">เบอร์โทร</div>
+          <input id="cust_phone" class="form-control form-control-sm" placeholder="080-xxx-xxxx">
+        </div>
+        <div class="col-md-3">
+          <div class="small muted">เลขที่ใบเสร็จ</div>
+          <input id="inv_no" class="form-control form-control-sm" readonly>
+        </div>
+      </div>
+
+      <div class="row g-2 mt-1">
+        <div class="col-md-6">
+          <div class="small muted">ที่อยู่ลูกค้า</div>
+          <input id="cust_addr" class="form-control form-control-sm" placeholder="ที่อยู่สำหรับใบเสร็จ">
+        </div>
+        <div class="col-md-3">
+          <div class="small muted">เลขผู้เสียภาษี</div>
+          <input id="cust_taxid" class="form-control form-control-sm" placeholder="(ถ้ามี)">
+        </div>
+        <div class="col-md-3">
+          <div class="small muted">วันที่/เวลา</div>
+          <div class="d-flex gap-1">
+            <input id="inv_date" class="form-control form-control-sm">
+            <input id="inv_time" class="form-control form-control-sm">
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-2 mt-1">
+        <div class="col-md-9">
+          <div class="small muted">งาน/รายละเอียด</div>
+          <input id="inv_job" class="form-control form-control-sm" placeholder="เช่น ฝากซื้อของ/ส่งพัสดุ">
+        </div>
+        <div class="col-md-3">
+          <div class="small muted">หมายเหตุในบิล</div>
+          <input id="inv_note" class="form-control form-control-sm" placeholder="(ถ้ามี)">
+        </div>
+      </div>
+
+      <div class="table-responsive mt-3">
+        <table class="table table-receipt align-middle" id="rc_table">
+          <thead>
+            <tr>
+              <th style="width:45%">รายการ</th>
+              <th class="text-center" style="width:10%">จำนวน</th>
+              <th class="text-center" style="width:12%">หน่วย</th>
+              <th class="text-end" style="width:16%">ราคา/หน่วย</th>
+              <th class="text-end" style="width:17%">จำนวนเงิน</th>
+            </tr>
+          </thead>
+          <tbody id="rc_items">
+            <tr><td class="text-muted" colspan="5">— กด “สร้างใบเสร็จ” เพื่อใส่รายการอัตโนมัติ หรือ “เพิ่มบรรทัด” เพื่อใส่เอง —</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><th class="text-end" colspan="4">ค่าสินค้าตามจริง</th><th class="text-end" id="rc_other">฿0</th></tr>
+            <tr><th class="text-end" colspan="4">ส่วนลด</th><th class="text-end" id="rc_discount">฿0</th></tr>
+            <tr><th class="text-end" colspan="4">Vat 7%</th><th class="text-end" id="rc_vat">฿0</th></tr>
+            <tr><th class="text-end" colspan="4">รวมทั้งสิ้น</th><th class="text-end" id="rc_total" style="font-size:1.2rem">฿0</th></tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="row g-2 mt-2">
+        <div class="col-md-3">
+          <div class="small muted">วิธีชำระเงิน</div>
+          <input id="pay_method" class="form-control form-control-sm" value="เงินสด">
+        </div>
+        <div class="col-md-3">
+          <div class="small muted">สถานะ</div>
+          <select id="pay_status" class="form-select form-select-sm">
+            <option value="ค้างชำระ">ค้างชำระ</option>
+            <option value="ชำระแล้ว" selected>ชำระแล้ว</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <div class="small muted">เลขอ้างอิงชำระ</div>
+          <input id="pay_ref" class="form-control form-control-sm" placeholder="เช่น TX1234">
+        </div>
+        <div class="col-md-3">
+          <div class="small muted">กำหนดชำระ (ถ้ามี)</div>
+          <input id="pay_due" type="date" class="form-control form-control-sm">
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-end mt-3">
+        <div class="small muted" id="bizNoteView">ขอบคุณที่ใช้บริการ</div>
+        <img id="bizQrView" class="qr d-none" alt="qr">
+      </div>
+    </section>
+  </div>
+</div>
+
+  </div>
+</main><!-- เวทีเรนเดอร์ (ซ่อน/ใช้ export & print clean) --><div id="exportStage" class="no-print"></div><!-- แถบล่าง (มือถือ) --><div class="total-dock no-print">
   <div class="fw-bold">รวม: <span id="grandDock">฿0</span></div>
   <div class="d-flex gap-2">
     <button id="dockReceipt" class="btn btn-primary btn-sm">สร้างใบเสร็จ</button>
     <button id="dockPrint" class="btn btn-outline-primary btn-sm">พิมพ์</button>
   </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
-<script>
+</div><script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script><script>
 // ===== Helpers =====
 const $ = (s, r=document)=>r.querySelector(s);
 const $$ = (s, r=document)=>[...r.querySelectorAll(s)];
@@ -517,13 +537,11 @@ const cfgEls = {
   stop: $('#cfg_stop'), wait: $('#cfg_wait'),
   night: $('#cfg_night'), rain: $('#cfg_rain'), weekend: $('#cfg_weekend'),
   roundTo: $('#cfg_roundTo'), multSize: $('#cfg_multSize'), multLabor: $('#cfg_multLabor'),
-  maxKm: $('#cfg_maxKm'), maxW: $('#cfg_maxW')
+  maxKm: $('#cfg_maxKm'), maxW: $('#cfg_maxW']
 };
 function readCfg(){
   const o = {};
-  cfgKeys.forEach(k=>{
-    o[k] = (k==='roundTo') ? parseFloat(cfgEls[k].value||1) : parseFloat(cfgEls[k].value||0);
-  });
+  cfgKeys.forEach(k=>{ o[k] = (k==='roundTo') ? parseFloat(cfgEls[k].value||1) : parseFloat(cfgEls[k].value||0); });
   return o;
 }
 function writeCfg(obj){ cfgKeys.forEach(k=>{ if(obj[k]!=null) cfgEls[k].value = obj[k]; }); }
@@ -811,7 +829,7 @@ function startNewInvoiceFromCalc(out){
   $('#pay_method').value = $('#biz_pay').value;
 }
 
-// ====== Export Image =====
+// ====== Export Image helpers =====
 async function exportNodeAsPNG(node, filename, scale=2){
   const canvas = await html2canvas(node, { backgroundColor:'#ffffff', scale, useCORS:true, allowTaint:false, imageTimeout:0, logging:false });
   const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
@@ -827,7 +845,83 @@ function filename(prefix='BILL'){
   const stamp = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
   return `${prefix}-${no||stamp}.png`;
 }
-// สรุปแบบการ์ด
+
+// ====== บิลสะอาด (Clean Receipt) ======
+function buildCleanReceipt(inv){
+  const stage = $('#exportStage'); stage.innerHTML='';
+  const el = document.createElement('div'); el.className='clean-receipt';
+
+  const logo = ($('#biz_logo').value||'').trim();
+  const qr   = ($('#biz_qr').value||'').trim();
+  const biz  = ($('#biz_name').value||'ผู้ให้บริการ').trim();
+  const phone= ($('#biz_phone').value||'').trim();
+  const line = ($('#biz_line').value||'').trim();
+  const addr = ($('#biz_addr').value||'').trim();
+
+  const itemsHtml = (inv.items||[]).map(it=>`
+    <tr>
+      <td>${it.desc||''}</td>
+      <td class="text-center">${it.qty||1}</td>
+      <td class="text-center">${it.unit||''}</td>
+      <td class="text-end">${(it.price||0).toLocaleString('th-TH')}</td>
+      <td class="text-end">${(it.amount||0).toLocaleString('th-TH')}</td>
+    </tr>`).join('');
+
+  el.innerHTML = `
+    <div class="head">
+      <div class="brand">
+        ${logo?`<img id="crLogo" alt="logo">`:''}
+        <div>
+          <div class="biz">${biz}</div>
+          <div class="meta">${phone?`โทร ${phone}`:''}${line?` • LINE ${line}`:''}${addr?` • ${addr}`:''}</div>
+        </div>
+      </div>
+      <div class="meta text-end">เลขที่: ${inv.invNo||''}<br>วันที่: ${inv.date||''} • เวลา: ${inv.time||''}</div>
+    </div>
+
+    <div class="title">ใบเสร็จ/บิลรับงาน — ${inv.job||''}</div>
+
+    <table>
+      <tbody>
+        <tr><td style="width:20%;">ลูกค้า</td><td>${inv.cust?.name||'-'}</td></tr>
+        <tr><td>เบอร์</td><td>${inv.cust?.phone||'-'}</td></tr>
+        ${inv.cust?.addr?`<tr><td>ที่อยู่</td><td>${inv.cust.addr}</td></tr>`:''}
+        ${inv.cust?.taxid?`<tr><td>เลขผู้เสียภาษี</td><td>${inv.cust.taxid}</td></tr>`:''}
+        ${inv.note?`<tr><td>หมายเหตุ</td><td>${inv.note}</td></tr>`:''}
+      </tbody>
+    </table>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:45%">รายการ</th>
+          <th class="text-center" style="width:10%">จำนวน</th>
+          <th class="text-center" style="width:12%">หน่วย</th>
+          <th class="text-end" style="width:16%">ราคา/หน่วย</th>
+          <th class="text-end" style="width:17%">จำนวนเงิน</th>
+        </tr>
+      </thead>
+      <tbody>${itemsHtml}</tbody>
+      <tfoot>
+        <tr><th class="text-end" colspan="4">ค่าสินค้าตามจริง</th><th class="text-end">฿${(inv.otherCost||0).toLocaleString('th-TH')}</th></tr>
+        <tr><th class="text-end" colspan="4">ส่วนลด</th><th class="text-end">-฿${(inv.discount||0).toLocaleString('th-TH')}</th></tr>
+        ${inv.vat?`<tr><th class="text-end" colspan="4">Vat 7%</th><th class="text-end">฿${(inv.vat||0).toLocaleString('th-TH')}</th></tr>`:''}
+        <tr><th class="text-end total" colspan="4">รวมทั้งสิ้น</th><th class="text-end total">฿${(inv.grand||0).toLocaleString('th-TH')}</th></tr>
+      </tfoot>
+    </table>
+
+    <div class="foot">
+      <div class="meta">วิธีชำระเงิน: ${inv.pay?.method||'-'} • สถานะ: ${inv.pay?.status||'-'}${inv.pay?.ref?` • อ้างอิง: ${inv.pay.ref}`:''}${inv.pay?.due?` • กำหนด: ${inv.pay.due}`:''}</div>
+      ${qr?`<img id="crQR" class="qr" alt="qr">`:''}
+    </div>
+  `;
+  stage.appendChild(el);
+  if(logo){ const L=el.querySelector('#crLogo'); L.crossOrigin='anonymous'; L.src=logo; }
+  if(qr){ const Q=el.querySelector('#crQR'); Q.crossOrigin='anonymous'; Q.src=qr; }
+  return el;
+}
+
+// ===== Summary Card (share) =====
 function buildShareCardFromInvoice(inv){
   const stage = $('#exportStage'); stage.innerHTML='';
   const card = document.createElement('div'); card.className = 'share-card';
@@ -851,11 +945,11 @@ function buildShareCardFromInvoice(inv){
     </div>
     <div class="title">สรุปบิล — ${inv.job}${inv.cust?.name?` • ลูกค้า: ${inv.cust.name}`:''}</div>
     <div class="list">
-      ${inv.items.slice(0,8).map(it=>`<div class="row"><div>${it.desc}</div><div><strong>${currency(it.amount)}</strong></div></div>`).join('')}
-      <div class="row"><div>ค่าสินค้าตามจริง</div><div><strong>${currency(inv.otherCost)}</strong></div></div>
-      <div class="row"><div>ส่วนลด</div><div><strong>-${currency(inv.discount).replace('฿','฿')}</strong></div></div>
-      ${inv.vat>0?`<div class="row"><div>Vat 7%</div><div><strong>${currency(inv.vat)}</strong></div></div>`:''}
-      <div class="row total"><div>รวมทั้งสิ้น</div><div>${currency(inv.grand)}</div></div>
+      ${(inv.items||[]).slice(0,8).map(it=>`<div class="row"><div>${it.desc}</div><div><strong>${currency(it.amount||0)}</strong></div></div>`).join('')}
+      <div class="row"><div>ค่าสินค้าตามจริง</div><div><strong>${currency(inv.otherCost||0)}</strong></div></div>
+      <div class="row"><div>ส่วนลด</div><div><strong>-${currency(inv.discount||0).replace('฿','฿')}</strong></div></div>
+      ${inv.vat>0?`<div class="row"><div>Vat 7%</div><div><strong>${currency(inv.vat||0)}</strong></div></div>`:''}
+      <div class="row total"><div>รวมทั้งสิ้น</div><div>${currency(inv.grand||0)}</div></div>
     </div>
     <div class="foot">
       <div class="meta">*สร้างด้วยเครื่องมือคำนวณราคา</div>
@@ -950,7 +1044,7 @@ function loadInvoiceToUI(inv){
   $('#pay_due').value = inv.pay?.due||'';
   // Items
   const tbody = $('#rc_items'); tbody.innerHTML='';
-  inv.items.forEach(it=> tbody.appendChild(makeRow(it)));
+  (inv.items||[]).forEach(it=> tbody.appendChild(makeRow(it)));
   // Footer numbers & top controls
   $('#otherCost').value = inv.otherCost||0;
   $('#discount').value = inv.discount||0;
@@ -1016,8 +1110,8 @@ function renderInvList(){
         <div class="mgr-actions text-end">
           <button class="btn btn-outline-primary btn-sm" title="ดู/แก้"><i class="bi bi-pencil"></i></button>
           <button class="btn btn-outline-secondary btn-sm" title="คัดลอกเป็นบิลใหม่"><i class="bi bi-files"></i></button>
-          <button class="btn btn-outline-secondary btn-sm" title="ภาพบิล"><i class="bi bi-card-image"></i></button>
-          <button class="btn btn-outline-secondary btn-sm" title="พิมพ์"><i class="bi bi-printer"></i></button>
+          <button class="btn btn-outline-secondary btn-sm" title="ภาพบิล (สะอาด)"><i class="bi bi-card-image"></i></button>
+          <button class="btn btn-outline-secondary btn-sm" title="พิมพ์ (สะอาด)"><i class="bi bi-printer"></i></button>
           <button class="btn btn-outline-danger btn-sm" title="ลบ"><i class="bi bi-trash3"></i></button>
         </div>
       </div>
@@ -1028,11 +1122,11 @@ function renderInvList(){
     btnDel.addEventListener('click', ()=> deleteInvoice(it.id));
     btnImg.addEventListener('click', async ()=>{
       loadInvoiceToUI(it);
-      setTimeout(async()=>{ await exportNodeAsPNG($('#receipt'), filename('RECEIPT')); }, 150);
+      setTimeout(async()=>{ const cr=buildCleanReceipt(it); await new Promise(r=>setTimeout(r,150)); await exportNodeAsPNG(cr, `RECEIPT-${it.invNo}.png`); }, 150);
     });
     btnPrint.addEventListener('click', ()=>{
       loadInvoiceToUI(it);
-      setTimeout(()=> printReceiptOnly(), 150);
+      setTimeout(()=> printCleanReceipt(), 180);
     });
     box.appendChild(div);
   });
@@ -1082,20 +1176,33 @@ $('#btnNewInvoice').addEventListener('click', ()=>{
   toast('เริ่มบิลใหม่แล้ว');
 });
 
-/* พิมพ์เฉพาะใบเสร็จ */
-function printReceiptOnly(){
+/* พิมพ์ — ใช้บิลสะอาดเป็นหลัก */
+function printReceiptOnly(){ // (สำรอง) — พิมพ์ฟอร์มเดิม
   document.body.classList.add('print-only-receipt');
   setTimeout(()=> window.print(), 20);
 }
-window.addEventListener('afterprint', ()=> document.body.classList.remove('print-only-receipt'));
+function printCleanReceipt(){
+  const inv = serializeInvoiceFromUI();
+  buildCleanReceipt(inv);
+  const stage = $('#exportStage'); stage.classList.remove('no-print');
+  document.body.classList.add('print-only-clean');
+  setTimeout(()=> window.print(), 25);
+}
+window.addEventListener('afterprint', ()=>{
+  document.body.classList.remove('print-only-receipt','print-only-clean');
+  $('#exportStage').classList.add('no-print');
+});
 const mq = window.matchMedia && window.matchMedia('print');
 if(mq && mq.addEventListener){
   mq.addEventListener('change', e=>{
-    if(!e.matches) document.body.classList.remove('print-only-receipt');
+    if(!e.matches){
+      document.body.classList.remove('print-only-receipt','print-only-clean');
+      $('#exportStage').classList.add('no-print');
+    }
   });
 }
-$('#btnPrint').addEventListener('click', printReceiptOnly);
-$('#dockPrint').addEventListener('click', printReceiptOnly);
+$('#btnPrint').addEventListener('click', printCleanReceipt);
+$('#dockPrint').addEventListener('click', printCleanReceipt);
 $('#dockReceipt').addEventListener('click', ()=> $('#btnCreateReceipt').click() );
 
 // total dock visibility
@@ -1136,7 +1243,13 @@ async function ensureReceiptReady(){
 }
 $('#btnExportReceipt').addEventListener('click', async ()=>{
   await ensureReceiptReady();
-  await exportNodeAsPNG($('#receipt'), filename('RECEIPT'));
+  await exportNodeAsPNG($('#receipt'), filename('RECEIPT-FORM'));
+});
+$('#btnExportReceiptClean').addEventListener('click', async ()=>{
+  const inv = serializeInvoiceFromUI();
+  const cr = buildCleanReceipt(inv);
+  await new Promise(r=> setTimeout(r, 200));
+  await exportNodeAsPNG(cr, filename('RECEIPT-CLEAN'));
 });
 $('#btnExportSummary').addEventListener('click', async ()=>{
   const inv = serializeInvoiceFromUI();
@@ -1153,6 +1266,5 @@ $('#inv_date').value = d0.toLocaleDateString('th-TH');
 $('#inv_time').value = d0.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
 calc(true);
 renderInvList();
-</script>
-</body>
+</script></body>
 </html>
