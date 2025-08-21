@@ -48,7 +48,6 @@
       background: var(--card);
       border-top: 1px solid var(--border);
       padding: .75rem 1rem;
-      /* ชดเชย padding ของการ์ด: p-3 ที่จอเล็ก, p-md-4 ที่จอ >= md */
       margin-left: -1rem; margin-right: -1rem;        /* สำหรับ p-3 */
       border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
     }
@@ -67,7 +66,7 @@
       }
     }
 
-    /* Print modes (ฐาน) */
+    /* Print base */
     @media print{
       .no-print{display:none!important}
       body{background:#fff}
@@ -79,13 +78,9 @@
 
     /* === โหมดพิมพ์เฉพาะใบเสร็จ (#receipt) === */
     @media print{
-      body.print-only-receipt *{
-        visibility: hidden !important;
-      }
+      body.print-only-receipt *{ visibility: hidden !important; }
       body.print-only-receipt #receipt,
-      body.print-only-receipt #receipt *{
-        visibility: visible !important;
-      }
+      body.print-only-receipt #receipt *{ visibility: visible !important; }
       body.print-only-receipt #receipt{
         position:absolute; left:0; top:0; width:100%;
         margin:0; border:0; box-shadow:none;
@@ -95,6 +90,25 @@
     input.is-invalid, select.is-invalid{border-color:#dc3545}
     .history-list .item{border:1px dashed var(--border); border-radius:10px; padding:.5rem .75rem; cursor:pointer}
     .history-list .item:hover{background:rgba(109,40,217,.06)}
+
+    /* ====== การ์ดสรุปแบบแชร์ (เรนเดอร์เป็นรูป) ====== */
+    #exportStage{ position:fixed; left:-200vw; top:0; width:0; height:0; overflow:visible; z-index:-1; }
+    .share-card{
+      width:860px; background:#fff; color:#111827;
+      border:1px solid #e5e7eb; border-radius:16px; padding:20px 22px;
+      font-family:'Kanit',system-ui,Arial; line-height:1.4;
+    }
+    .share-card .head{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+    .share-card .brand{display:flex; align-items:center; gap:12px;}
+    .share-card .brand img{height:54px; object-fit:contain}
+    .share-card .biz{font-weight:700; color:#4c1d95}
+    .share-card .meta{font-size:13px; color:#6b7280}
+    .share-card .title{font-size:20px; font-weight:700; margin-top:10px; color:#111827}
+    .share-card .list{margin-top:10px; border-top:1px dashed #e5e7eb}
+    .share-card .row{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #f1f5f9}
+    .share-card .row.total{font-size:18px; font-weight:800}
+    .share-card .foot{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-top:14px}
+    .share-card .qr{height:96px}
   </style>
 </head>
 <body class="print-a4">
@@ -315,6 +329,8 @@
           <div class="eyebrow">ใบเสร็จ/บิล</div>
           <div class="d-flex gap-2 no-print">
             <button id="btnAddItem" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>เพิ่มบรรทัด</button>
+            <button id="btnExportSummary" class="btn btn-sm btn-outline-secondary"><i class="bi bi-image me-1"></i>บันทึกภาพสรุป</button>
+            <button id="btnExportReceipt" class="btn btn-sm btn-outline-secondary"><i class="bi bi-card-image me-1"></i>บันทึกภาพบิล</button>
             <button id="btnPrint" class="btn btn-sm btn-primary"><i class="bi bi-printer me-1"></i>พิมพ์/PDF</button>
           </div>
         </div>
@@ -415,6 +431,9 @@
   </div>
 </main>
 
+<!-- เวทีเรนเดอร์การ์ด (ซ่อน) -->
+<div id="exportStage" class="no-print"></div>
+
 <!-- แถบล่าง (มือถือ) -->
 <div class="total-dock no-print">
   <div class="fw-bold">รวม: <span id="grandDock">฿0</span></div>
@@ -423,6 +442,9 @@
     <button id="dockPrint" class="btn btn-outline-primary btn-sm">พิมพ์</button>
   </div>
 </div>
+
+<!-- html2canvas สำหรับแปลง DOM เป็นรูป -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
 // ===== Helpers =====
@@ -534,6 +556,9 @@ function loadBiz(){
   $('#bizNoteView').textContent = $('#biz_note').value || '';
   const logo = $('#biz_logo').value.trim(); const qr = $('#biz_qr').value.trim();
   const logoEl = $('#bizLogoView'); const qrEl = $('#bizQrView');
+  // ตั้งค่า CORS ก่อนใส่ src
+  logoEl.crossOrigin = 'anonymous';
+  qrEl.crossOrigin = 'anonymous';
   if(logo){ logoEl.src = logo; logoEl.classList.remove('d-none'); } else logoEl.classList.add('d-none');
   if(qr){ qrEl.src = qr; qrEl.classList.remove('d-none'); } else qrEl.classList.add('d-none');
 }
@@ -706,6 +731,8 @@ function fillReceipt(out){
   $('#bizNoteView').textContent = $('#biz_note').value.trim()||'';
   const logo = $('#biz_logo').value.trim(); const qr = $('#biz_qr').value.trim();
   const logoEl = $('#bizLogoView'); const qrEl = $('#bizQrView');
+  logoEl.crossOrigin = 'anonymous';
+  qrEl.crossOrigin = 'anonymous';
   if(logo){ logoEl.src = logo; logoEl.classList.remove('d-none'); } else logoEl.classList.add('d-none');
   if(qr){ qrEl.src = qr; qrEl.classList.remove('d-none'); } else qrEl.classList.add('d-none');
 
@@ -834,6 +861,127 @@ function toast(msg){
   document.body.appendChild(el);
   setTimeout(()=> el.remove(), 2200);
 }
+
+// ===== Export Image Utilities =====
+async function exportNodeAsPNG(node, filename, scale=2){
+  const canvas = await html2canvas(node, {
+    backgroundColor:'#ffffff',
+    scale,
+    useCORS:true,
+    allowTaint:false,
+    imageTimeout:0,
+    logging:false
+  });
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename || 'export.png';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 1000);
+  toast('บันทึกเป็นรูปภาพแล้ว');
+}
+
+function filename(prefix='BILL'){
+  const no = ($('#inv_no').value||'').replace(/\s+/g,'');
+  const d = new Date();
+  const stamp = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+  return `${prefix}-${no||stamp}.png`;
+}
+
+// ====== สร้างการ์ดสรุป (ย่อ) สำหรับแชร์ ======
+function buildShareCard(out){
+  const stage = $('#exportStage');
+  stage.innerHTML = ''; // clear
+  const card = document.createElement('div');
+  card.className = 'share-card';
+  // เตรียมข้อมูล
+  const bizName = $('#biz_name').value.trim() || 'ผู้ให้บริการ';
+  const bizPhone = $('#biz_phone').value.trim();
+  const bizLine = $('#biz_line').value.trim();
+  const addr = $('#biz_addr').value.trim() || '';
+  const logo = $('#biz_logo').value.trim();
+  const qr = $('#biz_qr').value.trim();
+  const invNo = $('#inv_no').value || nextInvNo();
+  const date = $('#inv_date').value || new Date().toLocaleDateString('th-TH');
+  const time = $('#inv_time').value || new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  const cust = $('#cust_name').value.trim() || '';
+  const vat = $('#vat').value==='yes' ? Math.round(out.serviceTotal*0.07) : 0;
+
+  // จำกัดแถว breakdown ไม่ให้ยาวเกิน (เลือก 8 รายการแรก)
+  const lines = out.breakdown.slice(0,8);
+
+  card.innerHTML = `
+    <div class="head">
+      <div class="brand">
+        ${logo? `<img id="scLogo" alt="logo">` : ''}
+        <div>
+          <div class="biz">${bizName}</div>
+          <div class="meta">${bizPhone?`โทร ${bizPhone}`:''}${bizLine?` • LINE ${bizLine}`:''}${addr?` • ${addr}`:''}</div>
+        </div>
+      </div>
+      <div class="meta text-end">
+        เลขที่บิล: ${invNo}<br>
+        วันที่: ${date} • เวลา: ${time}
+      </div>
+    </div>
+    <div class="title">สรุปบิล — ${out.job}${cust?` • ลูกค้า: ${cust}`:''}</div>
+    <div class="list">
+      ${lines.map(([k,v])=>{
+        const val = (typeof v==='number')? currency(v) : v;
+        return `<div class="row"><div>${k}</div><div><strong>${val}</strong></div></div>`;
+      }).join('')}
+      <div class="row"><div>ค่าสินค้าตามจริง</div><div><strong>${currency(out.otherCost)}</strong></div></div>
+      <div class="row"><div>ส่วนลด</div><div><strong>-${currency(out.discount).replace('฿','฿')}</strong></div></div>
+      ${vat?`<div class="row"><div>Vat 7%</div><div><strong>${currency(vat)}</strong></div></div>`:''}
+      <div class="row total"><div>รวมทั้งสิ้น</div><div>${currency(out.grand)}</div></div>
+    </div>
+    <div class="foot">
+      <div class="meta">*สร้างด้วยเครื่องมือคำนวณราคา</div>
+      ${qr? `<img id="scQR" class="qr" alt="qr">` : ''}
+    </div>
+  `;
+  stage.appendChild(card);
+
+  // ใส่รูป (รองรับ CORS)
+  if(logo){
+    const img = $('#scLogo', card);
+    img.crossOrigin = 'anonymous';
+    img.src = logo;
+  }
+  if(qr){
+    const img = $('#scQR', card);
+    img.crossOrigin = 'anonymous';
+    img.src = qr;
+  }
+  return card;
+}
+
+// ====== ปุ่ม Export ======
+async function ensureReceiptReady(){
+  // ถ้ายังไม่ได้สร้างบิล ให้สร้างจากค่าปัจจุบัน
+  const hasPlaceholder = $('#rc_items').children.length===1 &&
+    $('#rc_items').children[0].querySelector('.text-muted');
+  if(hasPlaceholder){
+    const out = calc(true);
+    if(out) fillReceipt(out);
+  }
+}
+
+$('#btnExportReceipt').addEventListener('click', async ()=>{
+  await ensureReceiptReady();
+  const node = $('#receipt');
+  await exportNodeAsPNG(node, filename('RECEIPT'));
+});
+
+$('#btnExportSummary').addEventListener('click', async ()=>{
+  const out = calc(true); if(!out){ toast('กรอกข้อมูลให้ครบก่อนนะ'); return; }
+  const card = buildShareCard(out);
+  // รอให้ภาพโหลด (ถ้า cross-origin ไม่อนุญาต จะยังเรนเดอร์ได้โดยตัดรูปออก)
+  await new Promise(r=> setTimeout(r, 200));
+  await exportNodeAsPNG(card, filename('SUMMARY'));
+});
 
 // init
 loadCfg(); loadBiz(); renderHistory();
