@@ -470,6 +470,13 @@
         <ul id="invPager" class="pagination pagination-sm mb-0"></ul>
       </div>
     </section>
+        
+    <!-- รายละเอียดบิล (ดูอย่างเร็ว) -->
+    <section class="card p-3 mt-3" id="invQuickView">
+      <span class="badge-soft">รายละเอียดบิล (ดูอย่างเร็ว)</span>
+      <div id="invPreview" class="small subtle">เลือก “ดู/แก้ไข” จากคลังบิลด้านบน เพื่อแสดงรายละเอียดที่นี่</div>
+    </section>
+        
   </div>
 
   <!-- Pretty print container (used for window.print) -->
@@ -847,5 +854,50 @@
       if(window.innerWidth<780){ $$('.hint').forEach(el=> el.style.display='none'); }
     });
   </script>
+
+<script>
+// --- Quick Preview below the LocalStorage list ---
+(function(){
+  function getStore(){ try { return JSON.parse(localStorage.getItem('invoices')||'[]')||[]; } catch(e){ return []; } }
+  function findById(id){ return getStore().find(x=>x.inv_no===id) || null; }
+  function htmlEscape(s){ return (s??'').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])); }
+  function renderInvPreview(bill){
+    const box = document.getElementById('invPreview');
+    if(!box) return;
+    if(!bill){ box.innerHTML = '<div class="subtle small">ยังไม่ได้เลือกบิล</div>'; return; }
+    box.innerHTML = `
+      <div class="row g-2">
+        <div class="col-md-7">
+          <div class="small subtle">เลขที่บิล</div>
+          <div class="fw-semibold">${htmlEscape(bill.inv_no||'-')}</div>
+          <div class="small subtle mt-2">ลูกค้า</div>
+          <div>${htmlEscape(bill.cust_name||'-')}</div>
+          <div class="small subtle mt-2">งาน/รายละเอียด</div>
+          <div>${htmlEscape(bill.job||'-')}</div>
+        </div>
+        <div class="col-md-5 text-md-end">
+          <div class="small subtle">วันที่/เวลา</div>
+          <div>${htmlEscape(bill.date||'-')} ${htmlEscape(bill.time||'')}</div>
+          <div class="small subtle mt-2">สถานะ</div>
+          <div><span class="badge rounded-pill text-bg-${(bill.pay_status||'').includes('ชำระแล้ว')?'success':'warning'}">${htmlEscape(bill.pay_status||'-')}</span></div>
+          <div class="small subtle mt-2">ยอดสุทธิ</div>
+          <div class="h5 mb-0">${htmlEscape(bill.totalText||'฿0')}</div>
+        </div>
+      </div>`;
+  }
+  window.showInvPreviewById = function(id){ renderInvPreview(findById(id)); };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var list = document.getElementById('invList');
+    if(list){
+      list.addEventListener('click', function(e){
+        var btn = e.target.closest('button[data-act="load"]');
+        if(btn){ window.showInvPreviewById(btn.dataset.id); }
+      });
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
