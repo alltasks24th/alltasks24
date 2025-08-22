@@ -802,3 +802,21 @@ requireAdmin(async (user, role) => {
     });
   });
 });
+
+
+// === Sidebar toggle (persist state) + Pricing frame reload ===
+(function(){
+  try{
+    const key = 'adminSidebarCollapsed';
+    if (localStorage.getItem(key) === '1') document.body.classList.add('sidebar-collapsed');
+    document.getElementById('btnSidebar')?.addEventListener('click', ()=>{
+      const on = document.body.classList.toggle('sidebar-collapsed');
+      localStorage.setItem(key, on ? '1' : '0');
+    });
+    document.getElementById('btnReloadPricing')?.addEventListener('click', ()=>{
+      const f = document.getElementById('pricingFrame');
+      if (f && f.contentWindow) { try { f.contentWindow.location.reload(); } catch (e) { /* ignore */ } }
+    });
+  }catch(e){ console.warn('sidebar/pricing add-on:', e); }
+})();
+

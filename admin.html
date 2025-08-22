@@ -23,12 +23,19 @@
   .nav-pills .nav-link.active{background:var(--primary)}
   .stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
   .header{background:#fff;border-bottom:1px solid var(--border)}
+
+/* === Collapsible Sidebar (added) === */
+@media (min-width: 768px){
+  body.sidebar-collapsed #adminSidebar{ display:none !important; }
+}
+/* Keep content full width when collapsed (flex layout handles it) */
+
 </style>
 </head>
 <body>
 <nav class="navbar navbar-light bg-white border-bottom sticky-top">
   <div class="container-fluid">
-    <span class="navbar-brand mb-0 h5">alltasks24 — Admin</span>
+    <button id="btnSidebar" class="btn btn-outline-primary btn-sm me-2 d-none d-md-inline-flex"><i class="bi bi-list"></i></button><span class="navbar-brand mb-0 h5">alltasks24 — Admin</span>
     <div class="d-flex align-items-center gap-2">
       <span class="badge text-bg-warning">รีวิวใหม่ <span id="countNewReviews">0</span></span>
       <button id="btnLogout" class="btn btn-outline-primary btn-sm"><i class="bi bi-box-arrow-right me-1"></i>ออกจากระบบ</button>
@@ -38,7 +45,7 @@
 
 <div class="d-flex">
   <!-- เมนูฝั่งซ้าย -->
-  <aside class="sidebar p-3 d-none d-md-block">
+  <aside id="adminSidebar" class="sidebar p-3 d-none d-md-block">
     <div class="nav nav-pills flex-column gap-1" role="tablist">
       <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-dashboard"><i class="bi bi-speedometer2 me-2"></i>แดชบอร์ด</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-services"><i class="bi bi-grid me-2"></i>บริการ</button>
@@ -55,7 +62,8 @@
         <i class="bi bi-bag me-2"></i>ร้านค้า
       </button>
 
-      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-2"></i>FAQ</button>
+
+      <button class="nav-link" id="tab-pricing-tab" data-bs-toggle="pill" data-bs-target="#tab-pricing"><i class="bi bi-calculator me-2"></i>คำนวณราคา</button>      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-2"></i>FAQ</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-settings"><i class="bi bi-gear me-2"></i>ตั้งค่า</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chat"><i class="bi bi-chat-dots me-2"></i>แชทสด</button>
     </div>
@@ -227,6 +235,24 @@
 
         </div>
       </div>
+
+      
+      <!-- คำนวณราคา -->
+      <div class="tab-pane fade" id="tab-pricing" role="tabpanel" aria-labelledby="tab-pricing-tab">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="fw-semibold">คำนวณราคา & บิล</div>
+            <div class="d-flex gap-2">
+              <a class="btn btn-outline-primary btn-sm" href="Calculation%20system.html" target="_blank"><i class="bi bi-box-arrow-up-right me-1"></i>เปิดเต็มหน้าจอ</a>
+              <button id="btnReloadPricing" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1"></i>รีโหลด</button>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <iframe id="pricingFrame" src="Calculation%20system.html" style="width:100%;height:calc(100vh - 240px);border:0" loading="lazy"></iframe>
+          </div>
+        </div>
+      </div>
+
 
       <!-- พื้นที่ -->
       <div class="tab-pane fade" id="tab-areas">
