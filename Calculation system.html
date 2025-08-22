@@ -476,7 +476,79 @@
       <span class="badge-soft">รายละเอียดบิล (ดูอย่างเร็ว)</span>
       <div id="invPreview" class="small subtle">เลือก “ดู/แก้ไข” จากคลังบิลด้านบน เพื่อแสดงรายละเอียดที่นี่</div>
     </section>
-        
+
+<!-- คำอธิบายช่องตั้งค่า (ช่วยจำ) -->
+<section class="card p-3 mt-3" id="settings-help">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+      <span class="badge bg-secondary-subtle text-secondary-emphasis">ช่วยจำ</span>
+      <span class="fw-semibold ms-2">คำอธิบายช่องตั้งค่า (ฐาน/ระยะ/รอคิว/ปัดเศษ)</span>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm"
+            data-bs-toggle="collapse" data-bs-target="#settings-help-body"
+            aria-expanded="true" aria-controls="settings-help-body">
+      แสดง/ซ่อน
+    </button>
+  </div>
+
+    <dl class="row gy-2 mb-3">
+      <dt class="col-sm-4">ฐานในเมือง</dt>
+      <dd class="col-sm-8">ราคาเริ่มต้นต่อหนึ่งงาน/หนึ่งเที่ยว ภายในพื้นที่บริการ</dd>
+
+      <dt class="col-sm-4">ระยะในฐาน (กม.)</dt>
+      <dd class="col-sm-8">ระยะที่ “รวมอยู่ในราคาเริ่มต้น” — ภายในระยะนี้ไม่คิดค่า กม. เพิ่ม</dd>
+
+      <dt class="col-sm-4">เกินระยะ/กม. ชั้น 1</dt>
+      <dd class="col-sm-8">ค่า/กม. สำหรับช่วงที่เกิน “ระยะในฐาน” จนถึงก่อน “เริ่มชั้น 2”</dd>
+
+      <dt class="col-sm-4">เริ่มชั้น 2 ที่ (กม.)</dt>
+      <dd class="col-sm-8">ตั้งแต่ระยะนี้ขึ้นไป เปลี่ยนไปใช้เรทราคา “ชั้น 2”</dd>
+
+      <dt class="col-sm-4">เกินระยะ/กม. ชั้น 2</dt>
+      <dd class="col-sm-8">ค่า/กม. สำหรับส่วนระยะตั้งแต่ “เริ่มชั้น 2” เป็นต้นไป</dd>
+
+      <dt class="col-sm-4">ขั้นต่ำ</dt>
+      <dd class="col-sm-8">กันราคาไม่ให้ต่ำเกินไป ถ้าต่ำกว่านี้จะยกขึ้นมาเท่าค่านี้</dd>
+
+      <dt class="col-sm-4">จุดแวะ/จุด</dt>
+      <dd class="col-sm-8">คิดเพิ่มเป็นเงินตรา ต่อ 1 จุดแวะ</dd>
+
+      <dt class="col-sm-4">รอคิว/ชม.</dt>
+      <dd class="col-sm-8">ค่ารอเป็นบาทต่อชั่วโมง (ระบบคูณเวลาที่กรอกให้)</dd>
+
+      <dt class="col-sm-4">กลางคืน / ฝนตก / เสาร์–อาทิตย์/นักขัต</dt>
+      <dd class="col-sm-8">ค่าบวกพิเศษแบบเป็นเงินตรา จะบวกเมื่อเลือกใช้เงื่อนไขนั้น</dd>
+
+      <dt class="col-sm-4">ปัดเศษ</dt>
+      <dd class="col-sm-8">ปัด “ราคาบริการ” ให้ลงตัวตามขั้น (เช่น 5 หรือ 10 บาท) เพื่อเลขสวย/คิดเงินง่าย</dd>
+
+      <dt class="col-sm-4">คูณขนาด</dt>
+      <dd class="col-sm-8">ตัวคูณเมื่อเลือกงาน “ขนาดกลาง” (เช่น 1.05 = เพิ่ม 5%)</dd>
+
+      <dt class="col-sm-4">คูณแรงงาน (2 คน)</dt>
+      <dd class="col-sm-8">ตัวคูณเมื่อใช้แรงงาน 2 คน (เช่น 1.30 = เพิ่ม 30%)</dd>
+
+      <dt class="col-sm-4">ธีมสีหลัก/ธีมสีรอง</dt>
+      <dd class="col-sm-8">ปรับโทนสีหน้าจอ/เอกสาร <u>ไม่กระทบราคา</u></dd>
+    </dl>
+
+    <div class="border-top pt-3">
+      <div class="fw-semibold mb-1">ลำดับการคำนวณ (ย่อ)</div>
+      <ol class="mb-2 small">
+        <li>ราคาเริ่มต้น = <strong>ฐานในเมือง</strong></li>
+        <li>บวกค่า กม. ตามช่วง (ชั้น 1 / ชั้น 2) — ถ้า “ไป–กลับ” ให้คูณระยะก่อนคิด</li>
+        <li>บวก <strong>จุดแวะ + รอคิว + (กลางคืน/ฝนตก/วันหยุดที่เลือก)</strong></li>
+        <li>ถ้ามี <strong>ขนาดกลาง</strong> หรือ <strong>แรงงาน 2 คน</strong> ⇒ คูณตัวคูณที่ตั้งไว้</li>
+        <li>บังคับ <strong>ขั้นต่ำ</strong> แล้ว <strong>ปัดเศษ</strong></li>
+        <li>รวมกับ <strong>ค่าสินค้าจริง − ส่วนลด + VAT (ถ้าเลือก)</strong> ⇒ <strong>ยอดสุทธิ</strong></li>
+      </ol>
+      <div class="small text-muted">
+        ทิป: เช็กราคาแปลก ๆ ด้วย 3 จุดนี้ — (1) ระยะในฐาน (2) เริ่มชั้น 2 ต้องมากกว่า “ระยะในฐาน” (3) ตัวคูณ 1.00/1.05/1.30 ตรงงานจริงหรือไม่
+      </div>
+    </div>
+  </div>
+</section>
+    
   </div>
 
   <!-- Pretty print container (used for window.print) -->
