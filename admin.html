@@ -407,7 +407,26 @@
       <div class="tab-pane fade" id="tab-settings">
         <h5>ตั้งค่าทั่วไปของเว็บไซต์</h5>
         <div class="row g-3">
-          <div class="col-md-6"><label class="form-label">ชื่อเว็บ</label><input id="setSite" class="form-control" value="alltasks24.online"></div>
+          <div class="col-md-6"><label class="form-label">ชื่อเว็บ</label><input id="setSite" class="form-control" value="alltasks24.online">
+        <div class="card card-clean p-3 my-3">
+          <div class="fw-semibold mb-2">สถานะทีม (แสดงบนวิดเจ็ตลอย)</div>
+          <div class="row g-2 align-items-center">
+            <div class="col-12 col-md-7 d-flex flex-wrap align-items-center gap-3">
+              <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateOnline" value="online"><label class="form-check-label" for="teamStateOnline">ออนไลน์</label></div>
+              <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateBusy" value="busy"><label class="form-check-label" for="teamStateBusy">ติดงาน</label></div>
+              <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateOff" value="off" checked><label class="form-check-label" for="teamStateOff">ไม่ว่าง</label></div>
+              <div class="input-group" style="max-width:180px">
+                <span class="input-group-text">จำนวน</span>
+                <input id="teamCount" type="number" class="form-control" min="0" value="1">
+              </div>
+            </div>
+            <div class="col-12 col-md-5 d-flex align-items-center gap-2">
+              <input id="teamNote" class="form-control" placeholder="หมายเหตุ (ไม่บังคับ)">
+              <span class="text-muted small">ใช้ปุ่ม “บันทึก” ด้านล่าง</span>
+            </div>
+          </div>
+        </div>
+</div>
           <div class="col-md-6"><label class="form-label">หมายเลขโทรศัพท์</label><input id="setPhone" class="form-control" value="080-000-0000"></div>
           <div class="col-md-6"><label class="form-label">LINE</label><input id="setLine" class="form-control" value="@yourline"></div>
           <div class="col-md-6"><label class="form-label">Facebook</label><input id="setFb" class="form-control" value="https://facebook.com/"></div>

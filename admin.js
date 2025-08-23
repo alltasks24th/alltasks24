@@ -125,6 +125,9 @@ try{document.getElementById('svcTags').value=Array.isArray(v?.tags)?v.tags.join(
       facebook:$('#setFb').value,
       hero:$('#setHero').value,
       mediaPolicy:$('#setPolicy').value,
+      teamState:(document.querySelector('input[name="teamState"]:checked')||{}).value||'off',
+      teamHeadcount:parseInt($('#teamCount')?.value||0)||0,
+      teamNote:($('#teamNote')?.value||'').trim(),
       mapUrl:$('#setMap').value,
       updatedAt: serverTimestamp()
     };
@@ -820,3 +823,18 @@ requireAdmin(async (user, role) => {
   }catch(e){ console.warn('sidebar/pricing add-on:', e); }
 })();
 
+
+
+  async function loadTeamFromSettings(){
+    try{
+      const sRef=doc(db,'settings','public');
+      const snap=await getDoc(sRef);
+      if(!snap.exists()) return;
+      const d=snap.data()||{};
+      const r=document.querySelector(`input[name="teamState"][value="${d.teamState||'off'}"]`);
+      if(r) r.checked=true;
+      const c=document.getElementById('teamCount'); if(c&&d.teamHeadcount!=null) c.value=d.teamHeadcount;
+      const n=document.getElementById('teamNote'); if(n&&d.teamNote!=null) n.value=d.teamNote;
+    }catch(e){ console.error(e); }
+  }
+  document.addEventListener('DOMContentLoaded', loadTeamFromSettings);
