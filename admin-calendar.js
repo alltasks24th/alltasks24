@@ -31,20 +31,8 @@ function setDefaults(){
 }
 
 function badge(status){
-  const key = String(status || 'pending').toLowerCase();
-  const TH = {
-    pending: 'รอตรวจ',
-    confirmed: 'ยืนยันแล้ว',
-    in_progress: 'กำลังทำ',
-    done: 'เสร็จแล้ว',
-    canceled: 'ยกเลิก'
-  };
-  const label = TH[key] ?? key;
-  return `<span class="cal-badge ${key}">${label}</span>`;
-};
-  const label = TH[key] ?? key;
-  return `<span class="cal-badge ${key}">${label}</span>`;
-}">${s}</span>`;
+  const s = status || 'pending';
+  return `<span class="cal-badge ${s}">${s}</span>`;
 }
 
 function itemRow(id, b){
