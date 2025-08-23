@@ -826,15 +826,15 @@ requireAdmin(async (user, role) => {
 ;(function(){
   const elSave = document.getElementById('teamSave');
   if(!elSave) return;
-  const ref = doc(db, 'meta', 'teamStatus');
+  const ref = doc(db, 'settings', 'public');
   async function loadTeamStatus(){
     try{
       const s = await getDoc(ref);
       const d = s.exists()? s.data(): {state:'off', headcount:0, note:''};
-      const r = document.querySelector(`input[name="teamState"][value="${d.state||'off'}"]`);
+      const r = document.querySelector(`input[name="teamState"][value="${d.teamState||'off'}"]`);
       if (r) r.checked = true;
-      const c = document.getElementById('teamCount'); if (c) c.value = d.headcount||0;
-      const n = document.getElementById('teamNote'); if (n) n.value = d.note||'';
+      const c = document.getElementById('teamCount'); if (c) c.value = d.teamHeadcount||0;
+      const n = document.getElementById('teamNote'); if (n) n.value = d.teamNote||'';
     }catch(err){ console.error(err); }
   }
   elSave.addEventListener('click', async ()=>{
@@ -842,7 +842,7 @@ requireAdmin(async (user, role) => {
     const headcount = parseInt(document.getElementById('teamCount')?.value||0) || 0;
     const note = (document.getElementById('teamNote')?.value||'').trim();
     try{
-      await setDoc(ref, { state, headcount, note, updatedAt: serverTimestamp() }, { merge:true });
+      await setDoc(ref, { teamState: state, teamHeadcount: headcount, teamNote: note, teamUpdatedAt: serverTimestamp() }, { merge:true });
       alert('บันทึกแล้ว');
     }catch(err){
       console.error(err); alert('บันทึกไม่สำเร็จ');

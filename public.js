@@ -759,11 +759,11 @@ function setupTeamStatus(){
     if(!mount) return;
     mount.classList.remove('d-none');
     const LABEL = { online:'ออนไลน์', busy:'ติดงาน', off:'ไม่ว่าง' };
-    const ref = doc(db, 'meta', 'teamStatus');
+    const ref = doc(db, 'settings', 'public');
     const paint = (d)=>{
-      const state = (d?.state)||'off';
-      const n = d?.headcount||0;
-      const note = (d?.note||'');
+      const state = (teamState)||'off';
+      const n = teamHeadcount||0;
+      const note = (teamNote||'');
       mount.innerHTML = `
         <span class="status-badge status-${state}" title="${(note||'').replace(/"/g,'&quot;')}">
           <span class="status-dot"></span>
