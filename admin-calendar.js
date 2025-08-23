@@ -157,7 +157,7 @@ function refresh(){
     const to = ymd(end);
     const qy = query(collection(db,'bookings'),
               where('date','>=', from),
-              where('date','<=', to),
+              where('date','<=', to + '\uf8ff'),
               orderBy('date','asc'));
     unsub = onSnapshot(qy, (snap)=>{
       $('#calTodayWrap')?.classList.add('d-none');
