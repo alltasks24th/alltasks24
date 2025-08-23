@@ -31,6 +31,7 @@
 /* Keep content full width when collapsed (flex layout handles it) */
 
 </style>
+  <link rel="stylesheet" href="admin-calendar.css?v=3">
 </head>
 <body>
 <nav class="navbar navbar-light bg-white border-bottom sticky-top">
@@ -51,6 +52,7 @@
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-services"><i class="bi bi-grid me-2"></i>บริการ</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-areas"><i class="bi bi-geo-alt me-2"></i>พื้นที่</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-bookings"><i class="bi bi-calendar-check me-2"></i>การจอง</button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-calendar"><i class="bi bi-calendar3 me-2"></i>ปฏิทินงาน</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-tickets"><i class="bi bi-inbox me-2"></i>คำขอ/แจ้งปัญหา</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-reviews"><i class="bi bi-chat-quote me-2"></i>รีวิว</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-users"><i class="bi bi-people me-2"></i>ผู้ใช้/บทบาท</button>
@@ -352,6 +354,42 @@
         </table>
       </div>
 
+      
+      <!-- ปฏิทินงาน -->
+      <div class="tab-pane fade" id="tab-calendar">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+          <input type="date" id="calDate" class="form-control" style="max-width:220px;">
+          <select id="calView" class="form-select" style="max-width:160px;">
+            <option value="today">Today</option>
+            <option value="week">Week</option>
+          </select>
+          <select id="calStatus" class="form-select" style="max-width:200px;">
+            <option value="">สถานะทั้งหมด</option>
+            <option value="pending">รอตรวจ</option>
+            <option value="confirmed">ยืนยันแล้ว</option>
+            <option value="in_progress">กำลังทำ</option>
+            <option value="done">เสร็จแล้ว</option>
+            <option value="canceled">ยกเลิก</option>
+          </select>
+          <button id="calRefresh" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1"></i>รีโหลด</button>
+        </div>
+
+        <div id="calTodayWrap" class="vstack gap-2">
+          <div class="card card-clean p-3">
+            <div class="fw-semibold mb-2"><i class="bi bi-list-task me-2"></i>งานวันนี้</div>
+            <div id="calTodayList" class="list-group"></div>
+          </div>
+        </div>
+
+        <div id="calWeekWrap" class="d-none">
+          <div class="card card-clean p-3">
+            <div class="fw-semibold mb-2"><i class="bi bi-grid-3x3-gap me-2"></i>สัปดาห์นี้</div>
+            <div id="calWeekGrid" class="cal-week-grid"></div>
+          </div>
+        </div>
+      </div>
+    
+
       <!-- FAQ -->
       <div class="tab-pane fade" id="tab-faq">
         <h5>คำถามที่พบบ่อย (FAQ)</h5>
@@ -369,27 +407,7 @@
       <div class="tab-pane fade" id="tab-settings">
         <h5>ตั้งค่าทั่วไปของเว็บไซต์</h5>
         <div class="row g-3">
-          <div class="col-md-6"><label class="form-label">ชื่อเว็บ</label><input id="setSite" class="form-control" value="alltasks24.online">
-  <div class="card card-clean p-3 mb-3">
-    <div class="fw-semibold mb-2">สถานะทีม (แสดงบนหัวเว็บ)</div>
-    <div class="row g-2 align-items-center">
-      <div class="col-12 col-md-6 d-flex flex-wrap align-items-center gap-3">
-        <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateOnline" value="online"><label class="form-check-label" for="teamStateOnline">ออนไลน์</label></div>
-        <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateBusy" value="busy"><label class="form-check-label" for="teamStateBusy">ติดงาน</label></div>
-        <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateOff" value="off" checked><label class="form-check-label" for="teamStateOff">ไม่ว่าง</label></div>
-        <div class="input-group" style="max-width:180px">
-          <span class="input-group-text">จำนวน</span>
-          <input id="teamCount" type="number" class="form-control" min="0" value="1">
-        </div>
-      </div>
-      <div class="col-12 col-md-6 d-flex align-items-center gap-2">
-        <input id="teamNote" class="form-control" placeholder="หมายเหตุ (ไม่บังคับ)">
-        <button id="teamSave" class="btn btn-primary">บันทึก</button>
-      </div>
-    </div>
-  </div>
-
-</div>
+          <div class="col-md-6"><label class="form-label">ชื่อเว็บ</label><input id="setSite" class="form-control" value="alltasks24.online"></div>
           <div class="col-md-6"><label class="form-label">หมายเลขโทรศัพท์</label><input id="setPhone" class="form-control" value="080-000-0000"></div>
           <div class="col-md-6"><label class="form-label">LINE</label><input id="setLine" class="form-control" value="@yourline"></div>
           <div class="col-md-6"><label class="form-label">Facebook</label><input id="setFb" class="form-control" value="https://facebook.com/"></div>
@@ -489,5 +507,6 @@ https://...2.jpg"></textarea>
 <script type="module" src="firebase-init.js"></script>
 <script type="module" src="auth.js"></script>
 <script type="module" src="admin.js"></script>
+  <script type="module" src="admin-calendar.js?v=3"></script>
 </body>
 </html>

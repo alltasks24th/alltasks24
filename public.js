@@ -18,7 +18,6 @@ async function init(){
   if(!sessionId){ sessionId = Math.random().toString(36).slice(2); localStorage.setItem('sessionId', sessionId); }
   const y = document.getElementById('yearNow'); if(y) y.textContent = new Date().getFullYear();
   await loadSettings();
-  setupTeamStatus();
   bindRealtime();
   setupSearch(); setupBooking(); setupReview(); setupQuote();
   setupChat(user);
@@ -752,28 +751,3 @@ async function renderHomeProducts() {
 
 // เรียกเมื่อ DOM พร้อม
 document.addEventListener('DOMContentLoaded', renderHomeProducts);
-
-function setupTeamStatus(){
-  try{
-    const mount = document.getElementById('team-status');
-    if(!mount) return;
-    mount.classList.remove('d-none');
-    const LABEL = { online:'ออนไลน์', busy:'ติดงาน', off:'ไม่ว่าง' };
-    const ref = doc(db, 'meta', 'teamStatus');
-    const paint = (d)=>{
-      const state = (d?.state)||'off';
-      const n = d?.headcount||0;
-      const note = d?.note||'';
-      mount.innerHTML = `
-        <span class="status-badge status-${state}" title="${(note||'').replace(/"/g,'&quot;')}">
-          <span class="status-dot"></span>
-          <span class="label">${LABEL[state]||state}</span>
-          ${state==='online' && n ? `<span class="count">${n} คน</span>`:''}
-        </span>`;
-    };
-    onSnapshot(ref, snap=> paint(snap.data()||{}), err=>{
-      console.error('teamStatus error', err);
-      mount.innerHTML = '<span class="status-badge status-off"><span class="status-dot"></span><span class="label">ไม่ว่าง</span></span>';
-    });
-  }catch(err){ console.error(err); }
-}
