@@ -41,6 +41,9 @@ function badge(status){
   };
   const label = TH[key] ?? key;
   return `<span class="cal-badge ${key}">${label}</span>`;
+};
+  const label = TH[key] ?? key;
+  return `<span class="cal-badge ${key}">${label}</span>`;
 }">${s}</span>`;
 }
 
