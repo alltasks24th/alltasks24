@@ -31,11 +31,13 @@
 /* Keep content full width when collapsed (flex layout handles it) */
 
 </style>
+  <link rel="stylesheet" href="admin-calendar.css">
 </head>
 <body>
 <nav class="navbar navbar-light bg-white border-bottom sticky-top">
   <div class="container-fluid">
-    <button id="btnSidebar" class="btn btn-outline-primary btn-sm me-2 d-none d-md-inline-flex"><i class="bi bi-list"></i></button><span class="navbar-brand mb-0 h5">alltasks24 — Admin</span>
+    <button id="btnSidebar" class="btn btn-outline-primary btn-sm me-2 d-none d-md-inline-flex"><i class="bi bi-list"></i></button>
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-calendar"><i class="bi bi-calendar3 me-2"></i>ปฏิทินงาน</button><span class="navbar-brand mb-0 h5">alltasks24 — Admin</span>
     <div class="d-flex align-items-center gap-2">
       <span class="badge text-bg-warning">รีวิวใหม่ <span id="countNewReviews">0</span></span>
       <button id="btnLogout" class="btn btn-outline-primary btn-sm"><i class="bi bi-box-arrow-right me-1"></i>ออกจากระบบ</button>
@@ -288,6 +290,42 @@
         </table>
       </div>
 
+      
+      <!-- ปฏิทินงาน -->
+      <div class="tab-pane fade" id="tab-calendar">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+          <input type="date" id="calDate" class="form-control" style="max-width:220px;">
+          <select id="calView" class="form-select" style="max-width:160px;">
+            <option value="today">Today</option>
+            <option value="week">Week</option>
+          </select>
+          <select id="calStatus" class="form-select" style="max-width:200px;">
+            <option value="">สถานะทั้งหมด</option>
+            <option value="pending">รอตรวจ</option>
+            <option value="confirmed">ยืนยันแล้ว</option>
+            <option value="in_progress">กำลังทำ</option>
+            <option value="done">เสร็จแล้ว</option>
+            <option value="canceled">ยกเลิก</option>
+          </select>
+          <button id="calRefresh" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1"></i>รีโหลด</button>
+        </div>
+
+        <div id="calTodayWrap" class="vstack gap-2">
+          <div class="card card-clean p-3">
+            <div class="fw-semibold mb-2"><i class="bi bi-list-task me-2"></i>งานวันนี้</div>
+            <div id="calTodayList" class="list-group"></div>
+          </div>
+        </div>
+
+        <div id="calWeekWrap" class="d-none">
+          <div class="card card-clean p-3">
+            <div class="fw-semibold mb-2"><i class="bi bi-grid-3x3-gap me-2"></i>สัปดาห์นี้</div>
+            <div id="calWeekGrid" class="cal-week-grid"></div>
+          </div>
+        </div>
+      </div>
+    
+
       <!-- ใบเสนอราคา/ปัญหา -->
       <div class="tab-pane fade" id="tab-tickets">
         <h5>คำขอใบเสนอราคา / แจ้งปัญหา</h5>
@@ -469,5 +507,6 @@ https://...2.jpg"></textarea>
 <script type="module" src="firebase-init.js"></script>
 <script type="module" src="auth.js"></script>
 <script type="module" src="admin.js"></script>
+  <script type="module" src="admin-calendar.js"></script>
 </body>
 </html>
