@@ -18,6 +18,7 @@ async function init(){
   if(!sessionId){ sessionId = Math.random().toString(36).slice(2); localStorage.setItem('sessionId', sessionId); }
   const y = document.getElementById('yearNow'); if(y) y.textContent = new Date().getFullYear();
   await loadSettings();
+  setupTeamStatus();
   bindRealtime();
   setupSearch(); setupBooking(); setupReview(); setupQuote();
   setupChat(user);
@@ -751,3 +752,85 @@ async function renderHomeProducts() {
 
 // เรียกเมื่อ DOM พร้อม
 document.addEventListener('DOMContentLoaded', renderHomeProducts);
+
+function setupTeamStatus(){
+  try{
+    const mount = document.getElementById('team-status');
+    if(!mount) return;
+    mount.classList.remove('d-none');
+    const LABEL = { online:'ออนไลน์', busy:'ติดงาน', off:'ไม่ว่าง' };
+    const ref = doc(db, 'settings', 'public');
+    const paint = (d)=>{
+      const state = (teamState)||'off';
+      const n = teamHeadcount||0;
+      const note = (teamNote||'');
+      mount.innerHTML = `
+        <span class="status-badge status-${state}" title="${(note||'').replace(/"/g,'&quot;')}">
+          <span class="status-dot"></span>
+          <span class="label">${LABEL[state]||state}</span>
+          ${state==='online' && n ? `<span class="count">${n} คน</span>`:''}
+        </span>`;
+    };
+    onSnapshot(ref, snap=> paint(snap.data()||{}), err=>{
+      console.error('teamStatus error', err);
+      mount.innerHTML = '<span class="status-badge status-off"><span class="status-dot"></span><span class="label">ไม่ว่าง</span></span>';
+    });
+  }catch(err){ console.error(err); }
+}
+
+
+// === Floating Team Status Widget (uses settings/public) ===
+(function(){
+  const TSW_STYLE = 'pill'; // 'pill' | 'card' | 'bubble'  <-- เปลี่ยนสไตล์ได้ตรงนี้
+  const LABEL = { online:'ออนไลน์', busy:'ติดงาน', off:'ไม่ว่าง' };
+
+  function mountContainer(){
+    if(document.getElementById('status-widget')) return document.getElementById('status-widget');
+    const c = document.createElement('div'); c.id = 'status-widget'; document.body.appendChild(c); return c;
+  }
+  function renderPill(root, d){
+    root.innerHTML = `<div class="tsw-pill tsw-${d.state}">
+      <span class="tsw-dot"></span>
+      <span class="tsw-label">${LABEL[d.state]||d.state}</span>
+      ${d.state==='online' && d.count? `<span class="tsw-count">${d.count} คน</span>`:''}
+    </div>`;
+  }
+  function renderCard(root, d){
+    root.innerHTML = `<div class="tsw-card tsw-${d.state}" data-open="0" title="แตะเพื่อแสดง/ซ่อนรายละเอียด">
+      <span class="tsw-icon">⚡</span>
+      <div class="tsw-col">
+        <div class="tsw-row"><span class="tsw-dot"></span><span class="tsw-label">${LABEL[d.state]||d.state}</span>${d.state==='online' && d.count? `<span class="tsw-count" style="background:#fff;padding:.12rem .44rem;border-radius:.5rem;font-weight:700">${d.count} คน</span>`:''}</div>
+        <div class="tsw-note">${(d.note||'').replace(/</g,'&lt;')}</div>
+      </div>
+    </div>`;
+    const el = root.firstElementChild; el.addEventListener('click', ()=>{ el.dataset.open = (el.dataset.open==='1'?'0':'1'); });
+  }
+  function renderBubble(root, d){
+    root.innerHTML = `<div class="tsw-bubble tsw-${d.state}" data-open="0">
+      <button class="tsw-btn" aria-label="${LABEL[d.state]||d.state}${d.count? ' '+d.count+' คน':''}"><span class="tsw-dot"></span></button>
+      <div class="tsw-pop"><div class="tsw-row"><span class="tsw-dot"></span><span>${LABEL[d.state]||d.state}</span>${d.state==='online' && d.count? `<span class="tsw-count" style="background:#f3f4f6;border-radius:6px;padding:.06rem .4rem;margin-left:.25rem">${d.count} คน</span>`:''}</div>${(d.note? `<div class="tsw-note">${(d.note||'').replace(/</g,'&lt;')}</div>`:'')}</div>
+    </div>`;
+    const rootEl = root.firstElementChild; rootEl.querySelector('.tsw-btn').addEventListener('click', ()=>{ rootEl.dataset.open = (rootEl.dataset.open==='1'?'0':'1'); });
+  }
+
+  function paint(root, data){
+    const d = {state: (data?.teamState)||'off', count: data?.teamHeadcount||0, note: data?.teamNote||''};
+    if(TSW_STYLE==='card') return renderCard(root,d);
+    if(TSW_STYLE==='bubble') return renderBubble(root,d);
+    return renderPill(root,d); // default
+  }
+
+  async function setupStatusWidget(){
+    try{
+      const root = mountContainer();
+      const ref = doc(db,'settings','public');
+      // initial
+      try { const snap = await getDoc(ref); paint(root, snap.data()||{}); } catch(e){ paint(root, {teamState:'off'}); }
+      // realtime (if available)
+      try { if (typeof onSnapshot === 'function') onSnapshot(ref, s=> paint(root, s.data()||{})); } catch(e){ /* ignore */ }
+    }catch(err){ console.error('tsw init error', err); }
+  }
+
+  // รอให้ db พร้อม แล้วค่อยเริ่ม (ไม่ไปแตะ init() เดิม)
+  (function wait(){ if (typeof db!=='undefined' && db) setupStatusWidget(); else setTimeout(wait, 150); })();
+})();
