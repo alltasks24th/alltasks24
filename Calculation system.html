@@ -974,24 +974,31 @@
 
 <script type="module">
   import { db, ensureAnonAuth } from './firebase-init.js';
-  import { doc, getDoc, setDoc, onSnapshot } 
+  import { doc, getDoc, setDoc, onSnapshot }
     from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-  // เอกสารกลางเก็บ "ตั้งค่าคำนวน"
   const cfgRef = doc(db, 'settings', 'calculator_v4');
-  await ensureAnonAuth();
 
-  // โหลดค่าจากคลังกลาง → อัปเดต UI และ localStorage ให้ตรง
-  async function loadCfgCloud(){
-    const snap = await getDoc(cfgRef);
-    if (snap.exists()) {
-      const data = snap.data();
-      localStorage.setItem('cfg_v4', JSON.stringify(data));
-      try { loadCfg(); } catch(e){}
-    }
+  async function safeAuth(){
+    try {
+      if (typeof ensureAnonAuth === 'function') {
+        await ensureAnonAuth();
+      } // ถ้าไม่มี ก็ข้ามไป ใช้สถานะ auth ที่มีอยู่
+    } catch(e){ console.warn('[cfg] auth warn:', e); }
   }
 
-  // ครอบฟังก์ชัน save เดิม → บันทึกลง Firestore ด้วย
+  async function loadCfgCloud(){
+    try {
+      const snap = await getDoc(cfgRef);
+      if (snap.exists()) {
+        localStorage.setItem('cfg_v4', JSON.stringify(snap.data()));
+        console.log('[cfg] loaded from Firestore');
+        try { window.loadCfg && window.loadCfg(); } catch(e){}
+      }
+    } catch(e){ console.error('[cfg] load error:', e); }
+  }
+
+  // ครอบฟังก์ชันเซฟเดิม → เซฟ Firestore ด้วย
   const _saveCfg = window.saveCfg;
   window.saveCfg = async function(){
     _saveCfg && _saveCfg();  // เซฟลง localStorage ตามเดิม
@@ -999,32 +1006,36 @@
       const payload = JSON.parse(localStorage.getItem('cfg_v4')||'{}');
       await setDoc(cfgRef, payload, { merge: true });
       console.log('[cfg] synced to Firestore');
-    } catch(e){ console.error(e); }
+    } catch(e){ console.error('[cfg] sync error:', e); }
   };
 
-  // โหลดจากคลังกลางตอนเปิดหน้า (ครั้งแรก) + ฟังอัปเดตสด
-  document.addEventListener('DOMContentLoaded', () => {
-    loadCfgCloud();
-    try { onSnapshot(cfgRef, (s)=>{ if(s.exists()){ 
-      localStorage.setItem('cfg_v4', JSON.stringify(s.data())); 
-    }});} catch(e){}
-  });
-
-  // (ออปชัน) บันทึก “บิล” ถาวรด้วย: ครอบ save บิลเดิมแล้วเขียน Firestore
-  const _saveBill = window.saveInvoice; // ถ้ามีฟังก์ชันชื่อนี้
+  // (ออปชัน) เซฟ “บิล” ถาวรด้วย ถ้ามีฟังก์ชันเดิม
+  const _saveInvoice = window.saveInvoice;
   window.saveInvoice = async function(){
+    // ก่อนเซฟ เก็บค่าเดิม
     const before = localStorage.getItem('invoices')||'[]';
-    _saveBill && _saveBill(); // เซฟลง localStorage ตามเดิม
+    _saveInvoice && _saveInvoice();  // เซฟแบบเดิม
     try {
       const after = JSON.parse(localStorage.getItem('invoices')||'[]');
-      const bill = after.at(-1); // ตัวล่าสุดที่เพิ่งบันทึก
-      if (bill?.inv_no){
-        await setDoc(doc(db,'invoices', bill.inv_no), bill);
-        console.log('[invoice] saved:', bill.inv_no);
+      const bill = after.at(-1);     // รายการล่าสุด
+      if (bill?.inv_no) {
+        await setDoc(doc(db,'invoices', String(bill.inv_no)), bill, { merge: true });
+        console.log('[invoice] saved to Firestore:', bill.inv_no);
       }
-    } catch(e){ console.error(e); }
+    } catch(e){ console.error('[invoice] sync error:', e); }
   };
-</script>
+
+  // บูตเมื่อหน้าโหลดเสร็จ
+  document.addEventListener('DOMContentLoaded', async () => {
+    await safeAuth();           // login 匿名 ถ้ามี
+    await loadCfgCloud();       // โหลดค่ากลางเข้าหน้า
+    try {                       // อัปเดตสด ๆ เมื่อมีคนแก้ค่า
+      onSnapshot(cfgRef, (s)=>{ if (s.exists()) {
+        localStorage.setItem('cfg_v4', JSON.stringify(s.data()));
+      }});
+    } catch(e){ /* ignore */ }
+  });
+</script>  
   
 </body>
 </html>
