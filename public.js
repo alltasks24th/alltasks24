@@ -494,7 +494,7 @@ async function setupChat(user){
   input.addEventListener('keypress', e=>{ if(e.key==='Enter') sendMsg(); });
 
   if(createdNow){
-    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text: 'ยินดีให้บริการ 24 ชั่วโมง ฝากข้อความไว้ได้เลยครับ', createdAt: serverTimestamp() });
+    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text: 'ยินดีให้บริการ 24 ชั่วโมง ฝากข้อความไว้ได้เลยครับ หากไม่มีการตอบกลับ สามารถทัก Line ได้ครับ', createdAt: serverTimestamp() });
   }
 
   async function resetUnreadUser(){
