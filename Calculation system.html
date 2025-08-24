@@ -128,54 +128,6 @@
     .w-80mm{ width:80mm; margin:auto }
     .tnum{ font-variant-numeric: tabular-nums; }
   </style>
-
-<!-- PRO-SKIN :: begin -->
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style id="pro-skin">
-  :root{
-    --bg:#F6F7FB; --card:#ffffff; --ink:#0F172A; --muted:#6b7280;
-    --primary:#7C3AED; --accent:#A78BFA; --border:#E5E7EB;
-  }
-  html,body{height:100%}
-  body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:"Kanit",-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans Thai",sans-serif;
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-    font-variant-numeric: tabular-nums;
-  }
-  .pro-wrap{max-width:1180px;margin:12px auto;padding:0 10px}
-  .pro-card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 30px rgba(17,12,46,.08);padding:12px;margin-bottom:10px}
-  .pro-title{font-weight:800;font-size:1.05rem;margin-bottom:4px}
-  .pro-sub{color:var(--muted);font-size:.9rem}
-  input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="color"], select, textarea {
-    background:var(--card); border:1px solid var(--border); border-radius:10px; padding:.45rem .6rem; outline:none; width:100%;
-    transition:border-color .15s, box-shadow .15s;
-  }
-  input:focus, select:focus, textarea:focus{
-    border-color:#a78bfa; box-shadow:0 0 0 .15rem rgba(167,139,250,.25);
-  }
-  button, .btn{
-    background:var(--primary); color:#fff; border:1px solid var(--primary); border-radius:10px; padding:.45rem .8rem; cursor:pointer;
-    transition:transform .05s ease, box-shadow .15s ease; font-weight:600;
-  }
-  button:hover{ box-shadow:0 8px 20px rgba(124,58,237,.25) }
-  button:active{ transform:translateY(1px) }
-  .btn-outline{ background:transparent;color:var(--primary);border-color:var(--primary); }
-  .btn-outline:hover{ background:#f3e8ff }
-  table{ width:100%; border-collapse:separate; border-spacing:0 }
-  thead th{ background:#F3F4F6; color:#111827; text-align:left; padding:.55rem .6rem }
-  tbody td, tfoot th, tfoot td { border-bottom:1px dashed var(--border); padding:.55rem .6rem; vertical-align:middle }
-  tbody tr:hover{ background:#fafafa }
-  .badge{ display:inline-block; border-radius:999px; padding:.15rem .55rem; font-size:.82rem }
-  .badge-ok{ background:#16a34a; color:#fff }
-  .badge-warn{ background:#f59e0b; color:#111 }
-  #summaryBar{ position:sticky; bottom:12px; z-index:3; display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:.6rem .85rem; border:1px solid var(--border); border-radius:.75rem; background:var(--card); box-shadow:0 6px 20px rgba(17, 12, 46, 0.08) }
-  #toast{ position:fixed; left:50%; bottom:16px; transform:translateX(-50%); background:#111827; color:#fff; padding:.6rem .9rem; border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,.25); opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:9999; font-size:.95rem }
-  #toast.show{ opacity:1 }
-</style>
-<!-- PRO-SKIN :: end -->
-
 </head>
 <body class="paper-a4">
   <nav class="navbar brand">
@@ -646,7 +598,7 @@
       if(d.ui){ $('#ui_primary').value=d.ui.primary||'#7C3AED'; $('#ui_accent').value=d.ui.accent||'#A78BFA'; $('#ui_dark').checked = d.ui.dark?true:false; document.documentElement.setAttribute('data-theme', d.ui.dark?'dark':'light'); }
       if(d.biz){ $('#biz_name').value=d.biz.name||''; $('#biz_phone').value=d.biz.phone||''; $('#biz_line').value=d.biz.line||''; $('#biz_addr').value=d.biz.addr||''; $('#biz_note').value=d.biz.note||''; }
       applyTheme(); applyBiz();
-      alert('โหลดการตั้งค่าแล้ว');
+      if (!window.__cfgLoadedNotified) { window.__cfgLoadedNotified = true; console.log('[cfg] โหลดการตั้งค่าแล้ว'); }
     }
     function defaultCfg(){
       ['cfg_base','cfg_incKm','cfg_perKm1','cfg_tier2Start','cfg_perKm2','cfg_minCharge','cfg_stop','cfg_wait','cfg_night','cfg_rain','cfg_weekend'].forEach((id,i)=>{
@@ -1020,70 +972,95 @@
 })();
 </script>
 
+
+
+
+
+<!-- === Cloud sync for Calculator Config & Invoices (Firestore) — SAFE FOR ADMIN === -->
 <script type="module">
   import { db, ensureAnonAuth } from './firebase-init.js';
-  import { doc, getDoc, setDoc, onSnapshot }
+  import { doc, getDoc, setDoc, onSnapshot } 
     from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+  import { getAuth, onAuthStateChanged } 
+    from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
 
+  const auth = getAuth();
   const cfgRef = doc(db, 'settings', 'calculator_v4');
 
+  // รอให้ session เดิม (เช่น admin) ฟื้นก่อน ถ้ายังไม่มีและไม่ได้อยู่โหมด admin ค่อยล็อกอินนิรนาม
   async function safeAuth(){
-    try {
-      if (typeof ensureAnonAuth === 'function') {
-        await ensureAnonAuth();
-      } // ถ้าไม่มี ก็ข้ามไป ใช้สถานะ auth ที่มีอยู่
-    } catch(e){ console.warn('[cfg] auth warn:', e); }
+    const role = (localStorage.getItem('role')||'').toLowerCase();
+    if (role === 'owner' || role === 'admin') return;
+
+    await new Promise(resolve => {
+      let done = false;
+      const t = setTimeout(async () => {
+        if (!auth.currentUser) {
+          try { if (typeof ensureAnonAuth === 'function') await ensureAnonAuth(); } catch(e){}
+        }
+        resolve();
+      }, 800);
+      onAuthStateChanged(auth, (u)=>{
+        if (u) { clearTimeout(t); resolve(); }
+      });
+    });
   }
 
   async function loadCfgCloud(){
-    try {
+    try{
       const snap = await getDoc(cfgRef);
-      if (snap.exists()) {
+      if (snap.exists()){
         localStorage.setItem('cfg_v4', JSON.stringify(snap.data()));
         console.log('[cfg] loaded from Firestore');
-        try { window.loadCfg && window.loadCfg(); } catch(e){}
+        try{ window.loadCfg && window.loadCfg(); }catch(e){}
       }
-    } catch(e){ console.error('[cfg] load error:', e); }
+    }catch(e){ console.error('[cfg] load error:', e); }
   }
 
-  // ครอบฟังก์ชันเซฟเดิม → เซฟ Firestore ด้วย
-  const _saveCfg = window.saveCfg;
-  window.saveCfg = async function(){
-    _saveCfg && _saveCfg();  // เซฟลง localStorage ตามเดิม
-    try {
+  async function syncCfgToCloud(){
+    try{
       const payload = JSON.parse(localStorage.getItem('cfg_v4')||'{}');
-      await setDoc(cfgRef, payload, { merge: true });
+      await setDoc(cfgRef, payload, { merge:true });
       console.log('[cfg] synced to Firestore');
-    } catch(e){ console.error('[cfg] sync error:', e); }
-  };
+    }catch(e){ console.error('[cfg] sync error:', e); }
+  }
 
-  // (ออปชัน) เซฟ “บิล” ถาวรด้วย ถ้ามีฟังก์ชันเดิม
-  const _saveInvoice = window.saveInvoice;
-  window.saveInvoice = async function(){
-    // ก่อนเซฟ เก็บค่าเดิม
-    const before = localStorage.getItem('invoices')||'[]';
-    _saveInvoice && _saveInvoice();  // เซฟแบบเดิม
-    try {
-      const after = JSON.parse(localStorage.getItem('invoices')||'[]');
-      const bill = after.at(-1);     // รายการล่าสุด
-      if (bill?.inv_no) {
-        await setDoc(doc(db,'invoices', String(bill.inv_no)), bill, { merge: true });
-        console.log('[invoice] saved to Firestore:', bill.inv_no);
-      }
-    } catch(e){ console.error('[invoice] sync error:', e); }
-  };
-
-  // บูตเมื่อหน้าโหลดเสร็จ
-  document.addEventListener('DOMContentLoaded', async () => {
-    await safeAuth();           // login 匿名 ถ้ามี
-    await loadCfgCloud();       // โหลดค่ากลางเข้าหน้า
-    try {                       // อัปเดตสด ๆ เมื่อมีคนแก้ค่า
-      onSnapshot(cfgRef, (s)=>{ if (s.exists()) {
-        localStorage.setItem('cfg_v4', JSON.stringify(s.data()));
-      }});
-    } catch(e){ /* ignore */ }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const btn = document.getElementById('btnCfgSave');
+    if (btn){
+      btn.addEventListener('click', async ()=>{
+        try{ window.saveCfg && window.saveCfg(); }catch(e){}
+        await syncCfgToCloud();
+      });
+    }
   });
-</script>  
-  
+
+  (function(){
+    const btnBill = document.getElementById('btnSaveBill');
+    if (!btnBill) return;
+    btnBill.addEventListener('click', async ()=>{
+      const before = localStorage.getItem('invoices')||'[]';
+      setTimeout(async ()=>{
+        try{
+          const after = JSON.parse(localStorage.getItem('invoices')||'[]');
+          const bill = after.at(-1);
+          if (bill?.inv_no){
+            await setDoc(doc(db,'invoices', String(bill.inv_no)), bill, { merge:true });
+            console.log('[invoice] saved:', bill.inv_no);
+          }
+        }catch(e){ console.error('[invoice] sync error:', e); }
+      }, 50);
+    });
+  })();
+
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    await safeAuth();
+    await loadCfgCloud();
+    setTimeout(loadCfgCloud, 400);
+    setTimeout(loadCfgCloud, 1200);
+    try{ onSnapshot(cfgRef, s=>{ if(s.exists()){ localStorage.setItem('cfg_v4', JSON.stringify(s.data())); } }); }catch(e){}
+  });
+</script>
+
 </body>
 </html>
