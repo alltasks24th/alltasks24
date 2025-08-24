@@ -972,70 +972,80 @@
 })();
 </script>
 
+
+<!-- === Cloud sync for Calculator Config & Invoices (Firestore) === -->
 <script type="module">
   import { db, ensureAnonAuth } from './firebase-init.js';
-  import { doc, getDoc, setDoc, onSnapshot }
+  import { doc, getDoc, setDoc, onSnapshot } 
     from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
   const cfgRef = doc(db, 'settings', 'calculator_v4');
 
   async function safeAuth(){
-    try {
-      if (typeof ensureAnonAuth === 'function') {
-        await ensureAnonAuth();
-      } // ถ้าไม่มี ก็ข้ามไป ใช้สถานะ auth ที่มีอยู่
-    } catch(e){ console.warn('[cfg] auth warn:', e); }
+    try{
+      if (typeof ensureAnonAuth === 'function'){ await ensureAnonAuth(); }
+    }catch(e){ console.warn('[cfg] auth warn:', e); }
   }
 
   async function loadCfgCloud(){
-    try {
+    try{
       const snap = await getDoc(cfgRef);
-      if (snap.exists()) {
+      if (snap.exists()){
         localStorage.setItem('cfg_v4', JSON.stringify(snap.data()));
         console.log('[cfg] loaded from Firestore');
-        try { window.loadCfg && window.loadCfg(); } catch(e){}
+        try{ window.loadCfg && window.loadCfg(); }catch(e){}
       }
-    } catch(e){ console.error('[cfg] load error:', e); }
+    }catch(e){ console.error('[cfg] load error:', e); }
   }
 
-  // ครอบฟังก์ชันเซฟเดิม → เซฟ Firestore ด้วย
-  const _saveCfg = window.saveCfg;
-  window.saveCfg = async function(){
-    _saveCfg && _saveCfg();  // เซฟลง localStorage ตามเดิม
-    try {
+  async function syncCfgToCloud(){
+    try{
       const payload = JSON.parse(localStorage.getItem('cfg_v4')||'{}');
-      await setDoc(cfgRef, payload, { merge: true });
+      await setDoc(cfgRef, payload, { merge:true });
       console.log('[cfg] synced to Firestore');
-    } catch(e){ console.error('[cfg] sync error:', e); }
-  };
+    }catch(e){ console.error('[cfg] sync error:', e); }
+  }
 
-  // (ออปชัน) เซฟ “บิล” ถาวรด้วย ถ้ามีฟังก์ชันเดิม
-  const _saveInvoice = window.saveInvoice;
-  window.saveInvoice = async function(){
-    // ก่อนเซฟ เก็บค่าเดิม
-    const before = localStorage.getItem('invoices')||'[]';
-    _saveInvoice && _saveInvoice();  // เซฟแบบเดิม
-    try {
-      const after = JSON.parse(localStorage.getItem('invoices')||'[]');
-      const bill = after.at(-1);     // รายการล่าสุด
-      if (bill?.inv_no) {
-        await setDoc(doc(db,'invoices', String(bill.inv_no)), bill, { merge: true });
-        console.log('[invoice] saved to Firestore:', bill.inv_no);
-      }
-    } catch(e){ console.error('[invoice] sync error:', e); }
-  };
-
-  // บูตเมื่อหน้าโหลดเสร็จ
-  document.addEventListener('DOMContentLoaded', async () => {
-    await safeAuth();           // login 匿名 ถ้ามี
-    await loadCfgCloud();       // โหลดค่ากลางเข้าหน้า
-    try {                       // อัปเดตสด ๆ เมื่อมีคนแก้ค่า
-      onSnapshot(cfgRef, (s)=>{ if (s.exists()) {
-        localStorage.setItem('cfg_v4', JSON.stringify(s.data()));
-      }});
-    } catch(e){ /* ignore */ }
+  // Hook existing button -> save localStorage then sync cloud
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const btn = document.getElementById('btnCfgSave');
+    if (btn){
+      btn.addEventListener('click', async ()=>{
+        try{ window.saveCfg && window.saveCfg(); }catch(e){}
+        await syncCfgToCloud();
+      });
+    }
   });
-</script>  
-  
+
+  // Optional: also sync the latest invoice to Firestore by inv_no (if UI has it)
+  (function(){
+    const btnBill = document.getElementById('btnSaveBill');
+    if (!btnBill) return;
+    btnBill.addEventListener('click', async ()=>{
+      const before = localStorage.getItem('invoices')||'[]';
+      setTimeout(async ()=>{
+        try{
+          const after = JSON.parse(localStorage.getItem('invoices')||'[]');
+          const bill = after.at(-1);
+          if (bill?.inv_no){
+            await setDoc(doc(db,'invoices', String(bill.inv_no)), bill, { merge:true });
+            console.log('[invoice] saved:', bill.inv_no);
+          }
+        }catch(e){ console.error('[invoice] sync error:', e); }
+      }, 50);
+    });
+  })();
+
+  // Boot
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    await safeAuth();
+    await loadCfgCloud();
+    // Reload again in case other scripts set defaults after load
+    setTimeout(loadCfgCloud, 400);
+    setTimeout(loadCfgCloud, 1200);
+    try{ onSnapshot(cfgRef, s=>{ if(s.exists()){ localStorage.setItem('cfg_v4', JSON.stringify(s.data())); } }); }catch(e){}
+  });
+</script>
+
 </body>
 </html>

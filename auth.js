@@ -17,6 +17,7 @@ export async function logout(){
   await signOut(auth);
 }
 
+// Anti-bounce hardened requireAdmin
 export function requireAdmin(onReady){
   onAuthStateChanged(auth, async (u)=>{
     if(!u){ window.location.href = 'login.html'; return; }

@@ -2,6 +2,7 @@
 // firebase-init.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getAuth, setPersistence, browserLocalPersistence, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { indexedDBLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -18,7 +19,7 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-setPersistence(auth, browserLocalPersistence);
+setPersistence(auth, indexedDBLocalPersistence).catch(()=> setPersistence(auth, browserLocalPersistence));
 
 export async function ensureAnonAuth(){
   if(!auth.currentUser){
@@ -26,3 +27,5 @@ export async function ensureAnonAuth(){
   }
   return new Promise(res=> onAuthStateChanged(auth, u=> u && res(u)));
 }
+
+// persistence fallback patch applied
