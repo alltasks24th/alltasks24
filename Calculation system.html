@@ -598,7 +598,7 @@
       if(d.ui){ $('#ui_primary').value=d.ui.primary||'#7C3AED'; $('#ui_accent').value=d.ui.accent||'#A78BFA'; $('#ui_dark').checked = d.ui.dark?true:false; document.documentElement.setAttribute('data-theme', d.ui.dark?'dark':'light'); }
       if(d.biz){ $('#biz_name').value=d.biz.name||''; $('#biz_phone').value=d.biz.phone||''; $('#biz_line').value=d.biz.line||''; $('#biz_addr').value=d.biz.addr||''; $('#biz_note').value=d.biz.note||''; }
       applyTheme(); applyBiz();
-      if (!window.__cfgLoadedNotified) { window.__cfgLoadedNotified = true; console.log('[cfg] โหลดการตั้งค่าแล้ว'); }
+      alert('โหลดการตั้งค่าแล้ว');
     }
     function defaultCfg(){
       ['cfg_base','cfg_incKm','cfg_perKm1','cfg_tier2Start','cfg_perKm2','cfg_minCharge','cfg_stop','cfg_wait','cfg_night','cfg_rain','cfg_weekend'].forEach((id,i)=>{
