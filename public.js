@@ -752,4 +752,48 @@ async function renderHomeProducts() {
 }
 
 // เรียกเมื่อ DOM พร้อม
-document.addEventListener('DOMContentLoaded', renderHomeProducts);
+document.addEventListener('DOMContentLoaded', () => {
+  try { renderHomeProducts(); } catch (e) { /* shop.html may not have home section */ }
+  decorateSoldOutCards(document);
+  // Observe for dynamically rendered product cards (shop filters/search)
+  const obs = new MutationObserver(() => {
+    decorateSoldOutCards(document);
+  });
+  obs.observe(document.body, { childList: true, subtree: true });
+});
+
+
+// Generic decorator: mark sold-out cards on any page (home or shop)
+function decorateSoldOutCards(root=document){
+  const cards = root.querySelectorAll('.product-card');
+  cards.forEach(card => {
+    // Determine stock
+    let soldOut = card.classList.contains('is-soldout');
+    // 1) dataset / attribute
+    const ds = card.dataset?.stock ?? card.getAttribute('data-stock');
+    if (!soldOut && ds!=null && ds!=='') soldOut = Number(ds) <= 0;
+    // 2) stock elements
+    if (!soldOut){
+      const sv = card.querySelector('.stock, .stock-value, [data-stock]');
+      if (sv){
+        const v = (sv.dataset ? sv.dataset.stock : null) ?? (sv.getAttribute ? sv.getAttribute('data-stock') : null) ?? sv.textContent;
+        if (v!=null && String(v).trim()!=='') soldOut = Number(v)<=0;
+      }
+    }
+    // 3) fallback: parse text
+    if (!soldOut){
+      const t = card.textContent.replace(/\s+/g,'').toLowerCase();
+      if (t.includes('สต็อก:0') || t.includes('stock:0') || t.includes('สินค้าหมด')) soldOut = true;
+    }
+    if (soldOut){
+      card.classList.add('is-soldout');
+      const wrap = card.querySelector('.ratio, .card-img, .card-img-top') || card;
+      if (wrap && !wrap.querySelector('.soldout-badge')){
+        const badge = document.createElement('div');
+        badge.className = 'soldout-badge';
+        badge.textContent = 'สินค้าหมด';
+        wrap.appendChild(badge);
+      }
+    }
+  });
+}
