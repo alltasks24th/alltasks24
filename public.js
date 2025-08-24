@@ -494,7 +494,7 @@ async function setupChat(user){
   input.addEventListener('keypress', e=>{ if(e.key==='Enter') sendMsg(); });
 
   if(createdNow){
-    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text: 'ยินดีให้บริการ 24 ชั่วโมง ฝากข้อความไว้ได้เลยครับ หากไม่มีการตอบกลับ สามารถทัก Line ได้ครับ', createdAt: serverTimestamp() });
+    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text: 'ยินดีให้บริการ 24 ชั่วโมง ฝากข้อความไว้ได้เลยครับ', createdAt: serverTimestamp() });
   }
 
   async function resetUnreadUser(){
@@ -797,3 +797,67 @@ function decorateSoldOutCards(root=document){
     }
   });
 }
+
+
+// === Floating Team Status Widget (bottom-left) ===
+(function(){
+  // Config
+  const TSW_STYLE = 'pill'; // 'pill' | 'card' | 'bubble'
+  const LABEL = { online:'ออนไลน์', busy:'ติดงาน', off:'ไม่ว่าง' };
+
+  function mountContainer(){
+    let el = document.getElementById('status-widget');
+    if (!el){ el = document.createElement('div'); el.id = 'status-widget'; document.body.appendChild(el); }
+    return el;
+  }
+  function renderPill(root, d){
+    root.innerHTML = `<div class="tsw-pill tsw-${d.state}">
+      <span class="tsw-dot"></span>
+      <span class="tsw-label">${LABEL[d.state]||d.state}</span>
+      ${d.state==='online' && d.count? `<span class="tsw-count">${d.count} คน</span>`:''}
+    </div>`;
+  }
+  function renderCard(root, d){
+    root.innerHTML = `<div class="tsw-card tsw-${d.state}" data-open="0" title="แตะเพื่อแสดง/ซ่อนรายละเอียด">
+      <span class="tsw-icon">⚡</span>
+      <div class="tsw-col">
+        <div class="tsw-row"><span class="tsw-dot"></span><span class="tsw-label">${LABEL[d.state]||d.state}</span>${d.state==='online' && d.count? `<span class="tsw-count" style="background:#fff;padding:.12rem .44rem;border-radius:.5rem;font-weight:700">${d.count} คน</span>`:''}</div>
+        <div class="tsw-note">${(d.note||'').replace(/</g,'&lt;')}</div>
+      </div>
+    </div>`;
+    const el = root.firstElementChild; el.addEventListener('click', ()=>{ el.dataset.open = (el.dataset.open==='1'?'0':'1'); });
+  }
+  function renderBubble(root, d){
+    root.innerHTML = `<div class="tsw-bubble tsw-${d.state}" data-open="0">
+      <button class="tsw-btn" aria-label="${LABEL[d.state]||d.state}${d.count? ' '+d.count+' คน':''}"><span class="tsw-dot"></span></button>
+      <div class="tsw-pop"><div class="tsw-row"><span class="tsw-dot"></span><span>${LABEL[d.state]||d.state}</span>${d.state==='online' && d.count? `<span class="tsw-count" style="background:#f3f4f6;border-radius:6px;padding:.06rem .4rem;margin-left:.25rem">${d.count} คน</span>`:''}</div>${(d.note? `<div class="tsw-note">${(d.note||'').replace(/</g,'&lt;')}</div>`:'')}</div>
+    </div>`;
+    const rootEl = root.firstElementChild; rootEl.querySelector('.tsw-btn').addEventListener('click', ()=>{ rootEl.dataset.open = (rootEl.dataset.open==='1'?'0':'1'); });
+  }
+  function paint(root, data){
+    const d = {state: (data?.teamState)||'off', count: data?.teamHeadcount||0, note: data?.teamNote||''};
+    if(TSW_STYLE==='card') return renderCard(root,d);
+    if(TSW_STYLE==='bubble') return renderBubble(root,d);
+    return renderPill(root,d); // default
+  }
+
+  // Ensure firestore functions
+  function ensureFS(){
+    return new Promise((resolve)=>{
+      if (typeof doc!=='undefined' && typeof getDoc!=='undefined' && typeof onSnapshot!=='undefined') return resolve({doc, getDoc, onSnapshot});
+      import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js').then(m=> resolve(m));
+    });
+  }
+
+  async function setupStatusWidget(){
+    try{
+      const root = mountContainer();
+      const {doc, getDoc, onSnapshot} = await ensureFS();
+      const ref = doc(db,'settings','public');
+      try { const snap = await getDoc(ref); paint(root, snap.data()||{}); } catch(e){ paint(root, {teamState:'off'}); }
+      try { if (typeof onSnapshot === 'function') onSnapshot(ref, s=> paint(root, s.data()||{})); } catch(e){ /* ignore */ }
+    }catch(err){ console.error('tsw init error', err); }
+  }
+  function waitDb(){ if (typeof db!=='undefined' && db) setupStatusWidget(); else setTimeout(waitDb, 150); }
+  document.addEventListener('DOMContentLoaded', waitDb);
+})();
