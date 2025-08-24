@@ -973,18 +973,37 @@
 </script>
 
 
-<!-- === Cloud sync for Calculator Config & Invoices (Firestore) === -->
+
+
+
+<!-- === Cloud sync for Calculator Config & Invoices (Firestore) — SAFE FOR ADMIN === -->
 <script type="module">
   import { db, ensureAnonAuth } from './firebase-init.js';
   import { doc, getDoc, setDoc, onSnapshot } 
     from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+  import { getAuth, onAuthStateChanged } 
+    from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
 
+  const auth = getAuth();
   const cfgRef = doc(db, 'settings', 'calculator_v4');
 
+  // รอให้ session เดิม (เช่น admin) ฟื้นก่อน ถ้ายังไม่มีและไม่ได้อยู่โหมด admin ค่อยล็อกอินนิรนาม
   async function safeAuth(){
-    try{
-      if (typeof ensureAnonAuth === 'function'){ await ensureAnonAuth(); }
-    }catch(e){ console.warn('[cfg] auth warn:', e); }
+    const role = (localStorage.getItem('role')||'').toLowerCase();
+    if (role === 'owner' || role === 'admin') return;
+
+    await new Promise(resolve => {
+      let done = false;
+      const t = setTimeout(async () => {
+        if (!auth.currentUser) {
+          try { if (typeof ensureAnonAuth === 'function') await ensureAnonAuth(); } catch(e){}
+        }
+        resolve();
+      }, 800);
+      onAuthStateChanged(auth, (u)=>{
+        if (u) { clearTimeout(t); resolve(); }
+      });
+    });
   }
 
   async function loadCfgCloud(){
@@ -1006,7 +1025,6 @@
     }catch(e){ console.error('[cfg] sync error:', e); }
   }
 
-  // Hook existing button -> save localStorage then sync cloud
   document.addEventListener('DOMContentLoaded', ()=>{
     const btn = document.getElementById('btnCfgSave');
     if (btn){
@@ -1017,7 +1035,6 @@
     }
   });
 
-  // Optional: also sync the latest invoice to Firestore by inv_no (if UI has it)
   (function(){
     const btnBill = document.getElementById('btnSaveBill');
     if (!btnBill) return;
@@ -1036,11 +1053,9 @@
     });
   })();
 
-  // Boot
   document.addEventListener('DOMContentLoaded', async ()=>{
     await safeAuth();
     await loadCfgCloud();
-    // Reload again in case other scripts set defaults after load
     setTimeout(loadCfgCloud, 400);
     setTimeout(loadCfgCloud, 1200);
     try{ onSnapshot(cfgRef, s=>{ if(s.exists()){ localStorage.setItem('cfg_v4', JSON.stringify(s.data())); } }); }catch(e){}
