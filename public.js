@@ -797,3 +797,57 @@ function decorateSoldOutCards(root=document){
     }
   });
 }
+
+// --- boot everything on DOM ready (safe-call; ไม่พังถ้าไม่มีฟังก์ชันนั้น) ---
+document.addEventListener('DOMContentLoaded', () => {
+  try { renderHomeProducts && renderHomeProducts(); } catch(e) {}
+  // เรียกฟังก์ชันวาดป้ายที่โปรเจ็กต์ใช้อยู่ (ชื่ออาจเป็น renderSiteStatus หรือ renderSiteStatusBadge)
+  try { renderSiteStatus && renderSiteStatus(); } catch(e) {}
+  try { renderSiteStatusBadge && renderSiteStatusBadge(); } catch(e) {}
+
+  // ของแพตช์สินค้า “สินค้าหมด” (คงไว้)
+  try { decorateSoldOutCards && decorateSoldOutCards(document); } catch(e) {}
+  try {
+    const obs = new MutationObserver(() => {
+      try { decorateSoldOutCards && decorateSoldOutCards(document); } catch(e) {}
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+  } catch(e) {}
+
+  // Fallback: ถ้าโปรเจ็กต์ไม่มีฟังก์ชันใด ๆ ข้างบนเลย ให้สร้างป้ายจาก localStorage ชั่วคราว
+  if (!document.querySelector('.site-status-badge')) {
+    (function () {
+      const mount =
+        document.getElementById('siteStatusMount') ||
+        document.querySelector('.navbar-brand, .brand, header .container') ||
+        document.body;
+
+      const saved = localStorage.getItem('siteStatus');
+      let data = {};
+      try { data = saved ? JSON.parse(saved) : {}; } catch (_) {}
+      const state = data.state || 'online';   // online | busy | offline
+      const count = data.count || 0;
+
+      const label = { online: 'ออนไลน์', busy: 'ติดงาน', offline: 'ไม่ว่าง' }[state] || 'ออนไลน์';
+
+      const el = document.createElement('span');
+      el.className = `site-status-badge ${state}`;
+      el.innerHTML =
+        `<span class="dot"></span><span class="lbl">${label}</span>` +
+        (count ? `<span class="count ms-1">${count} คน</span>` : '');
+
+      // ถ้ามีที่ยึด ให้แปะหลังโลโก้/แบรนด์
+      if (mount) {
+        if (mount.id !== 'siteStatusMount') {
+          const holder = document.createElement('span');
+          holder.id = 'siteStatusMount';
+          holder.className = 'ms-2';
+          mount.appendChild(holder);
+          holder.appendChild(el);
+        } else {
+          mount.appendChild(el);
+        }
+      }
+    })();
+  }
+});
