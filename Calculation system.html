@@ -972,5 +972,59 @@
 })();
 </script>
 
+<script type="module">
+  import { db, ensureAnonAuth } from './firebase-init.js';
+  import { doc, getDoc, setDoc, onSnapshot } 
+    from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+  // เอกสารกลางเก็บ "ตั้งค่าคำนวน"
+  const cfgRef = doc(db, 'settings', 'calculator_v4');
+  await ensureAnonAuth();
+
+  // โหลดค่าจากคลังกลาง → อัปเดต UI และ localStorage ให้ตรง
+  async function loadCfgCloud(){
+    const snap = await getDoc(cfgRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      localStorage.setItem('cfg_v4', JSON.stringify(data));
+      try { loadCfg(); } catch(e){}
+    }
+  }
+
+  // ครอบฟังก์ชัน save เดิม → บันทึกลง Firestore ด้วย
+  const _saveCfg = window.saveCfg;
+  window.saveCfg = async function(){
+    _saveCfg && _saveCfg();  // เซฟลง localStorage ตามเดิม
+    try {
+      const payload = JSON.parse(localStorage.getItem('cfg_v4')||'{}');
+      await setDoc(cfgRef, payload, { merge: true });
+      console.log('[cfg] synced to Firestore');
+    } catch(e){ console.error(e); }
+  };
+
+  // โหลดจากคลังกลางตอนเปิดหน้า (ครั้งแรก) + ฟังอัปเดตสด
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCfgCloud();
+    try { onSnapshot(cfgRef, (s)=>{ if(s.exists()){ 
+      localStorage.setItem('cfg_v4', JSON.stringify(s.data())); 
+    }});} catch(e){}
+  });
+
+  // (ออปชัน) บันทึก “บิล” ถาวรด้วย: ครอบ save บิลเดิมแล้วเขียน Firestore
+  const _saveBill = window.saveInvoice; // ถ้ามีฟังก์ชันชื่อนี้
+  window.saveInvoice = async function(){
+    const before = localStorage.getItem('invoices')||'[]';
+    _saveBill && _saveBill(); // เซฟลง localStorage ตามเดิม
+    try {
+      const after = JSON.parse(localStorage.getItem('invoices')||'[]');
+      const bill = after.at(-1); // ตัวล่าสุดที่เพิ่งบันทึก
+      if (bill?.inv_no){
+        await setDoc(doc(db,'invoices', bill.inv_no), bill);
+        console.log('[invoice] saved:', bill.inv_no);
+      }
+    } catch(e){ console.error(e); }
+  };
+</script>
+  
 </body>
 </html>
