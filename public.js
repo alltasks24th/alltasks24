@@ -861,3 +861,74 @@ function decorateSoldOutCards(root=document){
   function waitDb(){ if (typeof db!=='undefined' && db) setupStatusWidget(); else setTimeout(waitDb, 150); }
   document.addEventListener('DOMContentLoaded', waitDb);
 })();
+
+
+/* === ADDON: copy link buttons (DO NOT REMOVE) === */
+(()=>{ 
+  function addCopyBtn(modal){ 
+    try{
+      if(!modal || modal.querySelector('[data-addon="copylink"]')) return;
+      const body = modal.querySelector('.modal-body'); if(!body) return;
+      // หาแถวปุ่มที่มีอยู่แล้ว (บริการ: data-addon=contact-cta, สินค้า: แถวปุ่มทั่วไป)
+      let row = body.querySelector('[data-addon="contact-cta"]') 
+             || body.querySelector('.d-flex.flex-wrap.gap-2.mt-3');
+      if(!row){ row = document.createElement('div'); row.className='d-flex flex-wrap gap-2 mt-3'; body.appendChild(row); }
+      const isSvc = modal.id?.startsWith('svc-'); 
+      const isProd = modal.id?.startsWith('prod-');
+      if(!(isSvc||isProd)) return;
+      const rid = modal.id.replace(/^svc-|^prod-/,'').trim();
+      const url = location.origin + location.pathname + (isSvc?`?svc=${encodeURIComponent(rid)}`:`?prod=${encodeURIComponent(rid)}`);
+      const btn = document.createElement('button');
+      btn.type='button';
+      btn.className='btn btn-outline-secondary btn-copylink';
+      btn.setAttribute('data-addon','copylink');
+      btn.setAttribute('data-copy-link', url);
+      btn.innerHTML='<i class="bi bi-link-45deg"></i> คัดลอกลิงก์';
+      row.appendChild(btn);
+    }catch(_){
+      /* no-op */
+    }
+  }
+
+  // เติมปุ่มตอนโมดอลแสดง
+  document.addEventListener('shown.bs.modal', e=>{ 
+    const m = e.target; 
+    if(!m || !(m.id && (m.id.startsWith('svc-')||m.id.startsWith('prod-')))) return; 
+    addCopyBtn(m); 
+  });
+
+  // คัดลอกลิงก์ (รองรับ fallback)
+  async function copyText(t){ 
+    try{ if(navigator.clipboard?.writeText){ await navigator.clipboard.writeText(t); return true; } }catch(_){}
+    try{ 
+      const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select(); const ok=document.execCommand('copy'); ta.remove(); 
+      return ok; 
+    }catch(_){ return false; }
+  }
+  document.addEventListener('click', async e=>{ 
+    const b = e.target.closest('[data-copy-link]'); if(!b) return;
+    const url = b.getAttribute('data-copy-link');
+    const ok = await copyText(url);
+    const prev = b.innerHTML;
+    b.innerHTML = ok?'<i class="bi bi-check2"></i> คัดลอกแล้ว':'คัดลอกไม่สำเร็จ';
+    b.classList.add('copied');
+    setTimeout(()=>{ b.innerHTML=prev; b.classList.remove('copied'); }, 1500);
+  });
+
+  // เปิดโมดอลอัตโนมัติถ้าเข้าด้วย ?svc= หรือ ?prod=
+  function autoOpenFromQuery(){ 
+    const q = new URLSearchParams(location.search);
+    const id = q.get('svc') ? `svc-${q.get('svc')}` : (q.get('prod') ? `prod-${q.get('prod')}` : '');
+    if(!id) return;
+    const open=()=>{
+      const el=document.getElementById(id); if(!el) return false;
+      const m = window.bootstrap?.Modal.getOrCreateInstance(el); m?.show?.(); return true;
+    };
+    if(open()) return;
+    const obs=new MutationObserver(()=>{ if(open()) obs.disconnect(); });
+    obs.observe(document.body, {childList:true, subtree:true});
+    setTimeout(()=>obs.disconnect(), 6000);
+  }
+  window.addEventListener('load', autoOpenFromQuery);
+})();
