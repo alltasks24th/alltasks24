@@ -147,3 +147,8 @@ a{color:var(--primary)}a:hover{filter:brightness(.9)}
 .tsw-bubble .tsw-pop .tsw-dot{width:.55rem;height:.55rem;border-radius:50%}
 .tsw-bubble .tsw-pop .tsw-note{font-size:12px;color:#4b5563;margin-top:2px}
 /* ============================================================================ */
+
+
+/* === ADDON: copy link buttons (DO NOT REMOVE) === */
+.btn-copylink.copied{ animation: copyPulse .8s ease; }
+@keyframes copyPulse{ 0%{transform:scale(1)} 40%{transform:scale(1.05)} 100%{transform:scale(1)} }
