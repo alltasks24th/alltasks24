@@ -837,10 +837,7 @@
       if(document.body.classList.contains('paper-a5')){ pretty.style.width='148mm'; }
       if(document.body.classList.contains('paper-80')){ pretty.style.width='80mm'; }
       const holder=document.createElement('div'); holder.style.position='fixed'; holder.style.left='-9999px'; holder.style.top='0'; holder.appendChild(pretty); document.body.appendChild(holder);
-      await (document.fonts && document.fonts.ready).catch(()=>{});
-      const _dpr=(window.devicePixelRatio||1);
-      const _scale=Math.max(2, Math.min(4, _dpr*2));
-      const canvas=await html2canvas(pretty,{ scale:_scale, useCORS:true, backgroundColor:"#FFFFFF", imageTimeout:20000, logging:false });
+      const canvas=await html2canvas(pretty,{ scale:2, useCORS:true, backgroundColor:'#FFFFFF' });
       if(to==='png'){ const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='เอกสาร.png'; a.click(); }
       if(to==='pdf'){ const { jsPDF } = window.jspdf; const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'}); const img=canvas.toDataURL('image/png'); const pageW=pdf.internal.pageSize.getWidth(); const imgW=pageW-20; const imgH=canvas.height*imgW/canvas.width; pdf.addImage(img,'PNG',10,10,imgW,imgH); pdf.save('เอกสาร.pdf'); }
       document.body.removeChild(holder);
