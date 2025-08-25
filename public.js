@@ -909,11 +909,18 @@ function decorateSoldOutCards(root=document){
   document.addEventListener('click', async e=>{ 
     const b = e.target.closest('[data-copy-link]'); if(!b) return;
     const url = b.getAttribute('data-copy-link');
-    const ok = await copyText(url);
+
+    // Compose "ส่ง<ชนิด>: <ชื่อ> + ลิงก์"
+    const modal = b.closest('.modal');
+    const title = (modal?.querySelector('.modal-title')?.textContent || '').trim();
+    const kind = modal?.id?.startsWith('svc-') ? 'บริการ' : 'สินค้า';
+    const textToCopy = title ? `ส่ง${kind}: ${title}\n${url}` : url;
+
+    const ok = await copyText(textToCopy);
     const prev = b.innerHTML;
-    b.innerHTML = ok?'<i class="bi bi-check2"></i> คัดลอกแล้ว':'คัดลอกไม่สำเร็จ';
+    b.innerHTML = ok ? '<i class="bi bi-check2"></i> คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
     b.classList.add('copied');
-    setTimeout(()=>{ b.innerHTML=prev; b.classList.remove('copied'); }, 1500);
+    setTimeout(()=>{ b.innerHTML = prev; b.classList.remove('copied'); }, 1500);
   });
 
   // เปิดโมดอลอัตโนมัติถ้าเข้าด้วย ?svc= หรือ ?prod=
