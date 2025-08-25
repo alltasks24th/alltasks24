@@ -128,47 +128,8 @@
     .w-80mm{ width:80mm; margin:auto }
     .tnum{ font-variant-numeric: tabular-nums; }
   </style>
-
-<style id="ui-polish-v1">
-/* ===== Polished UI v1 (visual-only patch) ===== */
-:root { --ui-card-radius: 1rem; --ui-card-shadow: 0 10px 30px rgba(0,0,0,.06); --ui-border: rgba(0,0,0,.08); --ui-border-dark: rgba(255,255,255,.12); --ui-focus: rgba(111,66,193,.25); }
-/* Sticky, translucent topbar */
-.pro-ui .navbar { position: sticky; top: 0; z-index: 1030; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--ui-border); background-color: rgba(255,255,255,.75); }
-[data-theme="dark"] .pro-ui .navbar { background-color: rgba(0,0,0,.35); border-bottom-color: var(--ui-border-dark); }
-/* Cards */
-.pro-ui .card { border-radius: var(--ui-card-radius); box-shadow: var(--ui-card-shadow); border: 1px solid var(--ui-border); }
-[data-theme="dark"] .pro-ui .card { border-color: var(--ui-border-dark); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
-/* Inputs */
-.pro-ui .form-control, .pro-ui .form-select, .pro-ui input, .pro-ui select, .pro-ui textarea { border-radius: .75rem !important; transition: box-shadow .2s, border-color .2s, background-color .2s; }
-.pro-ui .form-control:focus, .pro-ui .form-select:focus, .pro-ui input:focus, .pro-ui textarea:focus, .pro-ui select:focus { border-color: var(--primary, #6f42c1) !important; box-shadow: 0 0 0 .2rem var(--ui-focus) !important; outline: none; }
-/* Buttons */
-.pro-ui .btn { border-radius: .75rem; transition: transform .05s ease, box-shadow .2s ease; }
-.pro-ui .btn:active { transform: translateY(1px); }
-.pro-ui .btn-primary { background: var(--primary, #6f42c1); border-color: var(--primary, #6f42c1); }
-.pro-ui .btn-outline-primary { color: var(--primary, #6f42c1); border-color: var(--primary, #6f42c1); }
-.pro-ui .btn-outline-primary:hover { background: var(--primary, #6f42c1); color: #fff; }
-/* Section spacing */
-.pro-ui .container, .pro-ui .container-fluid { padding-top: .5rem; padding-bottom: 1.25rem; }
-/* Tables */
-.pro-ui thead th { position: sticky; top: 56px; background: rgba(255,255,255,.9); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1; }
-[data-theme="dark"] .pro-ui thead th { background: rgba(0,0,0,.5); }
-.pro-ui tbody tr { transition: background-color .15s ease; }
-.pro-ui tbody tr:hover { background-color: rgba(0,0,0,.035); }
-[data-theme="dark"] .pro-ui tbody tr:hover { background-color: rgba(255,255,255,.05); }
-.pro-ui table td, .pro-ui table th { border-top: 1px solid var(--ui-border); }
-[data-theme="dark"] .pro-ui table td, [data-theme="dark"] .pro-ui table th { border-top-color: var(--ui-border-dark); }
-/* Pretty print area */
-.pro-ui #prettyPrint, .pro-ui .pretty-doc { border-radius: 1rem; box-shadow: 0 20px 40px rgba(0,0,0,.08); }
-[data-theme="dark"] .pro-ui #prettyPrint, [data-theme="dark"] .pro-ui .pretty-doc { box-shadow: 0 20px 60px rgba(0,0,0,.45); }
-/* Divider */
-.pro-ui .soft-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(0,0,0,.1), transparent); margin: 1rem 0; }
-[data-theme="dark"] .pro-ui .soft-divider { background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent); }
-/* Keep print CSS intact */
-@media print { .pro-ui .navbar { display: none !important; } }
-</style>
-
 </head>
-<body class="paper-a4 pro-ui">
+<body class="paper-a4">
   <nav class="navbar brand">
     <div class="container-narrow container-fluid">
       <div class="d-flex align-items-center gap-2">
