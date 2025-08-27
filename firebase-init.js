@@ -27,5 +27,5 @@ export async function ensureAnonAuth(){
   }
   return new Promise(res=> onAuthStateChanged(auth, u=> u && res(u)));
 }
-
+window.firebaseConfig = window.firebaseConfig || firebaseConfig;
 // persistence fallback patch applied
