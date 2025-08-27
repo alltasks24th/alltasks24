@@ -536,5 +536,74 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+
+<!-- ===== Static Generator (assistant v36) ===== -->
+<style>
+  .static-gen-fab{position:fixed;right:16px;bottom:16px;z-index:1030;border-radius:999px;padding:12px 16px;border:none;background:#0EA5E9;color:#fff;box-shadow:0 10px 24px rgba(2,6,23,.15);}
+  .static-gen-fab:hover{filter:brightness(1.05)}
+  .static-gen-modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;z-index:1040;align-items:center;justify-content:center;padding:16px;}
+  .static-gen-modal{background:#fff;border-radius:16px;max-width:760px;width:100%;box-shadow:0 20px 60px rgba(2,6,23,.2);overflow:hidden}
+  .static-gen-hd{padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+  .static-gen-bd{padding:16px 20px;max-height:min(72vh,900px);overflow:auto}
+  .static-gen-ft{padding:16px 20px;border-top:1px solid #e2e8f0;display:flex;gap:12px;flex-wrap:wrap}
+  .static-gen-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .static-gen-input{width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px}
+  .static-gen-check{display:flex;align-items:center;gap:8px}
+  .btn-pri{background:#0EA5E9;color:#fff;border:none;border-radius:12px;padding:10px 14px}
+  .btn-sec{background:#f1f5f9;border:none;border-radius:12px;padding:10px 14px}
+  .muted{opacity:.8}
+  @media(max-width:640px){.static-gen-grid{grid-template-columns:1fr}}
+</style>
+<button id="openStaticGen" class="static-gen-fab" title="Static Generator">Static Generator</button>
+<div id="staticGenBackdrop" class="static-gen-modal-backdrop" aria-hidden="true">
+  <div class="static-gen-modal" role="dialog" aria-modal="true" aria-labelledby="sg-title">
+    <div class="static-gen-hd">
+      <h3 id="sg-title" style="margin:0">Static Generator</h3>
+      <button id="closeStaticGen" class="btn-sec" aria-label="Close">ปิด</button>
+    </div>
+    <div class="static-gen-bd">
+      <div class="static-gen-grid">
+        <div>
+          <label>โดเมนหลัก (canonical)</label>
+          <input id="sg-domain" class="static-gen-input" value="https://alltasks24.online">
+        </div>
+        <div>
+          <label>โฟลเดอร์รูป OG (1200×630)</label>
+          <input id="sg-ogdir" class="static-gen-input" value="/assets/og">
+        </div>
+        <div>
+          <label>คอลเลกชันบริการ (Firestore)</label>
+          <input id="sg-services-col" class="static-gen-input" value="services">
+        </div>
+        <div>
+          <label>คอลเลกชันสินค้า (Firestore)</label>
+          <input id="sg-products-col" class="static-gen-input" value="products">
+        </div>
+        <div class="static-gen-check">
+          <input type="checkbox" id="sg-generate-og" checked>
+          <label for="sg-generate-og">สร้างรูป OG 1200×630 อัตโนมัติ (พื้นหลังโทนแบรนด์)</label>
+        </div>
+        <div class="static-gen-check">
+          <input type="checkbox" id="sg-use-item-image">
+          <label for="sg-use-item-image">ถ้าเอกสารมี image URL ให้ใช้เป็นพื้นหลัง OG</label>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:12px">คลิกปุ่มเพื่อสร้างไฟล์ detail (Service/Product) พร้อม OG/JSON-LD และ <code>sitemap.xml</code> เป็น ZIP ดาวน์โหลด</p>
+      <pre id="sg-log" style="background:#0b1220;color:#d4e1ff;padding:12px;border-radius:12px;white-space:pre-wrap;max-height:240px;overflow:auto"></pre>
+    </div>
+    <div class="static-gen-ft">
+      <button id="sg-gen-all" class="btn-pri">Generate ALL (Pages + OG + sitemap)</button>
+      <button id="sg-gen-pages" class="btn-sec">Only Pages</button>
+      <button id="sg-gen-og" class="btn-sec">Only OG Images</button>
+      <button id="sg-gen-sitemap" class="btn-sec">Only sitemap.xml</button>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script type="module" src="/admin-static-gen.js"></script>
+<!-- ===== /Static Generator (assistant v36) ===== -->
+
+
 </body>
 </html>
