@@ -868,23 +868,44 @@ function decorateSoldOutCards(root=document){
   function addCopyBtn(modal){ 
     try{
       if(!modal || modal.querySelector('[data-addon="copylink"]')) return;
-      const body = modal.querySelector('.modal-body'); if(!body) return;
-      // หาแถวปุ่มที่มีอยู่แล้ว (บริการ: data-addon=contact-cta, สินค้า: แถวปุ่มทั่วไป)
-      let row = body.querySelector('[data-addon="contact-cta"]') 
-             || body.querySelector('.d-flex.flex-wrap.gap-2.mt-3');
-      if(!row){ row = document.createElement('div'); row.className='d-flex flex-wrap gap-2 mt-3'; body.appendChild(row); }
+
+      // 1) พยายามหาปุ่มใน footer ก่อน (มาตรฐาน)
+      let row = modal.querySelector('.modal-footer .d-flex.gap-2.flex-wrap');
+      const footer = modal.querySelector('.modal-footer');
+      if(!row && footer) row = footer;
+
+      // 2) Fallback: ถ้าไม่มี footer ให้ใช้แถวใน body เดิม
+      if(!row){
+        const body = modal.querySelector('.modal-body'); if(!body) return;
+        row = body.querySelector('[data-addon="contact-cta"]') 
+              || body.querySelector('.d-flex.flex-wrap.gap-2.mt-3');
+        if(!row){ 
+          row = document.createElement('div'); 
+          row.className='d-flex flex-wrap gap-2 mt-3'; 
+          body.appendChild(row); 
+        }
+      }
+
+      // 3) ระบุ URL ของรายการในโมดัลนี้
       const isSvc = modal.id?.startsWith('svc-'); 
       const isProd = modal.id?.startsWith('prod-');
       if(!(isSvc||isProd)) return;
       const rid = modal.id.replace(/^svc-|^prod-/,'').trim();
       const url = location.origin + location.pathname + (isSvc?`?svc=${encodeURIComponent(rid)}`:`?prod=${encodeURIComponent(rid)}`);
+
+      // 4) สร้างปุ่ม ให้ขนาดตามแถวปุ่ม (.btn-sm ถ้ามี)
+      const isSmall = !!row.querySelector('.btn-sm');
       const btn = document.createElement('button');
       btn.type='button';
-      btn.className='btn btn-outline-secondary btn-copylink';
+      btn.className='btn btn-outline-secondary' + (isSmall ? ' btn-sm' : '');
       btn.setAttribute('data-addon','copylink');
       btn.setAttribute('data-copy-link', url);
       btn.innerHTML='<i class="bi bi-link-45deg"></i> คัดลอกลิงก์';
-      row.appendChild(btn);
+
+      // 5) แทรกหลังปุ่ม Facebook ถ้ามี มิฉะนั้นต่อท้ายแถว
+      const fbBtn = row.querySelector('.bi-facebook')?.closest('a,button');
+      if(fbBtn) fbBtn.insertAdjacentElement('afterend', btn);
+      else row.appendChild(btn);
     }catch(_){
       /* no-op */
     }
