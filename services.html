@@ -73,27 +73,51 @@
 <script>
 /* === Add-on: Copy link for svc/prod modals + auto-open from ?svc / ?prod === */
 (()=>{ 
+  // ⬇⬇⬇ ปรับให้ปุ่มคัดลอกแทรก "ถัดจากปุ่ม Facebook" ใน .modal-footer ⬇⬇⬇
   function addCopyBtn(modal){
     try{
       if(!modal || modal.querySelector('[data-addon="copylink"]')) return;
-      const body = modal.querySelector('.modal-body'); if(!body) return;
-      let row = body.querySelector('[data-addon="contact-cta"]') 
-              || body.querySelector('.d-flex.flex-wrap.gap-2.mt-3');
-      if(!row){ row = document.createElement('div'); row.className='d-flex flex-wrap gap-2 mt-3'; body.appendChild(row); }
-      const isSvc = modal.id?.startsWith('svc-');
-      const isProd= modal.id?.startsWith('prod-');
+
+      // 1) หาแถวปุ่มใน footer ก่อน (เป็นตำแหน่งมาตรฐานของปุ่มติดต่อ)
+      let row = modal.querySelector('.modal-footer .d-flex.gap-2.flex-wrap');
+      const footer = modal.querySelector('.modal-footer');
+      if(!row && footer) row = footer; // ถ้าไม่ได้ใช้ div แถว ให้ใช้ footer ตรง ๆ
+
+      // 2) Fallback: ถ้าไม่มี footer ให้ใช้แถวใน body ตามเดิม
+      if(!row){
+        const body = modal.querySelector('.modal-body'); if(!body) return;
+        row = body.querySelector('[data-addon="contact-cta"]') 
+           || body.querySelector('.d-flex.flex-wrap.gap-2.mt-3');
+        if(!row){
+          row = document.createElement('div');
+          row.className='d-flex flex-wrap gap-2 mt-3';
+          body.appendChild(row);
+        }
+      }
+
+      // 3) เตรียม URL สำหรับบริการ/สินค้าในโมดัลนี้
+      const isSvc  = modal.id?.startsWith('svc-');
+      const isProd = modal.id?.startsWith('prod-');
       if(!(isSvc||isProd)) return;
       const rid = modal.id.replace(/^svc-|^prod-/,'').trim();
       const url = location.origin + location.pathname + (isSvc?`?svc=${encodeURIComponent(rid)}`:`?prod=${encodeURIComponent(rid)}`);
+
+      // 4) สร้างปุ่มคัดลอก ขนาดให้ตามปุ่มในแถวนั้น (ถ้ามี .btn-sm)
+      const isSmall = !!row.querySelector('.btn-sm');
       const btn = document.createElement('button');
       btn.type='button';
-      btn.className='btn btn-outline-secondary';
+      btn.className='btn btn-outline-secondary' + (isSmall ? ' btn-sm' : '');
       btn.setAttribute('data-addon','copylink');
       btn.setAttribute('data-copy-link', url);
       btn.innerHTML='<i class="bi bi-link-45deg"></i> คัดลอกลิงก์';
-      row.appendChild(btn);
+
+      // 5) แทรกถัดจากปุ่ม Facebook โดยตรง ถ้าเจอ
+      const fbBtn = row.querySelector('.bi-facebook')?.closest('a,button');
+      if(fbBtn) fbBtn.insertAdjacentElement('afterend', btn);
+      else row.appendChild(btn);
     }catch(_){}
   }
+  // ⬆⬆⬆ จบส่วนที่แก้ ⬆⬆⬆
 
   document.addEventListener('shown.bs.modal', e=>{
     const m=e.target; if(!m || !(m.id && (m.id.startsWith('svc-')||m.id.startsWith('prod-')))) return;
