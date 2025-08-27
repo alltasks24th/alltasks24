@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /login.html
+
+Sitemap: https://alltasks24.online/sitemap.xml
