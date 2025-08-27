@@ -527,5 +527,14 @@ https://...2.jpg"></textarea>
 <script type="module" src="auth.js"></script>
 <script type="module" src="admin.js"></script>
   <script type="module" src="admin-calendar.js?v=3"></script>
+
+<!-- PWA SW register (assistant v35) -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
 </body>
 </html>
