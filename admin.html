@@ -23,13 +23,15 @@
   .nav-pills .nav-link.active{background:var(--primary)}
   .stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
   .header{background:#fff;border-bottom:1px solid var(--border)}
-  @media (min-width: 768px){
-    body.sidebar-collapsed #adminSidebar{ display:none !important; }
-  }
-  /* helper */
-  .text-hint{font-size:.85rem;color:#6b7280}
+
+/* === Collapsible Sidebar (added) === */
+@media (min-width: 768px){
+  body.sidebar-collapsed #adminSidebar{ display:none !important; }
+}
+/* Keep content full width when collapsed (flex layout handles it) */
+
 </style>
-<link rel="stylesheet" href="admin-calendar.css?v=3">
+  <link rel="stylesheet" href="admin-calendar.css?v=3">
 </head>
 <body>
 <nav class="navbar navbar-light bg-white border-bottom sticky-top">
@@ -56,9 +58,14 @@
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-users"><i class="bi bi-people me-2"></i>ผู้ใช้/บทบาท</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-promos"><i class="bi bi-ticket-perforated me-2"></i>โปรโมชัน</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-banners"><i class="bi bi-images me-2"></i>แบนเนอร์</button>
-      <button class="nav-link" id="tab-products-tab" data-bs-toggle="pill" data-bs-target="#tab-products"><i class="bi bi-bag me-2"></i>ร้านค้า</button>
-      <button class="nav-link" id="tab-pricing-tab" data-bs-toggle="pill" data-bs-target="#tab-pricing"><i class="bi bi-calculator me-2"></i>คำนวณราคา</button>
-      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-2"></i>FAQ</button>
+
+      <!-- ปุ่มเมนูร้านค้า/สินค้า (ใหม่ วางถูกตำแหน่งแล้ว) -->
+      <button class="nav-link" id="tab-products-tab" data-bs-toggle="pill" data-bs-target="#tab-products">
+        <i class="bi bi-bag me-2"></i>ร้านค้า
+      </button>
+
+
+      <button class="nav-link" id="tab-pricing-tab" data-bs-toggle="pill" data-bs-target="#tab-pricing"><i class="bi bi-calculator me-2"></i>คำนวณราคา</button>      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-2"></i>FAQ</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-settings"><i class="bi bi-gear me-2"></i>ตั้งค่า</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chat"><i class="bi bi-chat-dots me-2"></i>แชทสด</button>
     </div>
@@ -76,59 +83,61 @@
           <div class="col-md-3"><div class="stat"><div class="text-muted">โปรโมชัน</div><div class="h4 mb-0" id="countPromos">0</div></div></div>
         </div>
 
-        <!-- Dashboard blocks (คงเดิม) -->
-        <div class="row g-3 mb-3">
-          <div class="col-md-3"><div class="stat"><div class="text-muted small">บริการทั้งหมด</div><div class="h4 mb-0" id="countServices">0</div></div></div>
-          <div class="col-md-3"><div class="stat"><div class="text-muted small">รีวิวทั้งหมด</div><div class="h4 mb-0" id="countReviewsAll">0</div></div></div>
-          <div class="col-md-3"><div class="stat"><div class="text-muted small">โปรโมชันที่ใช้งาน</div><div class="h4 mb-0" id="countPromosActive">0</div></div></div>
-        </div>
+<!-- === Dashboard Enhancements (auto-injected) === -->
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="stat"><div class="text-muted small">บริการทั้งหมด</div><div class="h4 mb-0" id="countServices">0</div></div></div>
+  <div class="col-md-3"><div class="stat"><div class="text-muted small">รีวิวทั้งหมด</div><div class="h4 mb-0" id="countReviewsAll">0</div></div></div>
+  <div class="col-md-3"><div class="stat"><div class="text-muted small">โปรโมชันที่ใช้งาน</div><div class="h4 mb-0" id="countPromosActive">0</div></div></div>
+</div>
 
-        <div class="row g-3">
-          <div class="col-lg-6">
-            <div class="card card-clean p-3 h-100">
-              <div class="fw-bold mb-2">การจองล่าสุด</div>
-              <div class="table-responsive">
-                <table class="table table-sm align-middle">
-                  <thead><tr><th>บริการ</th><th>ลูกค้า</th><th>วันที่</th><th>หมายเหตุ</th></tr></thead>
-                  <tbody id="latestBookingsBody"><tr><td colspan="4" class="text-muted small">ยังไม่มีข้อมูล</td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="card card-clean p-3 h-100">
-              <div class="fw-bold mb-2">โปรโมชันที่กำลังใช้งาน</div>
-              <ul id="activePromoList" class="list-group small"></ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="row g-3 mt-1">
-          <div class="col-lg-6">
-            <div class="card card-clean p-3 h-100">
-              <div class="fw-bold mb-2">บริการยอดนิยม</div>
-              <div class="table-responsive">
-                <table class="table table-sm align-middle">
-                  <thead><tr><th style="width:40px">#</th><th>บริการ</th><th class="text-end">จำนวนการจอง</th><th class="text-end">แจ้งปัญหา</th></tr></thead>
-                  <tbody id="topServicesBody"><tr><td colspan="4" class="text-muted small">ยังไม่มีข้อมูล</td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="card card-clean p-3 h-100">
-              <div class="fw-bold mb-2">สถิติ</div>
-              <div class="mb-3"><canvas id="chartDaily" height="140"></canvas></div>
-              <div><canvas id="chartMonthly" height="140"></canvas></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-clean p-3 mt-3">
-          <div class="fw-bold mb-2">การแจ้งเตือน</div>
-          <div id="notifBox" class="vstack gap-2"></div>
-        </div>
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card card-clean p-3 h-100">
+      <div class="fw-bold mb-2">การจองล่าสุด</div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>บริการ</th><th>ลูกค้า</th><th>วันที่</th><th>หมายเหตุ</th></tr></thead>
+          <tbody id="latestBookingsBody"><tr><td colspan="4" class="text-muted small">ยังไม่มีข้อมูล</td></tr></tbody>
+        </table>
       </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card card-clean p-3 h-100">
+      <div class="fw-bold mb-2">โปรโมชันที่กำลังใช้งาน</div>
+      <ul id="activePromoList" class="list-group small"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-lg-6">
+    <div class="card card-clean p-3 h-100">
+      <div class="fw-bold mb-2">บริการยอดนิยม</div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th style="width:40px">#</th><th>บริการ</th><th class="text-end">จำนวนการจอง</th><th class="text-end">แจ้งปัญหา</th></tr></thead>
+          <tbody id="topServicesBody"><tr><td colspan="4" class="text-muted small">ยังไม่มีข้อมูล</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card card-clean p-3 h-100">
+      <div class="fw-bold mb-2">สถิติ</div>
+      <div class="mb-3"><canvas id="chartDaily" height="140"></canvas></div>
+      <div><canvas id="chartMonthly" height="140"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="card card-clean p-3 mt-3">
+  <div class="fw-bold mb-2">การแจ้งเตือน</div>
+  <div id="notifBox" class="vstack gap-2"></div>
+</div>
+<!-- === /Dashboard Enhancements === -->
+
+</div>
 
       <!-- บริการ -->
       <div class="tab-pane fade" id="tab-services">
@@ -145,6 +154,7 @@
       <!-- ร้านค้า/สินค้า -->
       <div class="tab-pane fade" id="tab-products" role="tabpanel" aria-labelledby="tab-products-tab">
         <div class="row g-3 mt-3">
+
           <!-- ฟอร์มสินค้า -->
           <div class="col-lg-5">
             <div class="card">
@@ -166,26 +176,8 @@
                     <div class="col-4"><label class="form-label">จบโปรฯ</label><input id="saleEnd" type="datetime-local" class="form-control"></div>
                   </div>
 
-                  <!-- รูปปก: URL + อัปโหลดไฟล์ -->
-                  <div class="mt-2">
-                    <label class="form-label">รูปปก (URL หรืออัปโหลด)</label>
-                    <div class="input-group">
-                      <input id="cover" class="form-control" placeholder="https://...">
-                      <input id="prodCoverFile" type="file" accept="image/*" class="form-control" style="max-width:50%">
-                    </div>
-                    <div class="text-hint mt-1">วางลิงก์ หรือเลือกไฟล์เพื่ออัปโหลดขึ้น Storage</div>
-                  </div>
-
-                  <!-- แกลเลอรี: URL + อัปโหลดหลายไฟล์ (ต่อท้าย) -->
-                  <div class="mt-2">
-                    <label class="form-label">แกลเลอรี (คั่นด้วย , )</label>
-                    <input id="gallery" class="form-control" placeholder="https://..., https://...">
-                    <div class="d-flex align-items-center gap-2 mt-1">
-                      <input id="prodGalleryFiles" type="file" accept="image/*" multiple class="form-control">
-                    </div>
-                    <div class="text-hint mt-1">เลือกหลายไฟล์ได้ — ระบบจะอัปโหลดแล้วเติม URL ต่อท้ายให้</div>
-                  </div>
-
+                  <div class="mt-2"><label class="form-label">รูปปก (URL)</label><input id="cover" class="form-control" placeholder="https://..."></div>
+                  <div class="mt-2"><label class="form-label">แกลเลอรี (คั่นด้วย , )</label><input id="gallery" class="form-control" placeholder="https://..., https://..."></div>
                   <div class="mt-2"><label class="form-label">แท็ก (คั่นด้วย , )</label><input id="tags" class="form-control" placeholder="ทำความสะอาด, โปรฯ"></div>
 
                   <div class="row g-2 mt-1">
@@ -246,6 +238,7 @@
         </div>
       </div>
 
+      
       <!-- คำนวณราคา -->
       <div class="tab-pane fade" id="tab-pricing" role="tabpanel" aria-labelledby="tab-pricing-tab">
         <div class="card">
@@ -261,6 +254,7 @@
           </div>
         </div>
       </div>
+
 
       <!-- พื้นที่ -->
       <div class="tab-pane fade" id="tab-areas">
@@ -360,6 +354,7 @@
         </table>
       </div>
 
+      
       <!-- ปฏิทินงาน -->
       <div class="tab-pane fade" id="tab-calendar">
         <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
@@ -394,6 +389,7 @@
         </div>
       </div>
     
+
       <!-- FAQ -->
       <div class="tab-pane fade" id="tab-faq">
         <h5>คำถามที่พบบ่อย (FAQ)</h5>
@@ -412,21 +408,24 @@
         <h5>ตั้งค่าทั่วไปของเว็บไซต์</h5>
         <div class="row g-3">
           <div class="col-md-6"><label class="form-label">ชื่อเว็บ</label><input id="setSite" class="form-control" value="alltasks24.online">
-          <div class="card card-clean p-3 my-3">
-            <div class="fw-semibold mb-2">สถานะทีม (แสดงบนวิดเจ็ตลอย)</div>
-            <div class="row g-2 align-items-center">
-              <div class="col-12 col-md-7 d-flex flex-wrap align-items-center gap-3">
-                <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateOnline" value="online"><label class="form-check-label" for="teamStateOnline">ออนไลน์</label></div>
-                <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateBusy" value="busy"><label class="form-check-label" for="teamStateBusy">ติดงาน</label></div>
-                <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateOff" value="off" checked><label class="form-check-label" for="teamStateOff">ไม่ว่าง</label></div>
-                <div class="input-group" style="max-width:180px"><span class="input-group-text">จำนวน</span><input id="teamCount" type="number" class="form-control" min="0" value="1"></div>
-              </div>
-              <div class="col-12 col-md-5 d-flex align-items-center gap-2">
-                <input id="teamNote" class="form-control" placeholder="หมายเหตุ (ไม่บังคับ)">
-                <span class="text-muted small">ใช้ปุ่ม “บันทึก” ด้านล่าง</span>
+        <div class="card card-clean p-3 my-3">
+          <div class="fw-semibold mb-2">สถานะทีม (แสดงบนวิดเจ็ตลอย)</div>
+          <div class="row g-2 align-items-center">
+            <div class="col-12 col-md-7 d-flex flex-wrap align-items-center gap-3">
+              <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateOnline" value="online"><label class="form-check-label" for="teamStateOnline">ออนไลน์</label></div>
+              <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateBusy" value="busy"><label class="form-check-label" for="teamStateBusy">ติดงาน</label></div>
+              <div class="form-check"><input class="form-check-input" type="radio" name="teamState" id="teamStateOff" value="off" checked><label class="form-check-label" for="teamStateOff">ไม่ว่าง</label></div>
+              <div class="input-group" style="max-width:180px">
+                <span class="input-group-text">จำนวน</span>
+                <input id="teamCount" type="number" class="form-control" min="0" value="1">
               </div>
             </div>
+            <div class="col-12 col-md-5 d-flex align-items-center gap-2">
+              <input id="teamNote" class="form-control" placeholder="หมายเหตุ (ไม่บังคับ)">
+              <span class="text-muted small">ใช้ปุ่ม “บันทึก” ด้านล่าง</span>
+            </div>
           </div>
+        </div>
 </div>
           <div class="col-md-6"><label class="form-label">หมายเลขโทรศัพท์</label><input id="setPhone" class="form-control" value="080-000-0000"></div>
           <div class="col-md-6"><label class="form-label">LINE</label><input id="setLine" class="form-control" value="@yourline"></div>
@@ -473,12 +472,7 @@
         <input id="svcId" type="hidden">
         <label class="form-label">ชื่อบริการ</label><input id="svcName" class="form-control">
         <label class="form-label mt-2">หมวดหมู่</label><input id="svcCat" class="form-control">
-        <label class="form-label mt-2">ภาพ (ลิงก์ หรืออัปโหลด)</label>
-        <div class="input-group">
-          <input id="svcImg" class="form-control" placeholder="https://...">
-          <input id="svcImgFile" type="file" accept="image/*" class="form-control" style="max-width:50%">
-        </div>
-        <div class="text-hint mt-1">วางลิงก์ หรือเลือกไฟล์เพื่ออัปโหลดขึ้น Storage</div>
+        <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="svcImg" class="form-control">
         <label class="form-label mt-2">รายละเอียด</label><textarea id="svcDesc" rows="3" class="form-control"></textarea>
         <label class="form-label mt-2">ป้ายกำกับ (คั่นด้วย , )</label>
         <input id="svcTags" class="form-control" placeholder="เช่น ด่วน 24 ชม., รายครั้ง, รายเดือน">
@@ -500,11 +494,7 @@ https://...2.jpg"></textarea>
         <input id="promoId" type="hidden">
         <label class="form-label">ชื่อ</label><input id="promoTitle" class="form-control">
         <label class="form-label mt-2">คำอธิบาย</label><textarea id="promoDesc" class="form-control"></textarea>
-        <label class="form-label mt-2">ภาพ (ลิงก์ หรืออัปโหลด)</label>
-        <div class="input-group">
-          <input id="promoImg" class="form-control" placeholder="https://...">
-          <input id="promoImgFile" type="file" accept="image/*" class="form-control" style="max-width:50%">
-        </div>
+        <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="promoImg" class="form-control">
         <div class="row mt-2">
           <div class="col"><label class="form-label">เริ่ม</label><input id="promoStart" type="date" class="form-control"></div>
           <div class="col"><label class="form-label">สิ้นสุด</label><input id="promoEnd" type="date" class="form-control"></div>
@@ -524,11 +514,7 @@ https://...2.jpg"></textarea>
         <input id="banId" type="hidden">
         <label class="form-label">หัวเรื่อง</label><input id="banTitle" class="form-control">
         <label class="form-label mt-2">คำอธิบาย</label><input id="banSub" class="form-control">
-        <label class="form-label mt-2">ภาพ (ลิงก์ หรืออัปโหลด)</label>
-        <div class="input-group">
-          <input id="banImg" class="form-control" placeholder="https://...">
-          <input id="banImgFile" type="file" accept="image/*" class="form-control" style="max-width:50%">
-        </div>
+        <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="banImg" class="form-control">
       </div>
       <div class="modal-footer"><button id="banSave" class="btn btn-primary">บันทึก</button></div>
     </div>
@@ -540,17 +526,85 @@ https://...2.jpg"></textarea>
 <script type="module" src="firebase-init.js"></script>
 <script type="module" src="auth.js"></script>
 <script type="module" src="admin.js"></script>
-<script type="module" src="admin-calendar.js?v=3"></script>
+  <script type="module" src="admin-calendar.js?v=3"></script>
 
-<!-- PWA SW register -->
+<!-- PWA SW register (assistant v35) -->
 <script>
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
 }
 </script>
 
-<!-- Static Generator (คงเดิม) -->
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" as="script">
+
+<!-- ===== Static Generator (assistant v36) ===== -->
+<style>
+  .static-gen-fab{position:fixed;right:16px;bottom:16px;z-index:1030;border-radius:999px;padding:12px 16px;border:none;background:#0EA5E9;color:#fff;box-shadow:0 10px 24px rgba(2,6,23,.15);}
+  .static-gen-fab:hover{filter:brightness(1.05)}
+  .static-gen-modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;z-index:1040;align-items:center;justify-content:center;padding:16px;}
+  .static-gen-modal{background:#fff;border-radius:16px;max-width:760px;width:100%;box-shadow:0 20px 60px rgba(2,6,23,.2);overflow:hidden}
+  .static-gen-hd{padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+  .static-gen-bd{padding:16px 20px;max-height:min(72vh,900px);overflow:auto}
+  .static-gen-ft{padding:16px 20px;border-top:1px solid #e2e8f0;display:flex;gap:12px;flex-wrap:wrap}
+  .static-gen-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .static-gen-input{width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px}
+  .static-gen-check{display:flex;align-items:center;gap:8px}
+  .btn-pri{background:#0EA5E9;color:#fff;border:none;border-radius:12px;padding:10px 14px}
+  .btn-sec{background:#f1f5f9;border:none;border-radius:12px;padding:10px 14px}
+  .muted{opacity:.8}
+  @media(max-width:640px){.static-gen-grid{grid-template-columns:1fr}}
+</style>
+<button id="openStaticGen" class="static-gen-fab" title="Static Generator">Static Generator</button>
+<div id="staticGenBackdrop" class="static-gen-modal-backdrop" aria-hidden="true">
+  <div class="static-gen-modal" role="dialog" aria-modal="true" aria-labelledby="sg-title">
+    <div class="static-gen-hd">
+      <h3 id="sg-title" style="margin:0">Static Generator</h3>
+      <button id="closeStaticGen" class="btn-sec" aria-label="Close">ปิด</button>
+    </div>
+    <div class="static-gen-bd">
+      <div class="static-gen-grid">
+        <div>
+          <label>โดเมนหลัก (canonical)</label>
+          <input id="sg-domain" class="static-gen-input" value="https://alltasks24.online">
+        </div>
+        <div>
+          <label>โฟลเดอร์รูป OG (1200×630)</label>
+          <input id="sg-ogdir" class="static-gen-input" value="/assets/og">
+        </div>
+        <div>
+          <label>คอลเลกชันบริการ (Firestore)</label>
+          <input id="sg-services-col" class="static-gen-input" value="services">
+        </div>
+        <div>
+          <label>คอลเลกชันสินค้า (Firestore)</label>
+          <input id="sg-products-col" class="static-gen-input" value="products">
+        </div>
+        <div class="static-gen-check">
+          <input type="checkbox" id="sg-generate-og" checked>
+          <label for="sg-generate-og">สร้างรูป OG 1200×630 อัตโนมัติ (พื้นหลังโทนแบรนด์)</label>
+        </div>
+        <div class="static-gen-check">
+          <input type="checkbox" id="sg-use-item-image">
+          <label for="sg-use-item-image">ถ้าเอกสารมี image URL ให้ใช้เป็นพื้นหลัง OG</label>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:12px">คลิกปุ่มเพื่อสร้างไฟล์ detail (Service/Product) พร้อม OG/JSON-LD และ <code>sitemap.xml</code> เป็น ZIP ดาวน์โหลด</p>
+      <pre id="sg-log" style="background:#0b1220;color:#d4e1ff;padding:12px;border-radius:12px;white-space:pre-wrap;max-height:240px;overflow:auto"></pre>
+    </div>
+    <div class="static-gen-ft">
+      <button id="sg-gen-all" class="btn-pri">Generate ALL (Pages + OG + sitemap)</button>
+      <button id="sg-gen-pages" class="btn-sec">Only Pages</button>
+      <button id="sg-gen-og" class="btn-sec">Only OG Images</button>
+      <button id="sg-gen-sitemap" class="btn-sec">Only sitemap.xml</button>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<!-- ===== /Static Generator (assistant v36) ===== -->
+
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="/firebase-init.js"></script>
