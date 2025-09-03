@@ -436,75 +436,7 @@
           <div class="col-12"><label class="form-label">Hero Text</label><input id="setHero" class="form-control" value="รับจ้างสารพัด 24 ชั่วโมง"></div>
           <div class="col-12"><label class="form-label">URL แผนที่ (Embed)</label><input id="setMap" class="form-control" placeholder="https://www.google.com/maps?..."></div>
           <div class="col-12"><label class="form-label">นโยบายสื่อ</label><textarea id="setPolicy" class="form-control" rows="3">เนื้อหาตัวอย่างนโยบาย</textarea></div>
-          <div class="col-12">
-        <!-- เพิ่มเติม: SEO / OG / PWA / CTA -->
-        <div class="card card-clean p-3 my-3">
-          <div class="fw-semibold mb-2">SEO & แชร์ลิงก์ (ค่าเริ่มต้น)</div>
-          <div class="row g-3">
-            <div class="col-12">
-              <label class="form-label">Default meta description</label>
-              <textarea id="setDefaultDesc" class="form-control" rows="2" placeholder="ข้อความสั้น ๆ ประมาณ 120–160 ตัวอักษร"></textarea>
-            </div>
-            <div class="col-md-8">
-              <label class="form-label">Default OG image URL (1200×630)</label>
-              <input id="setDefaultOg" class="form-control" placeholder="/assets/og/default.jpg หรือ URL">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Keywords (ตัวเลือก)</label>
-              <input id="setKeywords" class="form-control" placeholder="คำ,คีย์เวิร์ด,คั่นด้วยจุลภาค">
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-clean p-3 my-3">
-          <div class="fw-semibold mb-2">ข้อมูลธุรกิจ (สำหรับ JSON-LD/Local SEO)</div>
-          <div class="row g-3">
-            <div class="col-md-6"><label class="form-label">ชื่อธุรกิจ</label><input id="setBizName" class="form-control" placeholder="AllTasks24"></div>
-            <div class="col-md-6"><label class="form-label">พื้นที่ให้บริการ</label><input id="setArea" class="form-control" placeholder="Nakhon Sawan, Thailand"></div>
-            <div class="col-12"><label class="form-label">ที่อยู่</label><input id="setAddress" class="form-control" placeholder="ที่อยู่ธุรกิจ (ไม่บังคับ)"></div>
-            <div class="col-md-6"><label class="form-label">พิกัดละติจูด</label><input id="setLat" type="number" step="0.000001" class="form-control"></div>
-            <div class="col-md-6"><label class="form-label">พิกัดลองจิจูด</label><input id="setLng" type="number" step="0.000001" class="form-control"></div>
-            <div class="col-12"><label class="form-label">เวลาทำการ (เช่น Mo-Su 00:00-24:00)</label><input id="setOpenHours" class="form-control"></div>
-          </div>
-        </div>
-
-        <div class="card card-clean p-3 my-3">
-          <div class="fw-semibold mb-2">PWA & แบรนด์ดิ้ง</div>
-          <div class="row g-3">
-            <div class="col-md-3"><label class="form-label">Theme color</label><input id="setThemeColor" type="color" class="form-control" value="#6d28d9"></div>
-            <div class="col-md-3"><label class="form-label">Background color</label><input id="setBgColor" type="color" class="form-control" value="#fbf7ff"></div>
-            <div class="col-md-3"><label class="form-label">Short name (PWA)</label><input id="setShortName" class="form-control" placeholder="AllTasks24"></div>
-            <div class="col-md-3 form-check form-switch d-flex align-items-center gap-2">
-              <input class="form-check-input" type="checkbox" id="setEnablePWA">
-              <label class="form-check-label" for="setEnablePWA">เปิดใช้ PWA</label>
-            </div>
-            <div class="col-12"><label class="form-label">ข้อความหน้า Offline</label><input id="setOfflineMessage" class="form-control" placeholder="ออฟไลน์ชั่วคราว ลองใหม่อีกครั้งเมื่อมีสัญญาณ"></div>
-          </div>
-        </div>
-
-        <div class="card card-clean p-3 my-3">
-          <div class="fw-semibold mb-2">ปุ่มติดต่อ & วิดเจ็ตลอย</div>
-          <div class="row g-3">
-            <div class="col-md-3">
-              <label class="form-label">Primary CTA</label>
-              <select id="setPrimaryCtaType" class="form-select">
-                <option value="">(เลือก)</option>
-                <option value="call">โทร</option>
-                <option value="line">LINE</option>
-                <option value="messenger">Messenger</option>
-                <option value="whatsapp">WhatsApp</option>
-              </select>
-            </div>
-            <div class="col-md-3"><label class="form-label">ข้อความปุ่ม</label><input id="setPrimaryCtaText" class="form-control" placeholder="โทรเลย / แชตเลย"></div>
-            <div class="col-md-3"><label class="form-label">WhatsApp</label><input id="setWhatsapp" class="form-control" placeholder="+66xxxxxxxxx"></div>
-            <div class="col-md-3"><label class="form-label">Messenger</label><input id="setMessenger" class="form-control" placeholder="https://m.me/..."></div>
-            <div class="col-12 form-check form-switch d-flex align-items-center gap-2">
-              <input class="form-check-input" type="checkbox" id="setShowFloatingContact" checked>
-              <label class="form-check-label" for="setShowFloatingContact">แสดงวิดเจ็ตปุ่มติดต่อแบบลอย</label>
-            </div>
-          </div>
-        </div>
-    <button class="btn btn-primary mt-2" id="saveSettings">บันทึก</button></div>
+          <div class="col-12"><button class="btn btn-primary mt-2" id="saveSettings">บันทึก</button></div>
         </div>
       </div>
 
