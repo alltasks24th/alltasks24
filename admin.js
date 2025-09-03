@@ -43,7 +43,27 @@ try{document.getElementById('svcTags').value=Array.isArray(v?.tags)?v.tags.join(
 
     const id=$('#svcId').value; const data={ name:$('#svcName').value, category:$('#svcCat').value, imageUrl:$('#svcImg').value, description:$('#svcDesc').value, tags: tags,
     gallery: gallery,
-    updatedAt: serverTimestamp() };
+    updatedAt: serverTimestamp() ,
+      defaultMetaDescription: ($('#setDefaultDesc')?.value||'').trim(),
+      defaultOgImage: ($('#setDefaultOg')?.value||'').trim(),
+      siteKeywords: ($('#setKeywords')?.value||'').trim(),
+      businessName: ($('#setBizName')?.value||'').trim(),
+      address: ($('#setAddress')?.value||'').trim(),
+      areaServed: ($('#setArea')?.value||'').trim(),
+      geoLat: parseFloat($('#setLat')?.value)||null,
+      geoLng: parseFloat($('#setLng')?.value)||null,
+      openingHours: ($('#setOpenHours')?.value||'').trim(),
+      themeColor: ($('#setThemeColor')?.value||'').trim(),
+      backgroundColor: ($('#setBgColor')?.value||'').trim(),
+      shortName: ($('#setShortName')?.value||'').trim(),
+      enablePwa: !!$('#setEnablePWA')?.checked,
+      offlineMessage: ($('#setOfflineMessage')?.value||'').trim(),
+      primaryCtaType: ($('#setPrimaryCtaType')?.value||'').trim(),
+      primaryCtaText: ($('#setPrimaryCtaText')?.value||'').trim(),
+      whatsapp: ($('#setWhatsapp')?.value||'').trim(),
+      messenger: ($('#setMessenger')?.value||'').trim(),
+      showFloatingContact: !!$('#setShowFloatingContact')?.checked
+    };
     if(id){ await updateDoc(doc(db,'services',id), data); } else { data.createdAt=serverTimestamp(); await addDoc(collection(db,'services'), data); }
     bootstrap.Modal.getInstance(document.getElementById('svcModal')).hide();
   });
@@ -149,6 +169,26 @@ try{document.getElementById('svcTags').value=Array.isArray(v?.tags)?v.tags.join(
     $('#setHero').value=v.hero||'';
     $('#setPolicy').value=v.mediaPolicy||'';
     $('#setMap').value=v.mapUrl||'';
+    $('#setDefaultDesc') && ($('#setDefaultDesc').value = v.defaultMetaDescription || '');
+    $('#setDefaultOg') && ($('#setDefaultOg').value = v.defaultOgImage || '');
+    $('#setKeywords') && ($('#setKeywords').value = v.siteKeywords || '');
+    $('#setBizName') && ($('#setBizName').value = v.businessName || '');
+    $('#setAddress') && ($('#setAddress').value = v.address || '');
+    $('#setArea') && ($('#setArea').value = v.areaServed || '');
+    $('#setLat') && ($('#setLat').value = (v.geoLat ?? ''));
+    $('#setLng') && ($('#setLng').value = (v.geoLng ?? ''));
+    $('#setOpenHours') && ($('#setOpenHours').value = v.openingHours || '');
+    $('#setThemeColor') && ($('#setThemeColor').value = v.themeColor || '#6d28d9');
+    $('#setBgColor') && ($('#setBgColor').value = v.backgroundColor || '#fbf7ff');
+    $('#setShortName') && ($('#setShortName').value = v.shortName || 'AllTasks24');
+    $('#setEnablePWA') && ($('#setEnablePWA').checked = !!v.enablePwa);
+    $('#setOfflineMessage') && ($('#setOfflineMessage').value = v.offlineMessage || '');
+    $('#setPrimaryCtaType') && ($('#setPrimaryCtaType').value = v.primaryCtaType || '');
+    $('#setPrimaryCtaText') && ($('#setPrimaryCtaText').value = v.primaryCtaText || '');
+    $('#setWhatsapp') && ($('#setWhatsapp').value = v.whatsapp || '');
+    $('#setMessenger') && ($('#setMessenger').value = v.messenger || '');
+    $('#setShowFloatingContact') && ($('#setShowFloatingContact').checked = (v.showFloatingContact ?? true));
+    
   }
 
   // === CHAT (ปรับเรนเดอร์ให้มีชื่อและเวลา + สีบับเบิล) ===
