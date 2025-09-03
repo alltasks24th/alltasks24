@@ -26,10 +26,11 @@
 
 <style>
   :root{
-    --brand:#ff6a00;
-    --brand-2:#ff8a00;
+    /* โทนม่วงของเว็บ */
+    --brand:#6d28d9;     /* violet-700 */
+    --brand-2:#8b5cf6;   /* violet-400 */
     --ink:#111;
-    --bg:#fffaf6;
+    --bg:#fbf7ff;
   }
   *,*:before,*:after{box-sizing:border-box}
   html,body{height:100%}
@@ -37,19 +38,20 @@
     margin:0;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Kanit", sans-serif;
     color:var(--ink);
-    background: radial-gradient(1200px 600px at 20% 10%, rgba(255,180,120,.35), transparent 60%),
-                radial-gradient(1000px 600px at 80% 100%, rgba(255,120,40,.25), transparent 60%),
-                var(--bg);
+    background:
+      radial-gradient(1200px 600px at 20% 10%, rgba(139,92,246,.28), transparent 60%),
+      radial-gradient(1000px 600px at 80% 100%, rgba(109,40,217,.22), transparent 60%),
+      var(--bg);
     overflow:hidden;
   }
 
-  /* animated gradient film */
+  /* ฟิล์มแสงแบบม่วง */
   .film{
     position:fixed; inset:-20vmax;
     background:
-      radial-gradient(50% 50% at 20% 30%, rgba(255,122,24,.18), transparent 60%),
-      radial-gradient(40% 40% at 80% 70%, rgba(255,61,0,.14), transparent 60%);
-    filter: blur(40px) saturate(120%);
+      radial-gradient(50% 50% at 20% 30%, rgba(139,92,246,.20), transparent 60%),
+      radial-gradient(40% 40% at 80% 70%, rgba(109,40,217,.16), transparent 60%);
+    filter: blur(42px) saturate(115%);
     animation: film 18s linear infinite alternate;
     pointer-events:none;
   }
@@ -58,24 +60,11 @@
     100%{transform:translate3d(-5%, 3%, 0) scale(1.06)}
   }
 
-  /* center card */
-  .wrap{
-    position:relative;
-    display:grid;
-    place-items:center;
-    min-height:100vh;
-    padding:24px;
-    isolation:isolate;
-  }
+  .wrap{ position:relative; display:grid; place-items:center; min-height:100vh; padding:24px; isolation:isolate; }
   .card{
-    position:relative;
-    width:min(680px, 92vw);
-    background:#fff;
-    border-radius:24px;
-    padding:28px 24px 24px;
-    box-shadow:
-      0 20px 40px rgba(255,106,0,.15),
-      0 2px 6px rgba(17,17,17,.06);
+    position:relative; width:min(680px, 92vw);
+    background:#fff; border-radius:24px; padding:28px 24px 24px;
+    box-shadow: 0 20px 40px rgba(109,40,217,.15), 0 2px 6px rgba(17,17,17,.06);
     transform-style:preserve-3d;
   }
   .badge{
@@ -83,43 +72,36 @@
     background:linear-gradient(135deg, var(--brand), var(--brand-2));
     color:#fff; font-weight:700; font-size:12px; letter-spacing:.04em;
     padding:6px 10px; border-radius:999px;
-    box-shadow:0 8px 20px rgba(255,106,0,.25);
+    box-shadow:0 8px 20px rgba(109,40,217,.25);
   }
 
   .big404{
-    font-size: clamp(56px, 14vw, 120px);
-    font-weight: 800;
-    line-height: .85;
-    margin: 2px 0 8px;
+    font-size: clamp(56px, 14vw, 120px); font-weight:800; line-height:.85;
+    margin:2px 0 8px;
     background: linear-gradient(135deg, var(--brand), var(--brand-2));
     -webkit-background-clip:text; background-clip:text; color:transparent;
-    text-shadow: 0 14px 30px rgba(255,106,0,.18);
+    text-shadow: 0 14px 30px rgba(109,40,217,.18);
     letter-spacing:.02em;
   }
-  .lead{
-    font-size: clamp(16px, 2.6vw, 18px);
-    color:#444; margin:0 0 14px;
-  }
-  .note{opacity:.7; font-size:13px}
+  .lead{ font-size:clamp(16px,2.6vw,18px); color:#444; margin:0 0 14px; }
+  .note{ opacity:.7; font-size:13px }
 
   .cta{
     display:inline-flex; align-items:center; gap:10px;
     padding:12px 18px; border-radius:14px;
     background: linear-gradient(135deg, var(--brand), var(--brand-2));
     color:#fff; text-decoration:none; font-weight:700;
-    box-shadow: 0 10px 22px rgba(255,106,0,.28);
+    box-shadow: 0 10px 22px rgba(109,40,217,.28);
     transform: translateZ(60px);
     transition: transform .25s ease, box-shadow .25s ease;
   }
-  .cta:hover{ transform: translateY(-2px) translateZ(60px); box-shadow:0 16px 34px rgba(255,106,0,.33) }
+  .cta:hover{ transform: translateY(-2px) translateZ(60px); box-shadow:0 16px 34px rgba(109,40,217,.33) }
   .cta svg{ width:18px; height:18px; flex:0 0 18px; }
 
-  .ghost{
-    position:absolute; inset:-2rem; pointer-events:none; z-index:-1;
-  }
+  .ghost{ position:absolute; inset:-2rem; pointer-events:none; z-index:-1; }
   .blob{
     position:absolute; width:200px; height:200px; border-radius:40%;
-    background:linear-gradient(135deg, rgba(255,106,0,.40), rgba(255,138,0,.25));
+    background:linear-gradient(135deg, rgba(109,40,217,.40), rgba(139,92,246,.25));
     filter:blur(16px); animation: float 12s ease-in-out infinite;
   }
   .blob.b2{ width:140px; height:140px; right:-30px; top:-20px; animation-duration:14s}
@@ -134,14 +116,13 @@
   .ghost-btn{
     display:inline-flex; align-items:center; gap:8px; padding:11px 14px;
     border-radius:12px; color:#333; text-decoration:none; font-weight:600;
-    background: #fff; border:1px solid #f1f1f1;
+    background:#fff; border:1px solid #eee;
   }
-  .ghost-btn:hover{ background:#fff7f0; border-color:#ffd4b5 }
+  .ghost-btn:hover{ background:#f6f0ff; border-color:#e5d9ff }
 
-  /* tilt effect (subtle) */
-  .wrap:hover .card{ transition: transform .2s ease }
+  /* ลด motion สำหรับคนไม่ต้องการแอนิเมชัน */
   @media (prefers-reduced-motion: reduce){
-    .film, .blob, .wrap:hover .card{ animation: none !important; transition: none !important }
+    .film, .blob{ animation: none !important }
   }
 </style>
 </head>
@@ -189,7 +170,7 @@
   </div>
 
 <script>
-  // subtle parallax tilt on pointer move (no external deps)
+  // เอฟเฟกต์ tilt เบา ๆ (ไม่มีไลบรารี)
   (function(){
     const scene = document.getElementById('scene');
     const card = document.getElementById('card');
@@ -207,7 +188,7 @@
   })();
 </script>
 
-<!-- Keep these for PWA & perf (already in project) -->
+<!-- คงไว้เพื่อ PWA & performance -->
 <script src="assets/sw-register.js"></script>
 <script src="assets/perf-boost.js"></script>
 </body>
