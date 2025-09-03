@@ -838,3 +838,105 @@ requireAdmin(async (user, role) => {
     }catch(e){ console.error(e); }
   }
   document.addEventListener('DOMContentLoaded', loadTeamFromSettings);
+
+
+/* ===== Image Upload to Firebase Storage (v40 patch) ===== */
+
+// อัปโหลดไฟล์ พร้อม progress (console)
+async function uploadImageWithProgress(file, path) {
+  return new Promise((resolve, reject) => {
+    try {
+      if (!firebase?.storage) return reject(new Error('Firebase Storage SDK not loaded'));
+      const storage = firebase.storage();
+      const cleanName = (file?.name || 'image').replace(/[^\w.\-]+/g, '_');
+      const ref = storage.ref(`${path}/${Date.now()}_${cleanName}`);
+      const task = ref.put(file, { contentType: file.type || 'image/jpeg' });
+
+      task.on('state_changed',
+        snap => {
+          const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+          console.log(`[upload] ${path} ${pct}%`);
+        },
+        err => reject(err),
+        async () => {
+          try {
+            const url = await ref.getDownloadURL();
+            resolve(url);
+          } catch (e) { reject(e); }
+        }
+      );
+
+      // กันค้าง 120 วิ
+      setTimeout(() => {
+        if (task.snapshot?.state !== 'success') {
+          try { task.cancel(); } catch {}
+          reject(new Error('Upload timeout'));
+        }
+      }, 120000);
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
+// ผูก input[type=file] -> เขียนค่าไปยัง input/url/textarea ที่ระบุ
+function bindUploaders() {
+  const $ = (id) => document.getElementById(id);
+
+  // helper: ผูกไฟล์เข้าช่องปลายทาง
+  const hook = (fileInputId, targetInputId, path, { append=false, newline=false } = {}) => {
+    const fi = $(fileInputId);
+    const to = $(targetInputId);
+    if (!fi || !to) return; // ไม่มี element ก็ข้าม
+
+    fi.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+
+      // ปิดปุ่มบันทึกชั่วคราว (ถ้ามี)
+      const btns = document.querySelectorAll('button, .btn');
+      btns.forEach(b => b.disabled = true);
+
+      try {
+        for (const f of files) {
+          const url = await uploadImageWithProgress(f, path);
+          if (append) {
+            if (newline) {
+              to.value = (to.value ? to.value.trim() + '\n' : '') + url;
+            } else {
+              to.value = (to.value ? (to.value + ', ') : '') + url;
+            }
+          } else {
+            to.value = url;
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        alert('อัปโหลดไฟล์ล้มเหลว: ' + (err?.message || err));
+      } finally {
+        // เปิดปุ่มคืน
+        btns.forEach(b => b.disabled = false);
+        fi.value = ''; // reset input file
+      }
+    });
+  };
+
+  // ====== Mapping ตาม id ที่มีอยู่ใน admin.html (v40) ======
+  // แบนเนอร์
+  hook('banImgFile',   'banImg',     'uploads/banners');
+
+  // โปรโมชัน
+  hook('promoImgFile', 'promoImg',   'uploads/promotions');
+
+  // บริการ
+  hook('svcFile',      'svcImg',     'uploads/services');                    // รูปหลัก
+  hook('svcGalFiles',  'svcGallery', 'uploads/services', { append:true, newline:true }); // แกลเลอรี (textarea บรรทัดละ 1 URL)
+
+  // สินค้า (ร้านค้า)
+  hook('prodCoverFile','cover',      'uploads/products');                    // รูปปก
+  hook('prodGalFiles', 'gallery',    'uploads/products', { append:true });   // แกลเลอรี (คั่นด้วย , )
+}
+
+// ให้โค้ดทำงานหลัง DOM พร้อม (ปลอดภัยกับไฟล์ยาว)
+document.addEventListener('DOMContentLoaded', bindUploaders);
+/* ===== /Image Upload patch ===== */
