@@ -34,6 +34,8 @@
     a.secondary:hover { background: #f1f5f9; }
     footer { margin-top: 14px; font-size: .85rem; opacity: .7; }
   </style>
+
+<link rel="manifest" href="/icons/site.webmanifest">
 </head>
 <body>
   <main class="card">
@@ -46,5 +48,7 @@
     </div>
     <footer>AllTasks24 · จะพยายามซิงก์ข้อมูลให้ใหม่เมื่อคุณกลับมาออนไลน์</footer>
   </main>
+
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}</script>
 </body>
 </html>

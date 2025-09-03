@@ -112,7 +112,7 @@ function buildServiceHTML(item, baseDomain, ogDir) {
   const metaDesc = `${desc}`.slice(0, 160);
   const offer = price ? `,"offers":{"@type":"Offer","price":"${price}","priceCurrency":"THB","availability":"https://schema.org/InStock"}` : "";
   const priceLine = price ? `<p><strong>ราคาเริ่มต้น:</strong> ${price} บาท</p>` : "";
-  return `<!doctype html><html lang="th"><head>
+  return `<!doctype html><html lang="th"><head><link rel="manifest" href="/icons/site.webmanifest">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${name} | AllTasks24</title>
 <meta name="description" content="${metaDesc}">
@@ -135,7 +135,7 @@ function buildServiceHTML(item, baseDomain, ogDir) {
   <p><strong>พื้นที่ให้บริการ:</strong> ${area}</p>
   <p><a href="${baseDomain}/services.html">← กลับไปหน้าบริการทั้งหมด</a></p>
 </main>
-</body></html>`;
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}</script></body></html>`;
 }
 function buildProductHTML(item, baseDomain, ogDir) {
   const name = pickVal(item, ['name','title']) || 'สินค้า';
@@ -148,7 +148,7 @@ function buildProductHTML(item, baseDomain, ogDir) {
   const metaDesc = `${desc}`.slice(0, 160);
   const offer = price ? `,"offers":{"@type":"Offer","price":"${price}","priceCurrency":"THB","availability":"https://schema.org/InStock"}` : "";
   const priceLine = price ? `<p><strong>ราคา:</strong> ${price} บาท</p>` : "";
-  return `<!doctype html><html lang="th"><head>
+  return `<!doctype html><html lang="th"><head><link rel="manifest" href="/icons/site.webmanifest">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${name} | AllTasks24</title>
 <meta name="description" content="${metaDesc}">
@@ -170,7 +170,7 @@ function buildProductHTML(item, baseDomain, ogDir) {
   ${priceLine}
   <p><a href="${baseDomain}/shop.html">← กลับไปหน้าสินค้าทั้งหมด</a></p>
 </main>
-</body></html>`;
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}</script></body></html>`;
 }
 function buildSitemap(baseDomain, pages=[]) {
   const urls = pages.map(u => `  <url><loc>${u}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`).join("\n");
