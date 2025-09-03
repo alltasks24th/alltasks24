@@ -22,27 +22,7 @@ function pickVal(obj, keys = []) { for (const k of keys){ if (obj && obj[k] != n
 
 async function ensureDb() {
   // dynamic imports to avoid early errors
-  const { initializeApp, getApps }
-
-async function readSettings(){
-  try{
-    const { db } = await ensureDb();
-    const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js');
-    const snap = await getDoc(doc(db, 'settings', 'public'));
-    return snap.exists()? (snap.data() || {}) : {};
-  }catch(e){ log('อ่าน settings ไม่ได้: '+e.message); return {}; }
-}
-
-// พรีฟิลด์เมื่อเปิดโมดอล
-openBtn?.addEventListener('click', async ()=>{
-  const s = await readSettings();
-  if (s.canonicalDomain && $('#sg-domain')) $('#sg-domain').value = s.canonicalDomain;
-  if (s.og_output_dir && $('#sg-ogdir')) $('#sg-ogdir').value = s.og_output_dir;
-  if (s.services_collection && $('#sg-services-col')) $('#sg-services-col').value = s.services_collection;
-  if (s.products_collection && $('#sg-products-col')) $('#sg-products-col').value = s.products_collection;
-});
-
- = await import('https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js');
+  const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js');
   const { getFirestore } = await import('https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js');
   let app = null;
   if (typeof firebase !== 'undefined' && firebase?.apps?.length) {
@@ -122,12 +102,12 @@ async function drawOgImage({title, subtitle, price, baseColor="#0EA5E9", accent=
 // --- Builders ---
 function buildServiceHTML(item, baseDomain, ogDir) {
   const name = pickVal(item, ['name','title']) || 'บริการ';
-  const desc = pickVal(item, ['description','desc','detail']) || settings?.defaultMetaDescription || 'บริการจาก AllTasks24 ในพื้นที่ของคุณ';
+  const desc = pickVal(item, ['description','desc','detail']) || 'บริการจาก AllTasks24 ในพื้นที่ของคุณ';
   const price = pickVal(item, ['price','basePrice','startingPrice']);
-  const area = pickVal(item, ['area','areaServed','province']) || settings?.areaServed || 'นครสวรรค์';
+  const area = pickVal(item, ['area','areaServed','province']) || 'นครสวรรค์';
   const img = pickVal(item, ['image','cover','thumbnail']) || null;
   const slug = item.slug || slugify(name);
-  const og = (img && String(img).startsWith('http')) ? img : (settings?.defaultOgImage || `${baseDomain}${ogDir}/${slug}-1200x630.jpg`);
+  const og = (img && String(img).startsWith('http')) ? img : `${baseDomain}${ogDir}/${slug}-1200x630.jpg`;
   const url = `${baseDomain}/service/${slug}.html`;
   const metaDesc = `${desc}`.slice(0, 160);
   const offer = price ? `,"offers":{"@type":"Offer","price":"${price}","priceCurrency":"THB","availability":"https://schema.org/InStock"}` : "";
@@ -159,11 +139,11 @@ function buildServiceHTML(item, baseDomain, ogDir) {
 }
 function buildProductHTML(item, baseDomain, ogDir) {
   const name = pickVal(item, ['name','title']) || 'สินค้า';
-  const desc = pickVal(item, ['description','desc','detail']) || settings?.defaultMetaDescription || 'สินค้าแนะนำจาก AllTasks24';
+  const desc = pickVal(item, ['description','desc','detail']) || 'สินค้าแนะนำจาก AllTasks24';
   const price = pickVal(item, ['price','salePrice','regularPrice']);
   const img = pickVal(item, ['image','cover','thumbnail']) || null;
   const slug = item.slug || slugify(name);
-  const og = (img && String(img).startsWith('http')) ? img : (settings?.defaultOgImage || `${baseDomain}${ogDir}/${slug}-1200x630.jpg`);
+  const og = (img && String(img).startsWith('http')) ? img : `${baseDomain}${ogDir}/${slug}-1200x630.jpg`;
   const url = `${baseDomain}/product/${slug}.html`;
   const metaDesc = `${desc}`.slice(0, 160);
   const offer = price ? `,"offers":{"@type":"Offer","price":"${price}","priceCurrency":"THB","availability":"https://schema.org/InStock"}` : "";
@@ -212,7 +192,6 @@ async function generate({ pages=true, og=false, sm=true }) {
   const servicesCol = $("#sg-services-col")?.value || "services";
   const productsCol = $("#sg-products-col")?.value || "products";
   const wantOG = og || $("#sg-generate-og")?.checked;
-  const settings = await readSettings();
 
   log("เริ่มสร้างไฟล์...");
   const zip = new JSZip();
