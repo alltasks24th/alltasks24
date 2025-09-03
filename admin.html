@@ -24,12 +24,14 @@
   .stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
   .header{background:#fff;border-bottom:1px solid var(--border)}
 
-  /* === Collapsible Sidebar (added) === */
-  @media (min-width: 768px){
-    body.sidebar-collapsed #adminSidebar{ display:none !important; }
-  }
+/* === Collapsible Sidebar (added) === */
+@media (min-width: 768px){
+  body.sidebar-collapsed #adminSidebar{ display:none !important; }
+}
+/* Keep content full width when collapsed (flex layout handles it) */
+
 </style>
-<link rel="stylesheet" href="admin-calendar.css?v=3">
+  <link rel="stylesheet" href="admin-calendar.css?v=3">
 </head>
 <body>
 <nav class="navbar navbar-light bg-white border-bottom sticky-top">
@@ -57,13 +59,13 @@
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-promos"><i class="bi bi-ticket-perforated me-2"></i>โปรโมชัน</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-banners"><i class="bi bi-images me-2"></i>แบนเนอร์</button>
 
-      <!-- ร้านค้า -->
+      <!-- ปุ่มเมนูร้านค้า/สินค้า (ใหม่ วางถูกตำแหน่งแล้ว) -->
       <button class="nav-link" id="tab-products-tab" data-bs-toggle="pill" data-bs-target="#tab-products">
         <i class="bi bi-bag me-2"></i>ร้านค้า
       </button>
 
-      <button class="nav-link" id="tab-pricing-tab" data-bs-toggle="pill" data-bs-target="#tab-pricing"><i class="bi bi-calculator me-2"></i>คำนวณราคา</button>
-      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-2"></i>FAQ</button>
+
+      <button class="nav-link" id="tab-pricing-tab" data-bs-toggle="pill" data-bs-target="#tab-pricing"><i class="bi bi-calculator me-2"></i>คำนวณราคา</button>      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-2"></i>FAQ</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-settings"><i class="bi bi-gear me-2"></i>ตั้งค่า</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chat"><i class="bi bi-chat-dots me-2"></i>แชทสด</button>
     </div>
@@ -81,60 +83,61 @@
           <div class="col-md-3"><div class="stat"><div class="text-muted">โปรโมชัน</div><div class="h4 mb-0" id="countPromos">0</div></div></div>
         </div>
 
-        <!-- === Dashboard Enhancements (auto-injected) === -->
-        <div class="row g-3 mb-3">
-          <div class="col-md-3"><div class="stat"><div class="text-muted small">บริการทั้งหมด</div><div class="h4 mb-0" id="countServices">0</div></div></div>
-          <div class="col-md-3"><div class="stat"><div class="text-muted small">รีวิวทั้งหมด</div><div class="h4 mb-0" id="countReviewsAll">0</div></div></div>
-          <div class="col-md-3"><div class="stat"><div class="text-muted small">โปรโมชันที่ใช้งาน</div><div class="h4 mb-0" id="countPromosActive">0</div></div></div>
-        </div>
+<!-- === Dashboard Enhancements (auto-injected) === -->
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="stat"><div class="text-muted small">บริการทั้งหมด</div><div class="h4 mb-0" id="countServices">0</div></div></div>
+  <div class="col-md-3"><div class="stat"><div class="text-muted small">รีวิวทั้งหมด</div><div class="h4 mb-0" id="countReviewsAll">0</div></div></div>
+  <div class="col-md-3"><div class="stat"><div class="text-muted small">โปรโมชันที่ใช้งาน</div><div class="h4 mb-0" id="countPromosActive">0</div></div></div>
+</div>
 
-        <div class="row g-3">
-          <div class="col-lg-6">
-            <div class="card card-clean p-3 h-100">
-              <div class="fw-bold mb-2">การจองล่าสุด</div>
-              <div class="table-responsive">
-                <table class="table table-sm align-middle">
-                  <thead><tr><th>บริการ</th><th>ลูกค้า</th><th>วันที่</th><th>หมายเหตุ</th></tr></thead>
-                  <tbody id="latestBookingsBody"><tr><td colspan="4" class="text-muted small">ยังไม่มีข้อมูล</td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="card card-clean p-3 h-100">
-              <div class="fw-bold mb-2">โปรโมชันที่กำลังใช้งาน</div>
-              <ul id="activePromoList" class="list-group small"></ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="row g-3 mt-1">
-          <div class="col-lg-6">
-            <div class="card card-clean p-3 h-100">
-              <div class="fw-bold mb-2">บริการยอดนิยม</div>
-              <div class="table-responsive">
-                <table class="table table-sm align-middle">
-                  <thead><tr><th style="width:40px">#</th><th>บริการ</th><th class="text-end">จำนวนการจอง</th><th class="text-end">แจ้งปัญหา</th></tr></thead>
-                  <tbody id="topServicesBody"><tr><td colspan="4" class="text-muted small">ยังไม่มีข้อมูล</td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="card card-clean p-3 h-100">
-              <div class="fw-bold mb-2">สถิติ</div>
-              <div class="mb-3"><canvas id="chartDaily" height="140"></canvas></div>
-              <div><canvas id="chartMonthly" height="140"></canvas></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-clean p-3 mt-3">
-          <div class="fw-bold mb-2">การแจ้งเตือน</div>
-          <div id="notifBox" class="vstack gap-2"></div>
-        </div>
-        <!-- === /Dashboard Enhancements === -->
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card card-clean p-3 h-100">
+      <div class="fw-bold mb-2">การจองล่าสุด</div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>บริการ</th><th>ลูกค้า</th><th>วันที่</th><th>หมายเหตุ</th></tr></thead>
+          <tbody id="latestBookingsBody"><tr><td colspan="4" class="text-muted small">ยังไม่มีข้อมูล</td></tr></tbody>
+        </table>
       </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card card-clean p-3 h-100">
+      <div class="fw-bold mb-2">โปรโมชันที่กำลังใช้งาน</div>
+      <ul id="activePromoList" class="list-group small"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-lg-6">
+    <div class="card card-clean p-3 h-100">
+      <div class="fw-bold mb-2">บริการยอดนิยม</div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th style="width:40px">#</th><th>บริการ</th><th class="text-end">จำนวนการจอง</th><th class="text-end">แจ้งปัญหา</th></tr></thead>
+          <tbody id="topServicesBody"><tr><td colspan="4" class="text-muted small">ยังไม่มีข้อมูล</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card card-clean p-3 h-100">
+      <div class="fw-bold mb-2">สถิติ</div>
+      <div class="mb-3"><canvas id="chartDaily" height="140"></canvas></div>
+      <div><canvas id="chartMonthly" height="140"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="card card-clean p-3 mt-3">
+  <div class="fw-bold mb-2">การแจ้งเตือน</div>
+  <div id="notifBox" class="vstack gap-2"></div>
+</div>
+<!-- === /Dashboard Enhancements === -->
+
+</div>
 
       <!-- บริการ -->
       <div class="tab-pane fade" id="tab-services">
@@ -173,22 +176,8 @@
                     <div class="col-4"><label class="form-label">จบโปรฯ</label><input id="saleEnd" type="datetime-local" class="form-control"></div>
                   </div>
 
-                  <!-- รูปปก + อัปไฟล์ -->
-                  <div class="mt-2">
-                    <label class="form-label">รูปปก (URL)</label>
-                    <input id="cover" class="form-control" placeholder="https://...">
-                    <!-- เพิ่มช่องไฟล์ -->
-                    <input id="coverFile" type="file" accept="image/*" class="form-control mt-1" style="max-width:240px">
-                  </div>
-
-                  <!-- แกลเลอรี + อัปหลายไฟล์ (CSV) -->
-                  <div class="mt-2">
-                    <label class="form-label">แกลเลอรี (คั่นด้วย , )</label>
-                    <input id="gallery" class="form-control" placeholder="https://..., https://...">
-                    <!-- เพิ่มช่องไฟล์หลายรูป -->
-                    <input id="galleryFiles" type="file" accept="image/*" multiple class="form-control mt-1" style="max-width:280px">
-                  </div>
-
+                  <div class="mt-2"><label class="form-label">รูปปก (URL)</label><input id="cover" class="form-control" placeholder="https://..."></div>
+                  <div class="mt-2"><label class="form-label">แกลเลอรี (คั่นด้วย , )</label><input id="gallery" class="form-control" placeholder="https://..., https://..."></div>
                   <div class="mt-2"><label class="form-label">แท็ก (คั่นด้วย , )</label><input id="tags" class="form-control" placeholder="ทำความสะอาด, โปรฯ"></div>
 
                   <div class="row g-2 mt-1">
@@ -249,6 +238,7 @@
         </div>
       </div>
 
+      
       <!-- คำนวณราคา -->
       <div class="tab-pane fade" id="tab-pricing" role="tabpanel" aria-labelledby="tab-pricing-tab">
         <div class="card">
@@ -264,6 +254,7 @@
           </div>
         </div>
       </div>
+
 
       <!-- พื้นที่ -->
       <div class="tab-pane fade" id="tab-areas">
@@ -363,6 +354,7 @@
         </table>
       </div>
 
+      
       <!-- ปฏิทินงาน -->
       <div class="tab-pane fade" id="tab-calendar">
         <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
@@ -397,6 +389,7 @@
         </div>
       </div>
     
+
       <!-- FAQ -->
       <div class="tab-pane fade" id="tab-faq">
         <h5>คำถามที่พบบ่อย (FAQ)</h5>
@@ -479,21 +472,13 @@
         <input id="svcId" type="hidden">
         <label class="form-label">ชื่อบริการ</label><input id="svcName" class="form-control">
         <label class="form-label mt-2">หมวดหมู่</label><input id="svcCat" class="form-control">
-
-        <!-- URL รูป + เพิ่มช่องไฟล์ -->
-        <label class="form-label mt-2">ภาพ (ลิงก์)</label>
-        <input id="svcImg" class="form-control" placeholder="https://...">
-        <input id="svcImgFile" type="file" accept="image/*" class="form-control mt-1" style="max-width:240px">
-
+        <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="svcImg" class="form-control">
         <label class="form-label mt-2">รายละเอียด</label><textarea id="svcDesc" rows="3" class="form-control"></textarea>
         <label class="form-label mt-2">ป้ายกำกับ (คั่นด้วย , )</label>
         <input id="svcTags" class="form-control" placeholder="เช่น ด่วน 24 ชม., รายครั้ง, รายเดือน">
-
-        <!-- แกลเลอรี 1 บรรทัด/ลิงก์ + เพิ่มช่องไฟล์หลายรูป -->
         <label class="form-label mt-2">แกลเลอรีผลงาน (1 ลิงก์ต่อ 1 บรรทัด)</label>
         <textarea id="svcGallery" rows="4" class="form-control" placeholder="https://...1.jpg
 https://...2.jpg"></textarea>
-        <input id="svcGalleryFiles" type="file" accept="image/*" multiple class="form-control mt-1" style="max-width:280px">
       </div>
       <div class="modal-footer"><button id="svcSave" class="btn btn-primary">บันทึก</button></div>
     </div>
@@ -509,12 +494,7 @@ https://...2.jpg"></textarea>
         <input id="promoId" type="hidden">
         <label class="form-label">ชื่อ</label><input id="promoTitle" class="form-control">
         <label class="form-label mt-2">คำอธิบาย</label><textarea id="promoDesc" class="form-control"></textarea>
-
-        <!-- URL รูป + เพิ่มช่องไฟล์ -->
-        <label class="form-label mt-2">ภาพ (ลิงก์)</label>
-        <input id="promoImg" class="form-control" placeholder="https://...">
-        <input id="promoImgFile" type="file" accept="image/*" class="form-control mt-1" style="max-width:240px">
-
+        <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="promoImg" class="form-control">
         <div class="row mt-2">
           <div class="col"><label class="form-label">เริ่ม</label><input id="promoStart" type="date" class="form-control"></div>
           <div class="col"><label class="form-label">สิ้นสุด</label><input id="promoEnd" type="date" class="form-control"></div>
@@ -534,26 +514,21 @@ https://...2.jpg"></textarea>
         <input id="banId" type="hidden">
         <label class="form-label">หัวเรื่อง</label><input id="banTitle" class="form-control">
         <label class="form-label mt-2">คำอธิบาย</label><input id="banSub" class="form-control">
-
-        <!-- URL รูป + เพิ่มช่องไฟล์ -->
-        <label class="form-label mt-2">ภาพ (ลิงก์)</label>
-        <input id="banImg" class="form-control" placeholder="https://...">
-        <input id="banImgFile" type="file" accept="image/*" class="form-control mt-1" style="max-width:240px">
+        <label class="form-label mt-2">ภาพ (ลิงก์)</label><input id="banImg" class="form-control">
       </div>
       <div class="modal-footer"><button id="banSave" class="btn btn-primary">บันทึก</button></div>
     </div>
   </div>
 </div>
 
-<!-- สคริปต์หลักเดิม -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module" src="firebase-init.js"></script>
 <script type="module" src="auth.js"></script>
 <script type="module" src="admin.js"></script>
-<script type="module" src="admin-calendar.js?v=3"></script>
+  <script type="module" src="admin-calendar.js?v=3"></script>
 
-<!-- PWA SW register -->
+<!-- PWA SW register (assistant v35) -->
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -561,6 +536,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
 
 <!-- ===== Static Generator (assistant v36) ===== -->
 <style>
@@ -625,102 +601,13 @@ if ('serviceWorker' in navigator) {
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
 <!-- ===== /Static Generator (assistant v36) ===== -->
+
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="/firebase-init.js"></script>
 <script type="module" src="/admin-static-gen.js"></script>
-
-<!-- ========== อัปโหลดไฟล์ขึ้น Firebase Storage (เพิ่มเฉพาะบล็อกนี้) ========== -->
-<script type="module">
-  import { getApps, getApp, initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
-
-  // ให้แน่ใจว่ามี Firebase App (ใช้ window.firebaseConfig จาก firebase-init.js)
-  let app = null;
-  try {
-    app = getApps().length ? getApp() : (window.firebaseConfig ? initializeApp(window.firebaseConfig) : null);
-  } catch (e) {
-    console.error("[upload-helper] init app failed:", e);
-  }
-  if (!app) console.error("[upload-helper] Firebase app not found. ตรวจว่า firebase-init.js โหลดก่อน");
-
-  const storage = app ? getStorage(app) : null;
-
-  async function uploadOne(fileEl, targetInputEl, folder) {
-    if (!storage) return;
-    const f = fileEl?.files?.[0];
-    if (!f || !targetInputEl) return;
-    const safe = f.name.replace(/[^\w.\-]+/g, '_');
-    const key  = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2,8)}_${safe}`;
-    const snap = await uploadBytes(ref(storage, key), f);
-    const url  = await getDownloadURL(snap.ref);
-    targetInputEl.value = url;
-    fileEl.value = "";
-  }
-
-  async function uploadManyAppendLines(fileEl, targetTextareaEl, folder) {
-    if (!storage) return;
-    const files = Array.from(fileEl?.files || []);
-    if (!files.length || !targetTextareaEl) return;
-    const urls = [];
-    for (const f of files) {
-      const safe = f.name.replace(/[^\w.\-]+/g, '_');
-      const key  = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2,8)}_${safe}`;
-      const snap = await uploadBytes(ref(storage, key), f);
-      urls.push(await getDownloadURL(snap.ref));
-    }
-    const cur = (targetTextareaEl.value || '').trim();
-    targetTextareaEl.value = [cur, ...urls].filter(Boolean).join('\n');
-    fileEl.value = "";
-  }
-
-  async function uploadManyAppendCsv(fileEl, targetInputEl, folder) {
-    if (!storage) return;
-    const files = Array.from(fileEl?.files || []);
-    if (!files.length || !targetInputEl) return;
-    const urls = [];
-    for (const f of files) {
-      const safe = f.name.replace(/[^\w.\-]+/g, '_');
-      const key  = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2,8)}_${safe}`;
-      const snap = await uploadBytes(ref(storage, key), f);
-      urls.push(await getDownloadURL(snap.ref));
-    }
-    const cur = (targetInputEl.value || '').split(',').map(s=>s.trim()).filter(Boolean);
-    targetInputEl.value = [...cur, ...urls].join(', ');
-    fileEl.value = "";
-  }
-
-  // bind เมื่อ DOM พร้อม (ไม่มี id ก็ไม่ทำอะไร → ไม่กระทบของเดิม)
-  window.addEventListener('DOMContentLoaded', () => {
-    // Services
-    document.getElementById('svcImgFile')?.addEventListener('change', () =>
-      uploadOne(document.getElementById('svcImgFile'), document.getElementById('svcImg'), 'services')
-    );
-    document.getElementById('svcGalleryFiles')?.addEventListener('change', () =>
-      uploadManyAppendLines(document.getElementById('svcGalleryFiles'), document.getElementById('svcGallery'), 'services/gallery')
-    );
-
-    // Promotions
-    document.getElementById('promoImgFile')?.addEventListener('change', () =>
-      uploadOne(document.getElementById('promoImgFile'), document.getElementById('promoImg'), 'promotions')
-    );
-
-    // Banners
-    document.getElementById('banImgFile')?.addEventListener('change', () =>
-      uploadOne(document.getElementById('banImgFile'), document.getElementById('banImg'), 'banners')
-    );
-
-    // Products
-    document.getElementById('coverFile')?.addEventListener('change', () =>
-      uploadOne(document.getElementById('coverFile'), document.getElementById('cover'), 'products')
-    );
-    document.getElementById('galleryFiles')?.addEventListener('change', () =>
-      uploadManyAppendCsv(document.getElementById('galleryFiles'), document.getElementById('gallery'), 'products')
-    );
-  });
-</script>
-<!-- ========== /อัปโหลดไฟล์ ========== -->
 </body>
 </html>
