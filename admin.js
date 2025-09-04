@@ -151,6 +151,8 @@ try{document.getElementById('svcTags').value=Array.isArray(v?.tags)?v.tags.join(
     $('#setHero').value=v.hero||'';
     $('#setHeroTitle') && ($('#setHeroTitle').value=v.heroTitle||'');
     $('#setHeroSubtitle') && ($('#setHeroSubtitle').value=v.heroSubtitle||'');
+    $('#setHeroTitle') && ($('#setHeroTitle').value=v.heroTitle||'');
+    $('#setHeroSubtitle') && ($('#setHeroSubtitle').value=v.heroSubtitle||'');
     $('#setPolicy').value=v.mediaPolicy||'';
     $('#setMap').value=v.mapUrl||'';
   }

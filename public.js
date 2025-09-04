@@ -31,6 +31,16 @@ async function loadSettings(){
   const call = $('#fabCall'); if(call) call.href = `tel:${data.phone||''}`;
   const ln=$('#fabLine'); if(ln){const r=(data.line||'').trim(); ln.href=r?(r.startsWith('http')?r:`https://line.me/R/ti/p/${r.startsWith('@')?r:'@'+r}`):'#';}
   const fb = $('#fabFb'); if(fb) fb.href = data.facebook||'#';
+  // Apply homepage hero texts from settings (if present)
+  try {
+    const heroH1 = document.querySelector('header.hero h1');
+    if (heroH1 && data.heroTitle) heroH1.textContent = data.heroTitle;
+    const heroSub = document.querySelector('header.hero .lead');
+    if (heroSub && data.heroSubtitle) heroSub.textContent = data.heroSubtitle;
+    const heroEyebrow = document.querySelector('header.hero .eyebrow');
+    if (heroEyebrow && data.hero) heroEyebrow.textContent = data.hero;
+  } catch (e) { console.warn('hero text apply', e); }
+
 }
 
 function bindRealtime(){
