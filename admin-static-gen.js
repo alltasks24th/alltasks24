@@ -257,70 +257,10 @@ async function generate({ pages=true, og=false, sm=true }) {
   log("✓ เสร็จสิ้น");
 }
 
-
-async function generateOne(ridOrSlug) {
-  const base = ($("#sg-domain")?.value || "").replace(/\/+$/,'') || "https://alltasks24.online";
-  const ogDir = $("#sg-ogdir")?.value || "/assets/og";
-  const servicesCol = $("#sg-services-col")?.value || "services";
-  const productsCol = $("#sg-products-col")?.value || "products";
-  const wantOG = $("#sg-generate-og")?.checked ?? true;
-  const useItemImage = $("#sg-use-item-image")?.checked;
-
-  if (!ridOrSlug) { log("กรุณากรอก ID หรือ slug"); return; }
-  log("เริ่มสร้างเฉพาะรายการ: " + ridOrSlug);
-
-  let services=[], products=[];
-  try {
-    services = await fetchDocsOrWarn(servicesCol);
-    products = await fetchDocsOrWarn(productsCol);
-  } catch(e) {
-    log("✗ ต้องใช้ Firestore สำหรับ Generate This Item"); throw e;
-  }
-
-  const findBy = (arr) => arr.find(d => d.id === ridOrSlug || ((d.slug || slugify(pickVal(d,['name','title']) || d.id)) === ridOrSlug));
-
-  let item = findBy(services); let type = 'service';
-  if (!item) { item = findBy(products); type = item ? 'product' : null; }
-  if (!item) { log("✗ ไม่พบรายการ: " + ridOrSlug); return; }
-
-  const name = pickVal(item, ['name','title']) || item.id;
-  const slug = item.slug || slugify(name);
-  const zip = new JSZip();
-
-  if (type === 'service') {
-    zip.folder("service").file(`${slug}.html`, buildServiceHTML(item, base, ogDir));
-    log(`✓ Page: service/${slug}.html`);
-  } else {
-    zip.folder("product").file(`${slug}.html`, buildProductHTML(item, base, ogDir));
-    log(`✓ Page: product/${slug}.html`);
-  }
-
-  if (wantOG) {
-    const folder = zip.folder(ogDir.replace(/^\//,''));
-    const desc = pickVal(item, ['description','desc','detail']) || '';
-    const price = pickVal(item, ['price','basePrice','startingPrice','salePrice','regularPrice']);
-    const bgUrl = useItemImage ? (pickVal(item, ['image','cover','thumbnail']) || null) : null;
-    const blob = await drawOgImage({ title:name, subtitle:desc, price, bgImageUrl:bgUrl });
-    const buff = await blob.arrayBuffer();
-    folder.file(`${slug}-1200x630.jpg`, buff);
-    log(`✓ OG: ${slug}`);
-  }
-
-  const blob = await zip.generateAsync({type:"blob"});
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-  a.download = `alltasks24-${type}-${slug}.zip`; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
-  log("✓ เสร็จสิ้น (เฉพาะรายการ)");
-}
 // Bind action buttons
 document.getElementById('sg-gen-all')?.addEventListener('click', ()=> generate({pages:true, og:true, sm:true}));
 document.getElementById('sg-gen-pages')?.addEventListener('click', ()=> generate({pages:true, og:false, sm:false}));
 document.getElementById('sg-gen-og')?.addEventListener('click', ()=> generate({pages:false, og:true, sm:false}));
 document.getElementById('sg-gen-sitemap')?.addEventListener('click', ()=> generate({pages:false, og:false, sm:true}));
-document.getElementById('sg-gen-one')?.addEventListener('click', ()=> {
-  const v = document.getElementById('sg-one-id')?.value?.trim();
-  if(!v){ log('กรุณากรอก ID หรือ slug'); return; }
-  generateOne(v);
-});
 
 console.log('[Static Generator HOTFIX] ready');
