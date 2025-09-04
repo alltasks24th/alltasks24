@@ -121,13 +121,22 @@
       const rid = modal.id.replace(/^svc-|^prod-/,'').trim();
       const url = location.origin + location.pathname + (isSvc?`?svc=${encodeURIComponent(rid)}`:`?prod=${encodeURIComponent(rid)}`);
 
-      // 4) สร้างปุ่มคัดลอก ขนาดให้ตามปุ่มในแถวนั้น (ถ้ามี .btn-sm)
+      
+      // prefer permanent HTML page with OG; fallback to query URL
+      const titleEl = modal.querySelector('.modal-title');
+      const name = (titleEl?.textContent || '').trim();
+      const slug = name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/[^a-z0-9ก-๙\s-]/g,' ')
+        .replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+      const urlPermanent = slug ? `${location.origin}/${isSvc ? 'service' : 'product'}/${slug}.html` : null;
+// 4) สร้างปุ่มคัดลอก ขนาดให้ตามปุ่มในแถวนั้น (ถ้ามี .btn-sm)
       const isSmall = !!row.querySelector('.btn-sm');
       const btn = document.createElement('button');
       btn.type='button';
       btn.className='btn btn-outline-secondary' + (isSmall ? ' btn-sm' : '');
       btn.setAttribute('data-addon','copylink');
-      btn.setAttribute('data-copy-link', url);
+      btn.setAttribute('data-copy-link', urlPermanent || url);
       btn.innerHTML='<i class="bi bi-link-45deg"></i> คัดลอกลิงก์';
 
       // 5) แทรกถัดจากปุ่ม Facebook โดยตรง ถ้าเจอ
