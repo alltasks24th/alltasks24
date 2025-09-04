@@ -124,6 +124,8 @@ try{document.getElementById('svcTags').value=Array.isArray(v?.tags)?v.tags.join(
       line:$('#setLine').value,
       facebook:$('#setFb').value,
       hero:$('#setHero').value,
+      heroTitle:($('#setHeroTitle')?.value||'').trim(),
+      heroSubtitle:($('#setHeroSubtitle')?.value||'').trim(),
       mediaPolicy:$('#setPolicy').value,
       teamState:(document.querySelector('input[name="teamState"]:checked')||{}).value||'off',
       teamHeadcount:parseInt($('#teamCount')?.value||0)||0,
@@ -147,6 +149,8 @@ try{document.getElementById('svcTags').value=Array.isArray(v?.tags)?v.tags.join(
     $('#setLine').value=v.line||'';
     $('#setFb').value=v.facebook||'';
     $('#setHero').value=v.hero||'';
+    $('#setHeroTitle') && ($('#setHeroTitle').value=v.heroTitle||'');
+    $('#setHeroSubtitle') && ($('#setHeroSubtitle').value=v.heroSubtitle||'');
     $('#setPolicy').value=v.mediaPolicy||'';
     $('#setMap').value=v.mapUrl||'';
   }
