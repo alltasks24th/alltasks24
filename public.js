@@ -504,7 +504,7 @@ async function setupChat(user){
   input.addEventListener('keypress', e=>{ if(e.key==='Enter') sendMsg(); });
 
   if(createdNow){
-    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text: 'ยินดีให้บริการ 24 ชั่วโมง หากทักผ่านช่องทางนี้แล้วไม่มีการติบกลับ สามารถแอดไลน์ เพื่อติดต่อได้ หรือ โทร', createdAt: serverTimestamp() });
+    await addDoc(collection(db,'chatThreads', currentThreadId, 'messages'), { sender:'bot', text: 'ยินดีให้บริการ 24 ชั่วโมง หากทักผ่านช่องทางนี้แล้วไม่มีการตอบกลับ สามารถแอดไลน์ เพื่อติดต่อได้ หรือ โทร', createdAt: serverTimestamp() });
   }
 
   async function resetUnreadUser(){
