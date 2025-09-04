@@ -127,7 +127,7 @@
       btn.type='button';
       btn.className='btn btn-outline-secondary' + (isSmall ? ' btn-sm' : '');
       btn.setAttribute('data-addon','copylink');
-      btn.setAttribute('data-copy-link', url);
+      btn.setAttribute('data-copy-link', (typeof shareUrl!=='undefined' && shareUrl) ? shareUrl : url);
       btn.innerHTML='<i class="bi bi-link-45deg"></i> คัดลอกลิงก์';
 
       // 5) แทรกถัดจากปุ่ม Facebook โดยตรง ถ้าเจอ
@@ -182,4 +182,26 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 </body>
-</html>
+</html
+  // 3) Build share URL (prefer permanent page with OG; fallback to query if slug can't be built)
+  const isSvc  = modal.id?.startsWith('svc-');
+  const isProd = modal.id?.startsWith('prod-');
+  if (!(isSvc || isProd)) return;
+
+  const titleEl = modal.querySelector('.modal-title');
+  const name = (titleEl?.textContent || '').trim();
+  const slugify = (s) => s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9ก-๙\s-]/g,' ')
+    .replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+
+  const slug = slugify(name);
+  const rid = modal.id.replace(/^svc-|^prod-/, '').trim();
+
+  let shareUrl = slug
+    ? `${location.origin}/${isSvc ? 'service' : 'product'}/${slug}.html`
+    : `${location.origin}${location.pathname}?${isSvc ? 'svc' : 'prod'}=${encodeURIComponent(rid)}`;
+
+  // set into data attribute for copy
+  btn.setAttribute('data-copy-link', shareUrl);
+>
