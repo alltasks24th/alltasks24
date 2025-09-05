@@ -152,3 +152,34 @@ a{color:var(--primary)}a:hover{filter:brightness(.9)}
 /* === ADDON: copy link buttons (DO NOT REMOVE) === */
 .btn-copylink.copied{ animation: copyPulse .8s ease; }
 @keyframes copyPulse{ 0%{transform:scale(1)} 40%{transform:scale(1.05)} 100%{transform:scale(1)} }
+
+/* ===== ย่อคำอธิบายการ์ดบริการ/สินค้าแบบไม่พังเลย์เอาต์ ===== */
+/* ใช้กับกล่องคำอธิบายที่ใส่คลาส .teaser + เลือกจำนวนบรรทัดด้วยคลาส clamp-* */
+
+.teaser{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ความยาวมาตรฐาน 6 บรรทัด (ปรับเลขได้) */
+.clamp-4 { -webkit-line-clamp: 4; max-height: calc(1.6em*4 + 2.5em); }
+.clamp-5 { -webkit-line-clamp: 5; max-height: calc(1.6em*5 + 2.5em); }
+.clamp-6 { -webkit-line-clamp: 6; max-height: calc(1.6em*6 + 2.5em); }
+.clamp-8 { -webkit-line-clamp: 8; max-height: calc(1.6em*8 + 2.5em); }
+
+/* ทำเงาเฟดด้านล่างเล็กน้อยให้รู้ว่ายังมีเนื้อหาต่อ */
+.teaser::after{
+  content:"";
+  position:absolute; left:0; right:0; bottom:0; height:2.5em;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,.92));
+  pointer-events:none;
+}
+
+/* เมื่ออยู่ในโมดัล/หน้ารายละเอียด ให้โชว์เต็มอัตโนมัติ */
+.modal .teaser, .detail .teaser{
+  -webkit-line-clamp: unset;
+  max-height: none;
+}
+.modal .teaser::after, .detail .teaser::after{ display:none; }
