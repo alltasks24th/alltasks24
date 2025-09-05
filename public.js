@@ -963,3 +963,115 @@ function decorateSoldOutCards(root=document){
   }
   window.addEventListener('load', autoOpenFromQuery);
 })();
+
+/* ===== AT24: 3D สำหรับหน้าแรก (เฉพาะ บริการ + สินค้าแนะนำ) ===== */
+(() => {
+  if (window.at24MakeCarousel3D) return; // กันซ้ำ
+
+  function makeCarousel3DFromList(listEl){
+    if (!listEl || listEl.dataset.at24Inited) return null;
+
+    // เก็บการ์ดจริง ๆ (ตัด .col ออกได้)
+    const cards = [...listEl.querySelectorAll('.card, .product-card')];
+    if (cards.length === 0) return null;
+
+    // Fallback ถ้าน้อยกว่า 4 ใบ → ใช้รางเลื่อน 2D
+    if (cards.length < 4){
+      const rail = document.createElement('div');
+      rail.className = 'at24-rail';
+      cards.forEach(card => {
+        const item = document.createElement('div');
+        item.className = 'at24-item';
+        item.appendChild(card);
+        rail.appendChild(item);
+      });
+      listEl.dataset.at24Inited = '1';
+      listEl.replaceWith(rail);
+      return rail;
+    }
+
+    // โครง 3D
+    const wrap = document.createElement('div');
+    wrap.className = 'at24-carousel3d';
+    const ring = document.createElement('div');
+    ring.className = 'at24-ring';
+    wrap.appendChild(ring);
+
+    cards.forEach(card => {
+      const slide = document.createElement('article');
+      slide.className = 'at24-slide';
+      slide.appendChild(card);
+      ring.appendChild(slide);
+    });
+
+    const ctr = document.createElement('div');
+    ctr.className = 'at24-controls';
+    ctr.innerHTML = `<button type="button" aria-label="ก่อนหน้า">‹</button><button type="button" aria-label="ถัดไป">›</button>`;
+    wrap.appendChild(ctr);
+
+    listEl.dataset.at24Inited = '1';
+    listEl.replaceWith(wrap);
+
+    // จัดวางรอบวง
+    const slides = [...wrap.querySelectorAll('.at24-slide')];
+    const n = slides.length;
+    const step = 360 / n;
+    const radius = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--at24-3d-radius')) || 360;
+    slides.forEach((s, i) => s.style.transform = `rotateY(${i*step}deg) translateZ(${radius}px)`);
+
+    let curr = 0, rot = 0;
+    const setActive = () => slides.forEach((s,i)=> s.classList.toggle('is-active', i===curr));
+    const update = () => { rot = -curr*step; ring.style.transform = `translateZ(-1px) rotateY(${rot}deg)`; setActive(); };
+    update();
+
+    ctr.firstElementChild.addEventListener('click', () => { curr=(curr-1+n)%n; update(); });
+    ctr.lastElementChild .addEventListener('click', () => { curr=(curr+1)%n; update(); });
+
+    let startX=null, startRot=0;
+    wrap.addEventListener('pointerdown', e=>{ startX=e.clientX; startRot=rot; wrap.setPointerCapture(e.pointerId); });
+    wrap.addEventListener('pointermove', e=>{
+      if (startX==null) return;
+      const dx = e.clientX - startX;
+      rot = startRot + dx * .5;
+      ring.style.transform = `translateZ(-1px) rotateY(${rot}deg)`;
+    });
+    const snap = () => {
+      if (startX==null) return;
+      startX=null;
+      const raw = -rot/step;
+      curr = Math.round((raw % n + n) % n);
+      update();
+    };
+    wrap.addEventListener('pointerup', snap);
+    wrap.addEventListener('pointercancel', snap);
+
+    wrap.tabIndex = 0;
+    wrap.addEventListener('keydown', e=>{
+      if (e.key === 'ArrowLeft')  { curr=(curr-1+n)%n; update(); }
+      if (e.key === 'ArrowRight') { curr=(curr+1)%n; update(); }
+    });
+
+    return wrap;
+  }
+  window.at24MakeCarousel3D = makeCarousel3DFromList;
+
+  // ===== ผูกเฉพาะ 2 จุดบนหน้าแรก =====
+  function tryAttachHome(){
+    // บริการ (home)
+    const srvSection = document.querySelector('#home-services, .home-services, section.services');
+    const srvList = srvSection && (srvSection.querySelector('.row, .cards, .list, .grid') || srvSection);
+    if (srvList) makeCarousel3DFromList(srvList);
+
+    // สินค้าแนะนำ (home)
+    const featSection = document.querySelector('#featured-products, .featured-products, #featured, .featured');
+    const featList = featSection && (featSection.querySelector('.row, .cards, .list, .grid') || featSection);
+    if (featList) makeCarousel3DFromList(featList);
+  }
+
+  // รอให้ DOM + ข้อมูล Firestore มาแล้วค่อยแปลง
+  if (document.readyState !== 'loading') tryAttachHome();
+  else document.addEventListener('DOMContentLoaded', tryAttachHome);
+
+  const mo = new MutationObserver(() => tryAttachHome());
+  mo.observe(document.body, { childList: true, subtree: true });
+})();
