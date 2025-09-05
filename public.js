@@ -1055,23 +1055,20 @@ function decorateSoldOutCards(root=document){
   }
   window.at24MakeCarousel3D = makeCarousel3DFromList;
 
-  // ===== ผูกเฉพาะ 2 จุดบนหน้าแรก =====
-  function tryAttachHome(){
-    // บริการ (home)
-    const srvSection = document.querySelector('#home-services, .home-services, section.services');
-    const srvList = srvSection && (srvSection.querySelector('.row, .cards, .list, .grid') || srvSection);
-    if (srvList) makeCarousel3DFromList(srvList);
+// ===== ผูกเฉพาะ 2 จุดบนหน้าแรก =====
+function tryAttachHome(){
+  // บริการ (home)
+  const srvList =
+    document.getElementById('service-cards') ||
+    document.querySelector('#services .row, #services .cards, #services .list, #services .grid') ||
+    document.getElementById('services');
+  if (srvList) window.at24MakeCarousel3D(srvList);
 
-    // สินค้าแนะนำ (home)
-    const featSection = document.querySelector('#featured-products, .featured-products, #featured, .featured');
-    const featList = featSection && (featSection.querySelector('.row, .cards, .list, .grid') || featSection);
-    if (featList) makeCarousel3DFromList(featList);
-  }
-
-  // รอให้ DOM + ข้อมูล Firestore มาแล้วค่อยแปลง
-  if (document.readyState !== 'loading') tryAttachHome();
-  else document.addEventListener('DOMContentLoaded', tryAttachHome);
-
-  const mo = new MutationObserver(() => tryAttachHome());
-  mo.observe(document.body, { childList: true, subtree: true });
-})();
+  // สินค้าแนะนำ (home)
+  const featList =
+    document.getElementById('home-products') ||
+    document.getElementById('home-products-list') ||
+    document.querySelector('#products .row, #products .cards, #products .list, #products .grid') ||
+    document.getElementById('products');
+  if (featList) window.at24MakeCarousel3D(featList);
+}
