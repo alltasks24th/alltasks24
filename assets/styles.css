@@ -192,3 +192,39 @@ a{color:var(--primary)}a:hover{filter:brightness(.9)}
 /* ถ้าใช้พื้นหลังไลท์ม่วงในบางส่วน ให้ใช้สีพื้นหลังนั้นแทน #fff */
 :root { --surface: #ffffff; }
 .card .desc::after { background: linear-gradient(to bottom, rgba(255,255,255,0), var(--surface)); }
+
+
+/* ===== สินค้า: ย่อรายละเอียดบนการ์ดให้สั้นเท่าบริการ ===== */
+/* ปรับจำนวนบรรทัดที่ต้องการได้ */
+:root { --prod-lines: 4; }
+
+/* จับคำอธิบายที่พบบ่อยในการ์ดสินค้า (เผื่อหลายคลาส) */
+.products .card .desc,
+.products .card .card-text,
+.products .card .summary,
+#products .card .desc,
+#recoProducts .card .desc,
+#shop .card .desc,
+.card.product .desc,
+.card.product .card-text,
+.section-products .card .desc,
+.section-products .card .card-text,
+.product-list .card .desc,
+.product-list .card .card-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--prod-lines);
+  overflow: hidden;
+  max-height: calc(1.5em * var(--prod-lines));
+  word-break: break-word;
+}
+
+/* Fallback: ถ้าโครงสร้างไม่ใส่คลาส desc/card-text ให้ย่อ p ตัวแรกในเนื้อการ์ดสินค้า */
+.products .card .card-body > p:first-of-type,
+.section-products .card .card-body > p:first-of-type {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--prod-lines);
+  overflow: hidden;
+  max-height: calc(1.5em * var(--prod-lines));
+}
