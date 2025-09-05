@@ -159,7 +159,7 @@ a{color:var(--primary)}a:hover{filter:brightness(.9)}
 .card.product-card .text-muted.flex-grow-1{
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;   /* ใส่ 4 ถ้าอยาก 4 บรรทัด */
+  -webkit-line-clamp: 4;   /* ใส่ 4 ถ้าอยาก 4 บรรทัด */
   overflow: hidden;
   white-space: normal;
   position: relative;
