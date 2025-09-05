@@ -647,7 +647,7 @@ async function renderHomeProducts() {
       where('isActive','==', true),
       where('featured','==', true),
       orderBy('rank','asc'),
-      limit(3) // โชว์ 3 รายการ
+      limit(8) // โชว์ 3 รายการ
     ));
 
     if (snap.empty) {
