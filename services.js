@@ -183,27 +183,3 @@ style.textContent = `
   .modal-backdrop{ z-index:1300 !important; }
 `;
 document.head.appendChild(style);
-
-/* ===========================
-   AT24 – 3D Carousel for services.html
-   วางท้าย services.js
-   =========================== */
-(() => {
-  // ถ้า helper ถูกประกาศใน public.js แล้ว จะเรียกใช้ได้เลย
-  const ensure = () => typeof window.at24MakeCarousel3D === 'function';
-
-  function attachServices(){
-    // ค้นหาลิสต์บริการหลักของหน้านี้
-    const root = document.querySelector('#services, .services, main, section.services');
-    if (!root) return;
-    const list = root.querySelector('.row, .list, .cards, .grid') || root;
-    if (ensure()) window.at24MakeCarousel3D(list);
-  }
-
-  if (document.readyState !== 'loading') attachServices();
-  else document.addEventListener('DOMContentLoaded', attachServices);
-
-  // เฝ้าดูเมื่อ Firestore ใส่การ์ดเข้ามา
-  const mo = new MutationObserver(() => attachServices());
-  mo.observe(document.body, { childList: true, subtree: true });
-})();
