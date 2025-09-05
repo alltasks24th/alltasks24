@@ -1,5 +1,5 @@
 // หน้าแรกอยากโชว์กี่บริการ (ปรับเลขเดียวจบ)
-const SERVICES_LIMIT_HOME = 3;
+const SERVICES_LIMIT_HOME = 8;
 
 // public.js — ฝั่งผู้ใช้ (realtime + chat เปิดเมื่อกดปุ่ม)
 import { auth, db, ensureAnonAuth } from './firebase-init.js';
