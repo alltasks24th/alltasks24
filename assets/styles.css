@@ -152,3 +152,55 @@ a{color:var(--primary)}a:hover{filter:brightness(.9)}
 /* === ADDON: copy link buttons (DO NOT REMOVE) === */
 .btn-copylink.copied{ animation: copyPulse .8s ease; }
 @keyframes copyPulse{ 0%{transform:scale(1)} 40%{transform:scale(1.05)} 100%{transform:scale(1)} }
+
+/* ===========================
+   AllTasks24 – Card Text Clamp
+   ใส่บล็อกเดียว จบ
+   =========================== */
+
+/* ⬇️ เวอร์ชัน "ย่อทุกการ์ด" (หน้าเว็บ + บริการ + สินค้า) */
+.card .card-text{
+  display: -webkit-box;
+  -webkit-line-clamp: 5;        /* ต้องการ 4 บรรทัด → เปลี่ยนเป็น 4 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ถ้าอยากย่อเฉพาะการ์ดบริการ/สินค้า ให้ใช้บล็อกนี้แทน (และลบบล็อกด้านบน)
+.service-card .card-text,
+.product-card .card-text{
+  display: -webkit-box;
+  -webkit-line-clamp: 5;        /* 4 ได้เช่นกัน */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  position: relative;
+}
+*/
+
+/* เฟดท้ายให้รู้ว่ามีเนื้อหาต่อ */
+.card .card-text::after{
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1.6em;                /* ปรับตาม line-height ของฟอนต์คุณ */
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0),
+    var(--bs-body-bg, #fff) 80%
+  );
+}
+
+/* ยูทิลิตี้สั้น ๆ เผื่อบางใบอยากเปลี่ยนจำนวนบรรทัดเฉพาะจุด */
+.at24-clamp-3 { -webkit-line-clamp: 3 !important; }
+.at24-clamp-4 { -webkit-line-clamp: 4 !important; }
+.at24-clamp-5 { -webkit-line-clamp: 5 !important; }
+
+/* ถ้าบางตำแหน่ง "ไม่อยากย่อ" ให้ใส่คลาสนี้บน .card-text ใบนั้น */
+.no-clamp{
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+  overflow: visible !important;
+}
