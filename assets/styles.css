@@ -192,3 +192,56 @@ a{color:var(--primary)}a:hover{filter:brightness(.9)}
 /* ถ้าใช้พื้นหลังไลท์ม่วงในบางส่วน ให้ใช้สีพื้นหลังนั้นแทน #fff */
 :root { --surface: #ffffff; }
 .card .desc::after { background: linear-gradient(to bottom, rgba(255,255,255,0), var(--surface)); }
+
+
+/* ===== ย่อข้อความบนการ์ด "สินค้า" ให้สั้นพอ ๆ กับบริการ ===== */
+:root{
+  /* ปรับจำนวนบรรทัดที่อยากให้โชว์ได้ที่นี่ */
+  --prod-lines: 4;           /* เนื้อหา */
+  --prod-title-lines: 2;     /* ชื่อสินค้า (ถ้าต้องการย่อชื่อด้วย) */
+}
+
+/* จับคำอธิบายบนการ์ดสินค้า (ครอบคลุมคลาสที่พบบ่อยในโปรเจกต์นี้) */
+.products .card .card-body > p,
+.shop .card .card-body > p,
+#shop .card .card-body > p,
+.products .product-card .desc,
+.shop .product-card .desc,
+.product-card .desc,
+.card.card-product .card-text,
+.card.card-product .desc{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--prod-lines);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  max-height: calc(var(--prod-lines) * 1.5em); /* เผื่อเบราว์เซอร์ไม่รองรับ line-clamp */
+}
+
+/* (ตัวเลือก) ย่อชื่อสินค้าให้สั้นลงด้วย ถ้าอยาก */
+.products .card .card-title,
+.shop .card .card-title,
+.product-card .card-title,
+.card.card-product .card-title{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--prod-title-lines);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: calc(var(--prod-title-lines) * 1.35em);
+}
+
+/* (สวยงาม) ทำเฟดจางด้านล่างนิดหน่อยเวลาตัดข้อความ */
+.products .card .card-body,
+.shop .card .card-body,
+.product-card .card-body{ position: relative; }
+.products .card .card-body::after,
+.shop .card .card-body::after,
+.product-card .card .card-body::after{
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2.4rem; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), var(--bg, #fff));
+}
