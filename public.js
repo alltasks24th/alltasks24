@@ -90,8 +90,8 @@ function bindRealtime(){
     home.innerHTML = items.slice(0, 3).map(card).join('');
     const lbl = document.getElementById('promo-range-label');
     if (lbl) lbl.textContent = items.length
-      ? `แสดงโปรโมชันที่ใช้งานอยู่ (${items.length})`
-      : 'ยังไม่มีโปรโมชันที่ใช้งาน';
+      ? `โปรโมชันที่ใช้งาน (${items.length})`
+      : 'ยังไม่มีโปรโมชันที่';
   }
 
   // หน้าโปรโมชันทั้งหมด: แสดงทั้งหมด
