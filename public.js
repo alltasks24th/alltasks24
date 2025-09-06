@@ -1,5 +1,5 @@
 // หน้าแรกอยากโชว์กี่บริการ (ปรับเลขเดียวจบ)
-const SERVICES_LIMIT_HOME = 3;
+const SERVICES_LIMIT_HOME = 9;
 
 // public.js — ฝั่งผู้ใช้ (realtime + chat เปิดเมื่อกดปุ่ม)
 import { auth, db, ensureAnonAuth } from './firebase-init.js';
@@ -647,7 +647,7 @@ async function renderHomeProducts() {
       where('isActive','==', true),
       where('featured','==', true),
       orderBy('rank','asc'),
-      limit(3) // โชว์ 3 รายการ
+      limit(6) // โชว์ 3 รายการ
     ));
 
     if (snap.empty) {
