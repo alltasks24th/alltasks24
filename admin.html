@@ -85,14 +85,7 @@
       <button class="nav-link" id="tab-pricing-tab" data-bs-toggle="pill" data-bs-target="#tab-pricing"><i class="bi bi-calculator me-2"></i>คำนวณราคา</button>      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-2"></i>FAQ</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-settings"><i class="bi bi-gear me-2"></i>ตั้งค่า</button>
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chat"><i class="bi bi-chat-dots me-2"></i>แชทสด</button>
-    
-      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-jobs">
-        <i class="bi bi-briefcase me-2"></i>ใบงาน
-      </button>
-      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-inventory">
-        <i class="bi bi-box-seam me-2"></i>สต๊อก
-      </button>
-</div>
+    </div>
   </aside>
 
   <!-- เนื้อหาฝั่งขวา -->
@@ -492,184 +485,7 @@
         </div>
       </div>
 
-    
-      <!-- ใบงาน/Jobs -->
-      <div class="tab-pane fade" id="tab-jobs">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div class="d-flex align-items-center gap-2">
-            <select id="jobsStatusFilter" class="form-select form-select-sm" style="width:auto;min-width:160px">
-              <option value="">ทั้งหมด</option>
-              <option value="new">ใหม่</option>
-              <option value="quoted">เสนอราคาแล้ว</option>
-              <option value="scheduled">นัดหมายแล้ว</option>
-              <option value="in_progress">กำลังทำ</option>
-              <option value="done">เสร็จแล้ว</option>
-              <option value="cancelled">ยกเลิก</option>
-            </select>
-            <input id="jobsSearch" class="form-control form-control-sm" style="max-width:240px" placeholder="ค้นหา ชื่อ/บริการ/โทร">
-          </div>
-          <div class="d-flex gap-2">
-            <button id="jobAdd" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i> สร้างใบงาน</button>
-          </div>
-        </div>
-        <div class="card card-clean p-0">
-          <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-              <thead class="table-light"><tr>
-                <th>รหัส</th><th>ลูกค้า</th><th>บริการ</th><th>สถานะ</th><th class="text-end">ยอด</th><th>เวลา</th><th style="width:160px">จัดการ</th>
-              </tr></thead>
-              <tbody id="jobsTableBody">
-                <tr><td colspan="7" class="text-center text-muted small">ยังไม่มีข้อมูล</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- สต๊อก/Inventory (วัสดุงานบริการ) -->
-      <div class="tab-pane fade" id="tab-inventory">
-        <div class="row g-3">
-          <div class="col-lg-4">
-            <div class="card card-clean p-3">
-              <div class="fw-semibold mb-2">วัสดุ/อะไหล่</div>
-              <form id="matForm" class="small">
-                <input type="hidden" id="matId">
-                <label class="form-label">ชื่อวัสดุ</label>
-                <input id="matName" class="form-control" required>
-                <div class="row g-2 mt-1">
-                  <div class="col-6">
-                    <label class="form-label">SKU/บาร์โค้ด</label>
-                    <input id="matSku" class="form-control">
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label">หน่วย</label>
-                    <input id="matUnit" class="form-control" placeholder="ชิ้น/กก./ชุด">
-                  </div>
-                </div>
-                <div class="row g-2 mt-1">
-                  <div class="col-6">
-                    <label class="form-label">จุดสั่งซื้อ (Reorder)</label>
-                    <input id="matReorder" type="number" min="0" class="form-control" value="0">
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label">คงเหลือ</label>
-                    <input id="matOnHand" type="number" class="form-control" value="0" disabled>
-                  </div>
-                </div>
-                <div class="row g-2 mt-1">
-                  <div class="col-6">
-                    <label class="form-label">ต้นทุนเฉลี่ย</label>
-                    <input id="matAvgCost" type="number" class="form-control" value="0" disabled>
-                  </div>
-                </div>
-                <div class="d-flex gap-2 mt-3">
-                  <button id="matSave" type="button" class="btn btn-primary btn-sm">บันทึก</button>
-                  <button id="matReset" type="button" class="btn btn-secondary btn-sm">ล้าง</button>
-                  <button id="matDelete" type="button" class="btn btn-outline-danger btn-sm d-none">ลบ</button>
-                </div>
-              </form>
-            </div>
-          </div>
-          <div class="col-lg-8">
-            <div class="card card-clean p-3">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="fw-semibold">รายการวัสดุ</div>
-                <div class="small text-muted">คลิก "รับเข้า/ปรับ" เพื่อบันทึกความเคลื่อนไหว</div>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-sm align-middle mb-0">
-                  <thead class="table-light">
-                    <tr><th>ชื่อ</th><th>คงเหลือ</th><th>หน่วย</th><th>เฉลี่ย</th><th>Reorder</th><th style="width:200px">จัดการ</th></tr>
-                  </thead>
-                  <tbody id="matTableBody"></tbody>
-                </table>
-              </div>
-            </div>
-            <div class="card card-clean p-3 mt-3">
-              <div class="fw-semibold mb-2">ความเคลื่อนไหวล่าสุด</div>
-              <div class="table-responsive">
-                <table class="table table-sm mb-0">
-                  <thead class="table-light"><tr><th>เวลา</th><th>รายการ</th><th>ประเภท</th><th class="text-end">จำนวน</th><th class="text-end">ราคา/หน่วย</th><th>หมายเหตุ</th></tr></thead>
-                  <tbody id="movesTableBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal: Job -->
-      <div class="modal fade" id="jobModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">ใบงาน</h5>
-              <button class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <form id="jobForm" class="small">
-                <input type="hidden" id="jobId">
-                <div class="row g-2">
-                  <div class="col-md-4">
-                    <label class="form-label">รหัส</label>
-                    <input id="jobCode" class="form-control" placeholder="AUTO" disabled>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label">สถานะ</label>
-                    <select id="jobStatus" class="form-select">
-                      <option value="new">ใหม่</option>
-                      <option value="quoted">เสนอราคาแล้ว</option>
-                      <option value="scheduled">นัดหมายแล้ว</option>
-                      <option value="in_progress">กำลังทำ</option>
-                      <option value="done">เสร็จแล้ว</option>
-                      <option value="cancelled">ยกเลิก</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label">ผู้รับผิดชอบ/ช่าง</label>
-                    <input id="jobAssign" class="form-control" placeholder="ช่างผู้รับงาน">
-                  </div>
-                </div>
-                <div class="row g-2 mt-1">
-                  <div class="col-md-4"><label class="form-label">ชื่อลูกค้า</label><input id="jobCusName" class="form-control"></div>
-                  <div class="col-md-4"><label class="form-label">โทรศัพท์</label><input id="jobCusPhone" class="form-control"></div>
-                  <div class="col-md-4"><label class="form-label">นัดหมาย</label><input id="jobSchedule" type="datetime-local" class="form-control"></div>
-                </div>
-                <label class="form-label mt-2">ที่อยู่</label><input id="jobCusAddr" class="form-control">
-                <label class="form-label mt-2">บริการ/หัวข้อ</label><input id="jobService" class="form-control">
-                <label class="form-label mt-2">รายละเอียด</label><textarea id="jobDesc" rows="3" class="form-control"></textarea>
-
-                <div class="row g-2 mt-2">
-                  <div class="col-md-3"><label class="form-label">เสนอราคา</label><input id="jobQuote" type="number" class="form-control" value="0"></div>
-                  <div class="col-md-3"><label class="form-label">มัดจำ</label><input id="jobDeposit" type="number" class="form-control" value="0"></div>
-                  <div class="col-md-3"><label class="form-label">ค่าเดินทาง</label><input id="jobTravelCost" type="number" class="form-control" value="0"></div>
-                  <div class="col-md-3"><label class="form-label">ค่าใช้จ่ายอื่น</label><input id="jobOtherCost" type="number" class="form-control" value="0"></div>
-                </div>
-
-                <div class="mt-3">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="fw-semibold">วัสดุที่ใช้ (บันทึกต้นทุนต่อจ๊อบ)</div>
-                    <button id="matAddRow" type="button" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus-lg"></i> เพิ่มรายการ</button>
-                  </div>
-                  <div class="table-responsive mt-2">
-                    <table class="table table-sm mb-0">
-                      <thead class="table-light"><tr><th>ชื่อวัสดุ</th><th style="width:120px">จำนวน</th><th style="width:140px">ต้นทุน/หน่วย</th><th style="width:60px"></th></tr></thead>
-                      <tbody id="jobMatBody"></tbody>
-                    </table>
-                  </div>
-                </div>
-              </form>
-              <div class="mt-3 small text-muted">* ตอนนี้การบันทึกวัสดุในใบงาน <b>ยังไม่หักสต๊อกอัตโนมัติ</b> — เพื่อไม่ให้กระทบระบบเดิม</div>
-            </div>
-            <div class="modal-footer">
-              <button id="jobDelete" class="btn btn-outline-danger me-auto d-none" type="button">ลบ</button>
-              <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">ปิด</button>
-              <button id="jobSave" class="btn btn-primary" type="button">บันทึก</button>
-            </div>
-          </div>
-        </div>
-      </div>
-</div><!-- /.tab-content -->
+    </div><!-- /.tab-content -->
   </div><!-- /.content -->
 </div><!-- /.layout -->
 
@@ -735,7 +551,6 @@ https://...2.jpg"></textarea>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module" src="auth.js"></script>
 <script type="module" src="admin.js"></script>
-  <script type="module" src="admin-ops.js?v=1"></script>
   <script type="module" src="admin-calendar.js?v=3"></script>
 
 <!-- PWA SW register (assistant v35) -->
