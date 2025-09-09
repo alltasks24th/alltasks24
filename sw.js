@@ -3,7 +3,7 @@ const CACHE_NAME = 'alltasks24:v2025-08-27-1';
 const OFFLINE_URL = '/offline.html';
 const PRECACHE = [
   "/",
-  "/alltasks24-main/Calculation system.html",
+  "/alltasks24-main/calculation-system.html",
   "/alltasks24-main/admin-calendar.css",
   "/alltasks24-main/admin-calendar.js",
   "/alltasks24-main/admin.html",

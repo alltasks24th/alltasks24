@@ -1,8 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="th">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>AllTasks24 — เมนูเดียว (โทนม่วง) + แบ่งหน้า + ตั้งค่า</title>
 <style>
 :root{
@@ -84,282 +85,271 @@ hr.sep{border:none; border-top:1px dashed var(--line); margin:10px 0}
   table.rtbl td::before{content:attr(data-label); font-weight:600; color:#6b7280}
 }
 </style>
-</head>
+<meta content="noindex,nofollow" name="robots"/><link href="https://alltasks24.online/admin-income.html" rel="canonical"/><meta content="รับจ้างสารพัด 24 ชั่วโมง — รวดเร็ว ปลอดภัย นัดเวลาได้ ติดต่อผ่าน LINE หรือโทรศัพท์" name="description"/><meta content="AllTasks24 — เมนูเดียว (โทนม่วง) + แบ่งหน้า + ตั้งค่า" property="og:title"/><meta content="รับจ้างสารพัด 24 ชั่วโมง — รวดเร็ว ปลอดภัย นัดเวลาได้ ติดต่อผ่าน LINE หรือโทรศัพท์" property="og:description"/><meta content="https://alltasks24.online/icons/android-chrome-512x512.png" property="og:image"/><meta content="https://alltasks24.online/admin-income.html" property="og:url"/><meta content="website" property="og:type"/><meta content="AllTasks24" property="og:site_name"/><meta content="summary_large_image" name="twitter:card"/><meta content="AllTasks24 — เมนูเดียว (โทนม่วง) + แบ่งหน้า + ตั้งค่า" name="twitter:title"/><meta content="รับจ้างสารพัด 24 ชั่วโมง — รวดเร็ว ปลอดภัย นัดเวลาได้ ติดต่อผ่าน LINE หรือโทรศัพท์" name="twitter:description"/><meta content="https://alltasks24.online/icons/android-chrome-512x512.png" name="twitter:image"/></head>
 <body>
 <header>
-  <div class="container head">
-    <h1>AllTasks24 · เมนูเดียว (ม่วง) + แบ่งหน้า + ตั้งค่า</h1>
-    <div class="actions">
-      <button class="btn" id="seedBtn">เติมข้อมูลตัวอย่าง</button>
-      <button class="btn" id="clearBtn">ล้างข้อมูล</button>
-    </div>
-  </div>
+<div class="container head">
+<h1>AllTasks24 · เมนูเดียว (ม่วง) + แบ่งหน้า + ตั้งค่า</h1>
+<div class="actions">
+<button class="btn" id="seedBtn">เติมข้อมูลตัวอย่าง</button>
+<button class="btn" id="clearBtn">ล้างข้อมูล</button>
+</div>
+</div>
 </header>
-
 <main class="container">
-  <!-- Overview -->
-  <section class="card">
-    <div class="segment">
-      <div class="seg" id="granularity">
-        <button data-g="day" class="active">รายวัน</button>
-        <button data-g="week">รายสัปดาห์</button>
-        <button data-g="month">รายเดือน</button>
-        <button data-g="year">รายปี</button>
-      </div>
-      <div class="periodnav">
-        <button class="btn" id="prevBtn">◀︎</button>
-        <div class="period-label" id="periodLabel">—</div>
-        <button class="btn" id="nextBtn">▶︎</button>
-      </div>
-    </div>
-    <div class="kpis">
-      <div class="card"><h3>รายรับช่วงนี้</h3><div class="kpi"><div class="big mono" id="kpiIn">0</div><span class="caption" id="curLabel">บาท</span></div></div>
-      <div class="card"><h3>รายจ่ายช่วงนี้</h3><div class="kpi"><div class="big mono" id="kpiOut">0</div><span class="caption" id="curLabel2">บาท</span></div></div>
-      <div class="card"><h3>สุทธิช่วงนี้</h3><div class="kpi"><div class="big mono" id="kpiNet">0</div><span class="caption" id="curLabel3">บาท</span></div></div>
-      <div class="card"><h3>คงเหลือรวมบัญชี</h3><div class="kpi"><div class="big mono" id="kpiBal">0</div><span class="caption" id="curLabel4">บาท</span></div></div>
-    </div>
-    <div class="grid grid-2" style="margin-top:12px">
-      <div class="card">
-        <h3>สรุปรายจ่ายตามหมวด (ช่วงที่เลือก)</h3>
-        <div id="catSum"></div>
-      </div>
-      <div class="card">
-        <h3>ยอดคงเหลือตามบัญชี</h3>
-        <table class="rtbl"><thead><tr><th>บัญชี</th><th class="mono">ยอดคงเหลือ</th></tr></thead><tbody id="acctTable"></tbody></table>
-      </div>
-    </div>
-    <div class="card" style="margin-top:12px">
-      <h3>แผนภาพกระแสเงินสด</h3>
-      <canvas id="cfChart" style="width:100%;max-height:220px;background:#fff;border:1px solid var(--line);border-radius:12px"></canvas>
-      <div class="caption">สรุปตามมุมมองที่เลือก (วัน/สัปดาห์/เดือน/ปี)</div>
-    </div>
-  </section>
-
-  <!-- Accordion sections -->
-  <section class="acc">
-    <div class="acc-item open">
-      <div class="acc-head"><h3>🧾 เดินบัญชี (เพิ่มรายการ/ตัวกรอง/Export)</h3><div class="caption">คลิกเพื่อพับ/ขยาย</div></div>
-      <div class="acc-body">
-        <div class="grid grid-2">
-          <div>
-            <div class="card">
-              <h3>เพิ่มรายการ</h3>
-              <div class="row">
-                <div><div class="caption">วันที่</div><input type="date" id="t_date"></div>
-                <div><div class="caption">ประเภท</div><select id="t_type"><option value="income">รายรับ</option><option value="expense">รายจ่าย</option><option value="transfer">โอนย้าย</option></select></div>
-                <div><div class="caption">เข้าบัญชี</div><select id="t_accIn"></select></div>
-                <div><div class="caption">ออกจากบัญชี</div><select id="t_accOut"></select></div>
-              </div>
-              <div class="row">
-                <div><div class="caption">หมวดหมู่</div><select id="t_cat"></select></div>
-                <div><div class="caption">จำนวนเงิน</div><input type="number" id="t_amt" value="0" step="0.01"></div>
-                <div><div class="caption">คู่ค้า/ลูกค้า</div><input id="t_party" placeholder="เช่น ร้าน A / ลูกค้า B"></div>
-              </div>
-              <div class="row"><div style="flex:1 1 100%"><div class="caption">หมายเหตุ (#แท็ก)</div><input id="t_note"></div></div>
-              <div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn primary" id="btnAddTx">+ บันทึกรายการ</button></div>
-            </div>
-
-            <div class="card">
-              <h3>ตั้งค่า: บัญชี / หมวด</h3>
-              <div class="row">
-                <div>
-                  <div class="caption">ชื่อบัญชี</div><input id="a_name" placeholder="เช่น เงินสด">
-                  <div class="caption">ยอดตั้งต้น</div><input id="a_open" type="number" value="0" step="0.01">
-                  <div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn" id="btnAddAcc">+ เพิ่มบัญชี</button></div>
-                </div>
-                <div>
-                  <div class="caption">เพิ่มหมวด</div>
-                  <div class="row">
-                    <div><select id="c_type"><option value="income">รายรับ</option><option value="expense">รายจ่าย</option></select></div>
-                    <div><input id="c_name" placeholder="ชื่อหมวด"></div>
-                    <div><input id="c_budget" type="number" value="0" step="0.01" placeholder="งบ/เดือน (รายจ่าย)"></div>
-                  </div>
-                  <div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn" id="btnAddCat">+ เพิ่มหมวด</button></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="card">
-              <h3>ตัวกรองรายการ + Export</h3>
-              <div class="row">
-                <div><div class="caption">จาก</div><input type="date" id="f_from"></div>
-                <div><div class="caption">ถึง</div><input type="date" id="f_to"></div>
-                <div><div class="caption">ประเภท</div><select id="f_type"><option value="">ทั้งหมด</option><option>income</option><option>expense</option><option>transfer</option></select></div>
-                <div><div class="caption">บัญชี</div><select id="f_acc"><option value="">ทั้งหมด</option></select></div>
-                <div><div class="caption">หมวด</div><select id="f_cat"><option value="">ทั้งหมด</option></select></div>
-              </div>
-              <div class="row" style="justify-content:flex-end; margin-top:8px">
-                <button class="btn" id="btnClearFilters">ล้างตัวกรอง</button>
-                <button class="btn primary" id="btnExportCSV">Export CSV</button>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="row" style="align-items:center; justify-content:space-between">
-                <h3 style="margin:0">รายการเดินบัญชี</h3>
-                <div class="pager" id="txPagerTop"></div>
-              </div>
-              <table class="rtbl">
-                <thead><tr><th>วันที่</th><th>ประเภท</th><th>บัญชี</th><th>หมวด</th><th>คู่ค้า</th><th class="mono">จำนวน</th><th>หมายเหตุ</th><th></th></tr></thead>
-                <tbody id="txTable"></tbody>
-              </table>
-              <div class="pager" id="txPager"></div>
-            </div>
-
-            <div class="grid grid-2">
-              <div class="card">
-                <div class="row" style="align-items:center; justify-content:space-between">
-                  <h3 style="margin:0">บัญชี</h3>
-                </div>
-                <table class="rtbl"><thead><tr><th>ชื่อ</th><th class="mono">ตั้งต้น</th><th class="mono">ปัจจุบัน</th><th></th></tr></thead><tbody id="accList"></tbody></table>
-              </div>
-              <div class="card">
-                <div class="row" style="align-items:center; justify-content:space-between">
-                  <h3 style="margin:0">หมวด</h3>
-                </div>
-                <table class="rtbl"><thead><tr><th>ประเภท</th><th>ชื่อ</th><th class="mono">งบ/เดือน</th><th></th></tr></thead><tbody id="catList"></tbody></table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="acc-item">
-      <div class="acc-head"><h3>📦 สต๊อกสินค้า (รับเข้า/ปรับ + รายการ)</h3><div class="caption">คลิกเพื่อพับ/ขยาย</div></div>
-      <div class="acc-body">
-        <div class="grid grid-2">
-          <div class="card">
-            <h3>เพิ่มสินค้า/วัสดุ</h3>
-            <div class="row">
-              <div><div class="caption">ชื่อสินค้า</div><input id="m_name" placeholder="เช่น น้ำมันเครื่อง 10W-40"></div>
-              <div><div class="caption">หน่วย</div><input id="m_unit" placeholder="ขวด / ชิ้น / เส้น"></div>
-              <div><div class="caption">SKU</div><input id="m_sku" placeholder="SKU"></div>
-              <div><div class="caption">บาร์โค้ด</div><input id="m_bar" placeholder="บาร์โค้ด"></div>
-              <div><div class="caption">Reorder</div><input id="m_reorder" type="number" value="0"></div>
-            </div>
-            <div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn primary" id="btnAddMat">+ เพิ่มสินค้า</button></div>
-          </div>
-          <div class="card">
-            <h3>รับเข้า / ปรับสต๊อก</h3>
-            <div class="row">
-              <div><div class="caption">สินค้า</div><select id="mm_sel"></select></div>
-              <div><div class="caption">จำนวน (+/−)</div><input id="mm_qty" type="number" step="0.01" value="1"></div>
-              <div><div class="caption">ต้นทุน/หน่วย (รับเข้า)</div><input id="mm_cost" type="number" step="0.01" value="0"></div>
-              <div><div class="caption">ประเภท</div><select id="mm_type"><option value="in">รับเข้า</option><option value="adjust">ปรับสต๊อก</option></select></div>
-            </div>
-            <div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn primary" id="btnDoMove">บันทึก</button></div>
-            <div class="caption">รับเข้า = คำนวณต้นทุนถัวเฉลี่ยอัตโนมัติ</div>
-          </div>
-        </div>
-        <div class="card" style="margin-top:10px">
-          <div class="row" style="align-items:center; justify-content:space-between">
-            <h3 style="margin:0">รายการสินค้า</h3>
-            <div class="pager" id="matPagerTop"></div>
-          </div>
-          <table class="rtbl">
-            <thead><tr><th>ชื่อ</th><th>SKU</th><th>บาร์โค้ด</th><th class="mono">คงเหลือ</th><th>หน่วย</th><th class="mono">ต้นทุนเฉลี่ย</th><th class="mono">มูลค่า</th><th class="mono">Reorder</th><th></th></tr></thead>
-            <tbody id="matTable"></tbody>
-          </table>
-          <div class="pager" id="matPager"></div>
-        </div>
-        <div class="card" style="margin-top:10px">
-          <div class="row" style="align-items:center; justify-content:space-between">
-            <h3 style="margin:0">เคลื่อนไหวล่าสุด</h3>
-            <div class="pager" id="movePagerTop"></div>
-          </div>
-          <table class="rtbl">
-            <thead><tr><th>เวลา</th><th>สินค้า</th><th>ประเภท</th><th class="mono">จำนวน</th><th class="mono">ต้นทุน/หน่วย</th><th>อ้างอิง</th></tr></thead>
-            <tbody id="moveTable"></tbody>
-          </table>
-          <div class="pager" id="movePager"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="acc-item">
-      <div class="acc-head"><h3>📋 นับสต๊อก (Cycle Count)</h3><div class="caption">คลิกเพื่อพับ/ขยาย</div></div>
-      <div class="acc-body">
-        <div class="grid grid-2">
-          <div class="card">
-            <h3>เริ่มรอบนับ</h3>
-            <div class="row">
-              <div><div class="caption">ชื่อรอบ</div><input id="c_name" placeholder="Cycle Sep-2025"></div>
-              <div><div class="caption">หมายเหตุ</div><input id="c_note" placeholder="ผู้ตรวจ/เงื่อนไข ฯลฯ"></div>
-            </div>
-            <div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn primary" id="btnStartCount">+ สร้างรอบนับ</button></div>
-            <div class="caption">ระบบ snapshot คงเหลือ ณ ตอนเริ่ม</div>
-          </div>
-          <div class="card">
-            <h3>ประวัติรอบนับ</h3>
-            <table class="rtbl">
-              <thead><tr><th>ชื่อรอบ</th><th>สถานะ</th><th class="mono">มูลค่าส่วนต่าง</th><th></th></tr></thead>
-              <tbody id="countList"></tbody>
-            </table>
-          </div>
-        </div>
-        <div id="countDetail" class="card" style="margin-top:10px; display:none"></div>
-      </div>
-    </div>
-
-    <div class="acc-item">
-      <div class="acc-head"><h3>⚙️ ตั้งค่าระบบ (การแบ่งหน้า/มุมมอง/รูปแบบ)</h3><div class="caption">คลิกเพื่อพับ/ขยาย</div></div>
-      <div class="acc-body">
-        <div class="grid grid-2">
-          <div class="card">
-            <h3>แสดงผล</h3>
-            <div class="row">
-              <div><div class="caption">มุมมองเริ่มต้น (สรุปบนสุด)</div>
-                <select id="set_gran"><option value="day">รายวัน</option><option value="week">รายสัปดาห์</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
-              </div>
-              <div><div class="caption">เริ่มต้นสัปดาห์</div>
-                <select id="set_weekStart"><option value="mon">จันทร์</option><option value="sun">อาทิตย์</option></select>
-              </div>
-              <div><div class="caption">สีธีม</div><input type="color" id="set_color" value="#7c3aed"></div>
-            </div>
-            <div class="row">
-              <div><div class="caption">คำเรียกสกุลเงิน</div><input id="set_currency" placeholder="เช่น บาท"></div>
-              <div><div class="caption">ทศนิยมแสดงผล</div><input type="number" id="set_decimals" min="0" max="4" value="2"></div>
-              <div><div class="caption">หมวดรายจ่าย Top N</div><input type="number" id="set_topCats" min="1" max="20" value="8"></div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>จำนวนรายการต่อหน้า</h3>
-            <div class="row">
-              <div><div class="caption">เดินบัญชี</div><select id="set_ps_tx"><option>10</option><option>25</option><option>50</option><option>100</option></select></div>
-              <div><div class="caption">รายการสินค้า</div><select id="set_ps_mat"><option>10</option><option>25</option><option>50</option><option>100</option></select></div>
-              <div><div class="caption">เคลื่อนไหวล่าสุด</div><select id="set_ps_move"><option>10</option><option>25</option><option>50</option><option>100</option></select></div>
-            </div>
-          </div>
-        </div>
-        <div class="row" style="justify-content:flex-end">
-          <button class="btn" id="btnResetSet">คืนค่าเริ่มต้น</button>
-          <button class="btn primary" id="btnSaveSet">บันทึกการตั้งค่า</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="acc-item">
-      <div class="acc-head"><h3>⤴️ สำรอง/นำเข้า</h3><div class="caption">คลิกเพื่อพับ/ขยาย</div></div>
-      <div class="acc-body">
-        <div class="row">
-          <div class="card" style="flex:1">
-            <h3>สำรองข้อมูล</h3>
-            <button class="btn primary" id="btnExportJSON">⬇️ ดาวน์โหลด JSON</button>
-          </div>
-          <div class="card" style="flex:1">
-            <h3>นำเข้า</h3>
-            <input type="file" id="importFile" accept="application/json">
-            <div class="caption">เขียนทับข้อมูลเดิมทั้งหมด</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+<!-- Overview -->
+<section class="card">
+<div class="segment">
+<div class="seg" id="granularity">
+<button class="active" data-g="day">รายวัน</button>
+<button data-g="week">รายสัปดาห์</button>
+<button data-g="month">รายเดือน</button>
+<button data-g="year">รายปี</button>
+</div>
+<div class="periodnav">
+<button class="btn" id="prevBtn">◀︎</button>
+<div class="period-label" id="periodLabel">—</div>
+<button class="btn" id="nextBtn">▶︎</button>
+</div>
+</div>
+<div class="kpis">
+<div class="card"><h3>รายรับช่วงนี้</h3><div class="kpi"><div class="big mono" id="kpiIn">0</div><span class="caption" id="curLabel">บาท</span></div></div>
+<div class="card"><h3>รายจ่ายช่วงนี้</h3><div class="kpi"><div class="big mono" id="kpiOut">0</div><span class="caption" id="curLabel2">บาท</span></div></div>
+<div class="card"><h3>สุทธิช่วงนี้</h3><div class="kpi"><div class="big mono" id="kpiNet">0</div><span class="caption" id="curLabel3">บาท</span></div></div>
+<div class="card"><h3>คงเหลือรวมบัญชี</h3><div class="kpi"><div class="big mono" id="kpiBal">0</div><span class="caption" id="curLabel4">บาท</span></div></div>
+</div>
+<div class="grid grid-2" style="margin-top:12px">
+<div class="card">
+<h3>สรุปรายจ่ายตามหมวด (ช่วงที่เลือก)</h3>
+<div id="catSum"></div>
+</div>
+<div class="card">
+<h3>ยอดคงเหลือตามบัญชี</h3>
+<table class="rtbl"><thead><tr><th>บัญชี</th><th class="mono">ยอดคงเหลือ</th></tr></thead><tbody id="acctTable"></tbody></table>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<h3>แผนภาพกระแสเงินสด</h3>
+<canvas id="cfChart" style="width:100%;max-height:220px;background:#fff;border:1px solid var(--line);border-radius:12px"></canvas>
+<div class="caption">สรุปตามมุมมองที่เลือก (วัน/สัปดาห์/เดือน/ปี)</div>
+</div>
+</section>
+<!-- Accordion sections -->
+<section class="acc">
+<div class="acc-item open">
+<div class="acc-head"><h3>🧾 เดินบัญชี (เพิ่มรายการ/ตัวกรอง/Export)</h3><div class="caption">คลิกเพื่อพับ/ขยาย</div></div>
+<div class="acc-body">
+<div class="grid grid-2">
+<div>
+<div class="card">
+<h3>เพิ่มรายการ</h3>
+<div class="row">
+<div><div class="caption">วันที่</div><input id="t_date" type="date"/></div>
+<div><div class="caption">ประเภท</div><select id="t_type"><option value="income">รายรับ</option><option value="expense">รายจ่าย</option><option value="transfer">โอนย้าย</option></select></div>
+<div><div class="caption">เข้าบัญชี</div><select id="t_accIn"></select></div>
+<div><div class="caption">ออกจากบัญชี</div><select id="t_accOut"></select></div>
+</div>
+<div class="row">
+<div><div class="caption">หมวดหมู่</div><select id="t_cat"></select></div>
+<div><div class="caption">จำนวนเงิน</div><input id="t_amt" step="0.01" type="number" value="0"/></div>
+<div><div class="caption">คู่ค้า/ลูกค้า</div><input id="t_party" placeholder="เช่น ร้าน A / ลูกค้า B"/></div>
+</div>
+<div class="row"><div style="flex:1 1 100%"><div class="caption">หมายเหตุ (#แท็ก)</div><input id="t_note"/></div></div>
+<div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn primary" id="btnAddTx">+ บันทึกรายการ</button></div>
+</div>
+<div class="card">
+<h3>ตั้งค่า: บัญชี / หมวด</h3>
+<div class="row">
+<div>
+<div class="caption">ชื่อบัญชี</div><input id="a_name" placeholder="เช่น เงินสด"/>
+<div class="caption">ยอดตั้งต้น</div><input id="a_open" step="0.01" type="number" value="0"/>
+<div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn" id="btnAddAcc">+ เพิ่มบัญชี</button></div>
+</div>
+<div>
+<div class="caption">เพิ่มหมวด</div>
+<div class="row">
+<div><select id="c_type"><option value="income">รายรับ</option><option value="expense">รายจ่าย</option></select></div>
+<div><input id="c_name" placeholder="ชื่อหมวด"/></div>
+<div><input id="c_budget" placeholder="งบ/เดือน (รายจ่าย)" step="0.01" type="number" value="0"/></div>
+</div>
+<div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn" id="btnAddCat">+ เพิ่มหมวด</button></div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<div class="card">
+<h3>ตัวกรองรายการ + Export</h3>
+<div class="row">
+<div><div class="caption">จาก</div><input id="f_from" type="date"/></div>
+<div><div class="caption">ถึง</div><input id="f_to" type="date"/></div>
+<div><div class="caption">ประเภท</div><select id="f_type"><option value="">ทั้งหมด</option><option>income</option><option>expense</option><option>transfer</option></select></div>
+<div><div class="caption">บัญชี</div><select id="f_acc"><option value="">ทั้งหมด</option></select></div>
+<div><div class="caption">หมวด</div><select id="f_cat"><option value="">ทั้งหมด</option></select></div>
+</div>
+<div class="row" style="justify-content:flex-end; margin-top:8px">
+<button class="btn" id="btnClearFilters">ล้างตัวกรอง</button>
+<button class="btn primary" id="btnExportCSV">Export CSV</button>
+</div>
+</div>
+<div class="card">
+<div class="row" style="align-items:center; justify-content:space-between">
+<h3 style="margin:0">รายการเดินบัญชี</h3>
+<div class="pager" id="txPagerTop"></div>
+</div>
+<table class="rtbl">
+<thead><tr><th>วันที่</th><th>ประเภท</th><th>บัญชี</th><th>หมวด</th><th>คู่ค้า</th><th class="mono">จำนวน</th><th>หมายเหตุ</th><th></th></tr></thead>
+<tbody id="txTable"></tbody>
+</table>
+<div class="pager" id="txPager"></div>
+</div>
+<div class="grid grid-2">
+<div class="card">
+<div class="row" style="align-items:center; justify-content:space-between">
+<h3 style="margin:0">บัญชี</h3>
+</div>
+<table class="rtbl"><thead><tr><th>ชื่อ</th><th class="mono">ตั้งต้น</th><th class="mono">ปัจจุบัน</th><th></th></tr></thead><tbody id="accList"></tbody></table>
+</div>
+<div class="card">
+<div class="row" style="align-items:center; justify-content:space-between">
+<h3 style="margin:0">หมวด</h3>
+</div>
+<table class="rtbl"><thead><tr><th>ประเภท</th><th>ชื่อ</th><th class="mono">งบ/เดือน</th><th></th></tr></thead><tbody id="catList"></tbody></table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="acc-item">
+<div class="acc-head"><h3>📦 สต๊อกสินค้า (รับเข้า/ปรับ + รายการ)</h3><div class="caption">คลิกเพื่อพับ/ขยาย</div></div>
+<div class="acc-body">
+<div class="grid grid-2">
+<div class="card">
+<h3>เพิ่มสินค้า/วัสดุ</h3>
+<div class="row">
+<div><div class="caption">ชื่อสินค้า</div><input id="m_name" placeholder="เช่น น้ำมันเครื่อง 10W-40"/></div>
+<div><div class="caption">หน่วย</div><input id="m_unit" placeholder="ขวด / ชิ้น / เส้น"/></div>
+<div><div class="caption">SKU</div><input id="m_sku" placeholder="SKU"/></div>
+<div><div class="caption">บาร์โค้ด</div><input id="m_bar" placeholder="บาร์โค้ด"/></div>
+<div><div class="caption">Reorder</div><input id="m_reorder" type="number" value="0"/></div>
+</div>
+<div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn primary" id="btnAddMat">+ เพิ่มสินค้า</button></div>
+</div>
+<div class="card">
+<h3>รับเข้า / ปรับสต๊อก</h3>
+<div class="row">
+<div><div class="caption">สินค้า</div><select id="mm_sel"></select></div>
+<div><div class="caption">จำนวน (+/−)</div><input id="mm_qty" step="0.01" type="number" value="1"/></div>
+<div><div class="caption">ต้นทุน/หน่วย (รับเข้า)</div><input id="mm_cost" step="0.01" type="number" value="0"/></div>
+<div><div class="caption">ประเภท</div><select id="mm_type"><option value="in">รับเข้า</option><option value="adjust">ปรับสต๊อก</option></select></div>
+</div>
+<div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn primary" id="btnDoMove">บันทึก</button></div>
+<div class="caption">รับเข้า = คำนวณต้นทุนถัวเฉลี่ยอัตโนมัติ</div>
+</div>
+</div>
+<div class="card" style="margin-top:10px">
+<div class="row" style="align-items:center; justify-content:space-between">
+<h3 style="margin:0">รายการสินค้า</h3>
+<div class="pager" id="matPagerTop"></div>
+</div>
+<table class="rtbl">
+<thead><tr><th>ชื่อ</th><th>SKU</th><th>บาร์โค้ด</th><th class="mono">คงเหลือ</th><th>หน่วย</th><th class="mono">ต้นทุนเฉลี่ย</th><th class="mono">มูลค่า</th><th class="mono">Reorder</th><th></th></tr></thead>
+<tbody id="matTable"></tbody>
+</table>
+<div class="pager" id="matPager"></div>
+</div>
+<div class="card" style="margin-top:10px">
+<div class="row" style="align-items:center; justify-content:space-between">
+<h3 style="margin:0">เคลื่อนไหวล่าสุด</h3>
+<div class="pager" id="movePagerTop"></div>
+</div>
+<table class="rtbl">
+<thead><tr><th>เวลา</th><th>สินค้า</th><th>ประเภท</th><th class="mono">จำนวน</th><th class="mono">ต้นทุน/หน่วย</th><th>อ้างอิง</th></tr></thead>
+<tbody id="moveTable"></tbody>
+</table>
+<div class="pager" id="movePager"></div>
+</div>
+</div>
+</div>
+<div class="acc-item">
+<div class="acc-head"><h3>📋 นับสต๊อก (Cycle Count)</h3><div class="caption">คลิกเพื่อพับ/ขยาย</div></div>
+<div class="acc-body">
+<div class="grid grid-2">
+<div class="card">
+<h3>เริ่มรอบนับ</h3>
+<div class="row">
+<div><div class="caption">ชื่อรอบ</div><input id="c_name" placeholder="Cycle Sep-2025"/></div>
+<div><div class="caption">หมายเหตุ</div><input id="c_note" placeholder="ผู้ตรวจ/เงื่อนไข ฯลฯ"/></div>
+</div>
+<div class="row" style="justify-content:flex-end; margin-top:8px"><button class="btn primary" id="btnStartCount">+ สร้างรอบนับ</button></div>
+<div class="caption">ระบบ snapshot คงเหลือ ณ ตอนเริ่ม</div>
+</div>
+<div class="card">
+<h3>ประวัติรอบนับ</h3>
+<table class="rtbl">
+<thead><tr><th>ชื่อรอบ</th><th>สถานะ</th><th class="mono">มูลค่าส่วนต่าง</th><th></th></tr></thead>
+<tbody id="countList"></tbody>
+</table>
+</div>
+</div>
+<div class="card" id="countDetail" style="margin-top:10px; display:none"></div>
+</div>
+</div>
+<div class="acc-item">
+<div class="acc-head"><h3>⚙️ ตั้งค่าระบบ (การแบ่งหน้า/มุมมอง/รูปแบบ)</h3><div class="caption">คลิกเพื่อพับ/ขยาย</div></div>
+<div class="acc-body">
+<div class="grid grid-2">
+<div class="card">
+<h3>แสดงผล</h3>
+<div class="row">
+<div><div class="caption">มุมมองเริ่มต้น (สรุปบนสุด)</div>
+<select id="set_gran"><option value="day">รายวัน</option><option value="week">รายสัปดาห์</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
+</div>
+<div><div class="caption">เริ่มต้นสัปดาห์</div>
+<select id="set_weekStart"><option value="mon">จันทร์</option><option value="sun">อาทิตย์</option></select>
+</div>
+<div><div class="caption">สีธีม</div><input id="set_color" type="color" value="#7c3aed"/></div>
+</div>
+<div class="row">
+<div><div class="caption">คำเรียกสกุลเงิน</div><input id="set_currency" placeholder="เช่น บาท"/></div>
+<div><div class="caption">ทศนิยมแสดงผล</div><input id="set_decimals" max="4" min="0" type="number" value="2"/></div>
+<div><div class="caption">หมวดรายจ่าย Top N</div><input id="set_topCats" max="20" min="1" type="number" value="8"/></div>
+</div>
+</div>
+<div class="card">
+<h3>จำนวนรายการต่อหน้า</h3>
+<div class="row">
+<div><div class="caption">เดินบัญชี</div><select id="set_ps_tx"><option>10</option><option>25</option><option>50</option><option>100</option></select></div>
+<div><div class="caption">รายการสินค้า</div><select id="set_ps_mat"><option>10</option><option>25</option><option>50</option><option>100</option></select></div>
+<div><div class="caption">เคลื่อนไหวล่าสุด</div><select id="set_ps_move"><option>10</option><option>25</option><option>50</option><option>100</option></select></div>
+</div>
+</div>
+</div>
+<div class="row" style="justify-content:flex-end">
+<button class="btn" id="btnResetSet">คืนค่าเริ่มต้น</button>
+<button class="btn primary" id="btnSaveSet">บันทึกการตั้งค่า</button>
+</div>
+</div>
+</div>
+<div class="acc-item">
+<div class="acc-head"><h3>⤴️ สำรอง/นำเข้า</h3><div class="caption">คลิกเพื่อพับ/ขยาย</div></div>
+<div class="acc-body">
+<div class="row">
+<div class="card" style="flex:1">
+<h3>สำรองข้อมูล</h3>
+<button class="btn primary" id="btnExportJSON">⬇️ ดาวน์โหลด JSON</button>
+</div>
+<div class="card" style="flex:1">
+<h3>นำเข้า</h3>
+<input accept="application/json" id="importFile" type="file"/>
+<div class="caption">เขียนทับข้อมูลเดิมทั้งหมด</div>
+</div>
+</div>
+</div>
+</div>
+</section>
 </main>
-
 <script>
 // ===== Storage & Settings =====
 const K = { TX:"ie5_tx", AC:"ie5_accounts", CAT:"ie5_categories", MAT:"ie5_materials", MOV:"ie5_moves", CT:"ie5_counts", SET:"ie5_settings" };
@@ -835,5 +825,5 @@ document.getElementById('clearBtn').addEventListener('click', ()=>{
 function renderAll(){ refreshSelectors(); applyLook(); renderOverview(); renderTxTable(); renderAccCatTables(); refreshMatSelectors(); renderMaterials(); renderMoves(); renderCountList(); loadSettingsToUI(); }
 el('t_date').value=todayISO(); renderAll();
 </script>
-</body>
+<script src="/seo.js"></script><script src="/share.js"></script></body>
 </html>

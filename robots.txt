@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /admin.html
+Disallow: /admin-income.html
 Disallow: /login.html
+Disallow: /offline.html
 
 Sitemap: https://alltasks24.online/sitemap.xml
