@@ -1,84 +1,94 @@
 <!-- services.html -->
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="th">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>บริการทั้งหมด — alltasks24.online</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="assets/styles.css" rel="stylesheet"/>
-<style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>บริการทั้งหมด — alltasks24.online</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
     body{font-family:"Kanit",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
     .svc-thumb{width:100%;height:180px;object-fit:cover;border-top-left-radius:1rem;border-top-right-radius:1rem}
     .card-clean{border:1px solid var(--border,#e9ecef); border-radius:1rem; overflow:hidden; background:#fff;}
     .svc-icon{width:36px;height:36px;border-radius:12px;background:#f3f4f6;display:inline-flex;align-items:center;justify-content:center}
     .sticky-header{position:sticky;top:0;z-index:1000;background:#fff;border-bottom:1px solid var(--border,#e9ecef)}
   </style>
-<!-- Favicons -->
-<link href="/icons/favicon.ico" rel="icon" sizes="any"/>
-<link href="/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
-<link href="/icons/apple-touch-icon.png" rel="apple-touch-icon"/>
-<link href="/icons/site.webmanifest" rel="manifest"/>
-<meta content="#6C37FF" name="theme-color"/>
-<link href="https://alltasks24.online/services.html" rel="canonical"/>
+
+  <!-- Favicons -->
+  <link rel="icon" href="/icons/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/icons/site.webmanifest">
+  <meta name="theme-color" content="#6C37FF">
+
+  <link rel="canonical" href="https://alltasks24.online/services.html">
+
 <!-- SEO:assistant-v35-start -->
-<meta content="website" property="og:type">
-<meta content="บริการทั้งหมด — alltasks24.online" property="og:title">
-<meta content="AllTasks24 — รับจ้างสารพัด 24 ชั่วโมง: ส่งของ งานช่าง ทำความสะอาด ซักรีด และบริการอื่นๆ ในจังหวัดนครสวรรค์ ติดต่อสะดวกตลอด 24 ชม." property="og:description">
-<meta content="https://alltasks24.online/services.html" property="og:url"/>
-<meta content="https://alltasks24.online/icons/android-chrome-512x512.png" property="og:image"/>
-<meta content="summary_large_image" name="twitter:card"/>
-<meta content="บริการทั้งหมด — alltasks24.online" name="twitter:title"/>
-<meta content="AllTasks24 — รับจ้างสารพัด 24 ชั่วโมง: ส่งของ งานช่าง ทำความสะอาด ซักรีด และบริการอื่นๆ ในจังหวัดนครสวรรค์ ติดต่อสะดวกตลอด 24 ชม." name="twitter:description"/>
-<meta content="https://alltasks24.online/icons/android-chrome-512x512.png" name="twitter:image"/>
+
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="บริการทั้งหมด — alltasks24.online"/>
+<meta property="og:description" content="บริการรับจ้างสารพัด 24 ชั่วโมง รับส่งของ เอกสาร แม่บ้าน ซักรีด งานช่าง และอีกมากมายในนครสวรรค์"/>
+<meta property="og:url" content="https://alltasks24.online/services.html"/>
+<meta property="og:image" content="https://alltasks24.online/icons/android-chrome-512x512.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="บริการทั้งหมด — alltasks24.online"/>
+<meta name="twitter:description" content="บริการรับจ้างสารพัด 24 ชั่วโมง รับส่งของ เอกสาร แม่บ้าน ซักรีด งานช่าง และอีกมากมายในนครสวรรค์"/>
+<meta name="twitter:image" content="https://alltasks24.online/icons/android-chrome-512x512.png"/>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "CollectionPage", "name": "บริการของเรา - AllTasks24", "url": "https://alltasks24.online/services.html", "inLanguage": "th-TH", "about": "ศูนย์รวมบริการรับจ้างสารพัด 24 ชั่วโมง"}]</script>
 <!-- SEO:assistant-v35-end -->
-<meta content="AllTasks24 — รับจ้างสารพัด 24 ชั่วโมง: ส่งของ งานช่าง ทำความสะอาด ซักรีด และบริการอื่นๆ ในจังหวัดนครสวรรค์ ติดต่อสะดวกตลอด 24 ชม." name="description"/>
-</meta></meta></meta><meta content="AllTasks24" property="og:site_name"/></head>
+
+<meta name="description" content="AllTasks24 — รับจ้างสารพัด 24 ชั่วโมง: ส่งของ งานช่าง ทำความสะอาด ซักรีด และบริการอื่นๆ ในจังหวัดนครสวรรค์ ติดต่อสะดวกตลอด 24 ชม.">
+</head>
 <body>
 <h1 style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden">บริการทั้งหมด</h1>
-<!-- Header -->
-<header class="sticky-header">
-<div class="container py-2 d-flex align-items-center justify-content-between">
-<a class="btn btn-gradient btn-lg rounded-pill" href="index.html"><i class="bi bi-arrow-left"></i> กลับหน้าแรก</a>
-<h6 class="h4 mb-0">บริการทั้งหมด</h6>
-<span></span>
-</div>
-</header>
-<main class="container my-4">
-<!-- Search / Filter -->
-<div class="row g-2 align-items-end mb-3">
-<div class="col-md-5">
-<label class="form-label">ค้นหาบริการ</label>
-<input class="form-control" id="qService" placeholder="เช่น ทำความสะอาด, ช่างซ่อม"/>
-</div>
-<div class="col-md-4">
-<label class="form-label">หมวดหมู่</label>
-<input class="form-control" id="qCategory" placeholder="เช่น แม่บ้าน, บริการทั่วไป"/>
-</div>
-<div class="col-md-3">
-<button class="btn btn-gradient btn-lg rounded-pill w-100" id="btnClear">ล้างตัวกรอง</button>
-</div>
-</div>
-<!-- รายการบริการทั้งหมด -->
-<div class="row g-3" id="servicesList"></div>
-</main>
-<!-- ที่วางโมดอลรายละเอียด -->
-<div id="service-modals"></div>
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- โหลด config (ห้ามลบ) -->
-<script src="firebase-init.js" type="module"></script>
-<!-- ✅ เพิ่มค่าติดต่อให้หน้านี้ (ต้องอยู่ก่อน services.js) -->
-<script>
+  <!-- Header -->
+  <header class="sticky-header">
+    <div class="container py-2 d-flex align-items-center justify-content-between">
+      <a href="index.html" class="btn btn-gradient btn-lg rounded-pill"><i class="bi bi-arrow-left"></i> กลับหน้าแรก</a>
+      <h6 class="h4 mb-0">บริการทั้งหมด</h6>
+      <span></span>
+    </div>
+  </header>
+
+  <main class="container my-4">
+    <!-- Search / Filter -->
+    <div class="row g-2 align-items-end mb-3">
+      <div class="col-md-5">
+        <label class="form-label">ค้นหาบริการ</label>
+        <input id="qService" class="form-control" placeholder="เช่น ทำความสะอาด, ช่างซ่อม">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">หมวดหมู่</label>
+        <input id="qCategory" class="form-control" placeholder="เช่น แม่บ้าน, บริการทั่วไป">
+      </div>
+      <div class="col-md-3">
+        <button id="btnClear" class="btn btn-gradient btn-lg rounded-pill w-100">ล้างตัวกรอง</button>
+      </div>
+    </div>
+
+    <!-- รายการบริการทั้งหมด -->
+    <div class="row g-3" id="servicesList"></div>
+  </main>
+
+  <!-- ที่วางโมดอลรายละเอียด -->
+  <div id="service-modals"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- โหลด config (ห้ามลบ) -->
+  <script type="module" src="firebase-init.js"></script>
+
+  <!-- ✅ เพิ่มค่าติดต่อให้หน้านี้ (ต้องอยู่ก่อน services.js) -->
+  <script>
     window.SITE_PHONE    = '094-173-1710';
     window.SITE_LINE_URL = 'https://line.me/R/ti/p/@243zoeey';
     window.SITE_FB_URL   = 'https://www.facebook.com/share/16Qd9wh7h4/';
   </script>
+
 <script>
 /* === Add-on: Copy link for svc/prod modals + auto-open from ?svc / ?prod === */
 (()=>{ 
@@ -158,9 +168,11 @@
   document.addEventListener('DOMContentLoaded', autoOpenFromQuery);
 })();
 </script>
-<!-- โค้ดหน้านี้ -->
-<script src="services.js?v=2" type="module"></script>
-<script src="seo-boost.js"></script>
+  
+  <!-- โค้ดหน้านี้ -->
+  <script type="module" src="services.js?v=2"></script>
+  <script src="seo-boost.js"></script>
+
 <!-- PWA SW register (assistant v35) -->
 <script>
 if ('serviceWorker' in navigator) {
@@ -169,5 +181,5 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-<script src="/seo.js"></script><script src="/share.js"></script></body>
+</body>
 </html>

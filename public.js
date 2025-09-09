@@ -876,76 +876,50 @@ function decorateSoldOutCards(root=document){
 /* === ADDON: copy link buttons (DO NOT REMOVE) === */
 (()=>{ 
   function addCopyBtn(modal){ 
-  try{
-    if(!modal) return;
-    // เตรียมแถวปุ่ม
-    let row = modal.querySelector('.modal-footer .d-flex.gap-2.flex-wrap');
-    const footer = modal.querySelector('.modal-footer');
-    if(!row && footer) row = footer;
-    if(!row){
-      const body = modal.querySelector('.modal-body'); if(!body) return;
-      row = body.querySelector('[data-addon="contact-cta"]') 
-            || body.querySelector('.d-flex.flex-wrap.gap-2.mt-3');
-      if(!row){ 
-        row = document.createElement('div'); 
-        row.className='d-flex flex-wrap gap-2 mt-3'; 
-        body.appendChild(row); 
+    try{
+      if(!modal || modal.querySelector('[data-addon="copylink"]')) return;
+
+      // 1) พยายามหาปุ่มใน footer ก่อน (มาตรฐาน)
+      let row = modal.querySelector('.modal-footer .d-flex.gap-2.flex-wrap');
+      const footer = modal.querySelector('.modal-footer');
+      if(!row && footer) row = footer;
+
+      // 2) Fallback: ถ้าไม่มี footer ให้ใช้แถวใน body เดิม
+      if(!row){
+        const body = modal.querySelector('.modal-body'); if(!body) return;
+        row = body.querySelector('[data-addon="contact-cta"]') 
+              || body.querySelector('.d-flex.flex-wrap.gap-2.mt-3');
+        if(!row){ 
+          row = document.createElement('div'); 
+          row.className='d-flex flex-wrap gap-2 mt-3'; 
+          body.appendChild(row); 
+        }
       }
-    }
 
-    // ระบุรายการ/ลิงก์
-    const isSvc = modal.id?.startsWith('svc-'); 
-    const isProd = modal.id?.startsWith('prod-');
-    if(!(isSvc||isProd)) return;
-    const rid = modal.id.replace(/^svc-|^prod-/,'').trim();
-    const url = location.origin + location.pathname + (isSvc?`?svc=${encodeURIComponent(rid)}`:`?prod=${encodeURIComponent(rid)}`);
+      // 3) ระบุ URL ของรายการในโมดัลนี้
+      const isSvc = modal.id?.startsWith('svc-'); 
+      const isProd = modal.id?.startsWith('prod-');
+      if(!(isSvc||isProd)) return;
+      const rid = modal.id.replace(/^svc-|^prod-/,'').trim();
+      const url = location.origin + location.pathname + (isSvc?`?svc=${encodeURIComponent(rid)}`:`?prod=${encodeURIComponent(rid)}`);
 
-    // ขนาดปุ่มอิงตามปุ่มเดิม
-    const isSmall = !!row.querySelector('.btn-sm');
-
-    // ----- ปุ่มคัดลอกลิงก์ (ของเดิม) -----
-    if(!modal.querySelector('[data-addon="copylink"]')){
+      // 4) สร้างปุ่ม ให้ขนาดตามแถวปุ่ม (.btn-sm ถ้ามี)
+      const isSmall = !!row.querySelector('.btn-sm');
       const btn = document.createElement('button');
       btn.type='button';
       btn.className='btn btn-outline-secondary' + (isSmall ? ' btn-sm' : '');
       btn.setAttribute('data-addon','copylink');
       btn.setAttribute('data-copy-link', url);
       btn.innerHTML='<i class="bi bi-link-45deg"></i> คัดลอกลิงก์';
+
+      // 5) แทรกหลังปุ่ม Facebook ถ้ามี มิฉะนั้นต่อท้ายแถว
       const fbBtn = row.querySelector('.bi-facebook')?.closest('a,button');
       if(fbBtn) fbBtn.insertAdjacentElement('afterend', btn);
       else row.appendChild(btn);
+    }catch(_){
+      /* no-op */
     }
-
-    // ----- ปุ่มแชร์ (FDL) ใหม่ -----
-    if(!modal.querySelector('[data-addon="fdlshare"]')){
-      // ดึงข้อมูลจากโมดอลเพื่อใช้ทำพรีวิว
-      const title = (modal.querySelector('.modal-title')?.textContent || '').trim();
-      const descEl = modal.querySelector('.modal-body p');
-      const desc = (descEl?.textContent || '').trim().split('\n').slice(0,3).join(' ').slice(0,180);
-      const imgEl = modal.querySelector('.modal-body img[src]');
-      const imgSrc = imgEl ? imgEl.getAttribute('src') : '/icons/android-chrome-512x512.png';
-      const image = imgSrc.startsWith('http') ? imgSrc : (location.origin + (imgSrc.startsWith('/')?imgSrc:('/'+imgSrc)));
-
-      const sbtn = document.createElement('button');
-      sbtn.type='button';
-      sbtn.className='btn btn-outline-primary' + (isSmall ? ' btn-sm' : '');
-      sbtn.setAttribute('data-addon','fdlshare');
-      if(isSvc){ sbtn.setAttribute('data-share-service',''); }
-      if(isProd){ sbtn.setAttribute('data-share-product',''); }
-      sbtn.dataset.id = rid;
-      sbtn.dataset.title = title || (isSvc?'บริการ':'สินค้า');
-      sbtn.dataset.desc = desc || '';
-      sbtn.dataset.img = image;
-      sbtn.innerHTML='<i class="bi bi-share"></i> แชร์';
-
-      // แทรกก่อนปุ่มคัดลอก (หรือท้ายสุดถ้าไม่พบ)
-      const copyBtn = row.querySelector('[data-addon="copylink"]');
-      if(copyBtn) copyBtn.insertAdjacentElement('beforebegin', sbtn);
-      else row.appendChild(sbtn);
-    }
-
-  }catch(_){ /* no-op */ }
-}
+  }
 
   // เติมปุ่มตอนโมดอลแสดง
   document.addEventListener('shown.bs.modal', e=>{ 

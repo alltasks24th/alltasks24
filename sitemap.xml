@@ -1,1 +1,51 @@
-<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>https://alltasks24.online/</loc></url>\n<url><loc>https://alltasks24.online/services.html</loc></url>\n<url><loc>https://alltasks24.online/shop.html</loc></url>\n<url><loc>https://alltasks24.online/promotions.html</loc></url>\n<url><loc>https://alltasks24.online/reviews.html</loc></url>\n<url><loc>https://alltasks24.online/calculation-system.html</loc></url>\n</urlset>\n
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://alltasks24.online/Calculation system.html</loc>
+    <lastmod>2025-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://alltasks24.online/index.html</loc>
+    <lastmod>2025-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://alltasks24.online/login.html</loc>
+    <lastmod>2025-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://alltasks24.online/offline.html</loc>
+    <lastmod>2025-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://alltasks24.online/promotions.html</loc>
+    <lastmod>2025-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://alltasks24.online/reviews.html</loc>
+    <lastmod>2025-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://alltasks24.online/services.html</loc>
+    <lastmod>2025-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://alltasks24.online/shop.html</loc>
+    <lastmod>2025-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>
