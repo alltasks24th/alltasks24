@@ -1,17 +1,18 @@
-<!doctype html>
-<html lang="th" data-theme="light">
+<!DOCTYPE html>
+
+<html data-theme="light" lang="th">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>คำนวณราคา & บิล</title>
-  <meta name="description" content="คำนวณราคา • สร้างบิล • PNG/PDF/พิมพ์ • คลังบิล (ดู/แก้ไข/ลบ)">
-  <!-- libs -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>คำนวณราคา &amp; บิล</title>
+<meta content="คำนวณราคา • สร้างบิล • PNG/PDF/พิมพ์ • คลังบิล (ดู/แก้ไข/ลบ)" name="description"/>
+<!-- libs -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
     :root{
       --bg:#F6F7FB; --card:#ffffff; --ink:#0F172A; --muted:#6b7280;
       --primary:#7C3AED; --accent:#A78BFA; --soft:#F3E8FF; --border:#E5E7EB;
@@ -128,7 +129,6 @@
     .w-80mm{ width:80mm; margin:auto }
     .tnum{ font-variant-numeric: tabular-nums; }
   </style>
-
 <style id="ui-polish-v1">
 /* ===== Polished UI v1 (visual-only patch) ===== */
 :root { --ui-card-radius: 1rem; --ui-card-shadow: 0 10px 30px rgba(0,0,0,.06); --ui-border: rgba(0,0,0,.08); --ui-border-dark: rgba(255,255,255,.12); --ui-focus: rgba(111,66,193,.25); }
@@ -166,438 +166,403 @@
 /* Keep print CSS intact */
 @media print { .pro-ui .navbar { display: none !important; } }
 </style>
-
-
-<link rel="manifest" href="/icons/site.webmanifest">
+<link href="/icons/site.webmanifest" rel="manifest"/>
 </head>
 <body class="paper-a4 pro-ui">
-<h1 style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden">คำนวณราคา & บิล</h1>
-  <nav class="navbar brand">
-    <div class="container-narrow container-fluid">
-      <div class="d-flex align-items-center gap-2">
-        <div class="logo-dot">A</div>
-        <div>
-          <div class="fw-bold">ระบบคำนวณค่าบริการ</div>
-          <div class="small" style="opacity:.9">คำนวณราคา & บิล • PNG/PDF/พิมพ์ • คลังบิล CRUD</div>
-        </div>
-      </div>
-      <div class="ms-auto d-flex align-items-center gap-2">
-        <div class="btn-group btn-group-sm" role="group" aria-label="paper">
-          <button class="btn btn-light" id="paperA4">A4</button>
-          <button class="btn btn-light" id="paperA5">A5</button>
-          <button class="btn btn-light" id="paper80">80mm</button>
-        </div>
-        <div class="form-check form-switch ms-2">
-          <input id="ui_dark" class="form-check-input" type="checkbox">
-          <label class="form-check-label text-white-50" for="ui_dark">Dark</label>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container-narrow my-3">
-    <!-- ตั้งค่า & สูตรคำนวณ -->
-    <section class="card p-3 form-section">
-      <span class="badge-soft">ตั้งค่า & สูตรคำนวณ</span>
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="section-title">ฐาน/ระยะ/รอคิว/ปัดเศษ</div>
-        <div class="d-flex gap-2">
-          <button id="btnCfgSave" class="btn btn-outline-primary btn-sm">บันทึกการตั้งค่า</button>
-          <button id="btnCfgLoad" class="btn btn-outline-secondary btn-sm">โหลด</button>
-          <button id="btnCfgReset" class="btn btn-outline-secondary btn-sm">Default</button>
-          <span class="hint-toggle subtle small" id="toggleHints">แสดง/ซ่อนคำอธิบาย</span>
-        </div>
-      </div>
-      <div class="grid-4 mt-2">
-        <div>
-          <label class="form-label">ฐานในเมือง</label>
-          <input id="cfg_base" type="number" class="form-control" value="59">
-          <div class="hint">ค่าเริ่มต้นของงานในพื้นที่บริการ (บาท)</div>
-        </div>
-        <div>
-          <label class="form-label">ระยะในฐาน (กม.)</label>
-          <input id="cfg_incKm" type="number" class="form-control" value="3">
-          <div class="hint">ระยะทางที่รวมอยู่ในฐานแล้ว ไม่คิดเพิ่ม</div>
-        </div>
-        <div>
-          <label class="form-label">เกินระยะ/กม. ชั้น1</label>
-          <input id="cfg_perKm1" type="number" class="form-control" value="8">
-          <div class="hint">คิดเพิ่มต่อกิโล หลังเกินระยะในฐาน จนถึงจุดเริ่มชั้น2</div>
-        </div>
-        <div>
-          <label class="form-label">เริ่มชั้น2 ที่ (กม.)</label>
-          <input id="cfg_tier2Start" type="number" class="form-control" value="15">
-          <div class="hint">ตั้งแต่ระยะนี้ขึ้นไป ใช้เรตราคา “ชั้น2”</div>
-        </div>
-        <div>
-          <label class="form-label">เกินระยะ/กม. ชั้น2</label>
-          <input id="cfg_perKm2" type="number" class="form-control" value="6">
-          <div class="hint">คิดเพิ่มต่อกิโล สำหรับช่วงระยะชั้น2</div>
-        </div>
-        <div>
-          <label class="form-label">ขั้นต่ำ</label>
-          <input id="cfg_minCharge" type="number" class="form-control" value="49">
-          <div class="hint">ราคาต่ำสุดที่รับงาน (กันราคาต่ำเกินไป)</div>
-        </div>
-        <div>
-          <label class="form-label">จุดแวะ/จุด</label>
-          <input id="cfg_stop" type="number" class="form-control" value="10">
-          <div class="hint">คิดเพิ่มต่อ 1 จุดแวะ</div>
-        </div>
-        <div>
-          <label class="form-label">รอคิว/ชม.</label>
-          <input id="cfg_wait" type="number" class="form-control" value="100">
-          <div class="hint">ถ้าต้องรอคิว คิดราย 1 ชั่วโมง (ปัดขึ้นเป็นช่วงละ 15 นาที)</div>
-        </div>
-        <div>
-          <label class="form-label">กลางคืน</label>
-          <input id="cfg_night" type="number" class="form-control" value="10">
-          <div class="hint">ค่าบริการเพิ่มพิเศษเมื่อทำงานเวลากลางคืน</div>
-        </div>
-        <div>
-          <label class="form-label">ฝนตก</label>
-          <input id="cfg_rain" type="number" class="form-control" value="8">
-          <div class="hint">ค่าบริการเพิ่มเมื่อสภาพอากาศมีฝน</div>
-        </div>
-        <div>
-          <label class="form-label">เสาร์–อาทิตย์/นักขัต</label>
-          <input id="cfg_weekend" type="number" class="form-control" value="10">
-          <div class="hint">เพิ่มพิเศษวันหยุด</div>
-        </div>
-        <div>
-          <label class="form-label">ปัดเศษ</label>
-          <select id="cfg_roundTo" class="form-select">
-            <option value="1">ไม่ปัด</option><option value="5" selected>5</option><option value="10">10</option>
-          </select>
-          <div class="hint">ปัดเศษรวมบริการให้ลงตัว (เช่น 5 บาท)</div>
-        </div>
-        <div>
-          <label class="form-label">คูณขนาด</label>
-          <input id="cfg_multSize" type="number" step="0.01" class="form-control" value="1.05">
-          <div class="hint">ถ้าสินค้า/งาน “กลาง” ให้คูณอัตรานี้</div>
-        </div>
-        <div>
-          <label class="form-label">คูณแรงงาน (2 คน)</label>
-          <input id="cfg_multLabor" type="number" step="0.01" class="form-control" value="1.30">
-          <div class="hint">หากต้องใช้ 2 คน ให้คูณอัตรานี้</div>
-        </div>
-        <div>
-          <label class="form-label">ธีมสีหลัก</label>
-          <input type="color" id="ui_primary" class="form-control form-control-color" value="#7C3AED">
-          <div class="hint">เปลี่ยนสี UI/หัวเอกสารให้เข้ากับแบรนด์</div>
-        </div>
-        <div>
-          <label class="form-label">ธีมสีรอง</label>
-          <input type="color" id="ui_accent" class="form-control form-control-color" value="#A78BFA">
-          <div class="hint">ใช้กับปุ่ม/แท็บ/เส้นไฮไลต์</div>
-        </div>
-      </div>
-      <hr>
-      <div class="eyebrow">ข้อมูลร้าน</div>
-      <div class="grid-3 mt-1">
-        <div>
-          <label class="form-label">ชื่อร้าน</label>
-          <input id="biz_name" class="form-control" value="alltasks24 — นครสวรรค์">
-        </div>
-        <div>
-          <label class="form-label">โทร</label>
-          <input id="biz_phone" class="form-control" value="080-000-0000">
-        </div>
-        <div>
-          <label class="form-label">LINE</label>
-          <input id="biz_line" class="form-control" value="@yourline">
-        </div>
-        <div class="col-12">
-          <label class="form-label">ที่อยู่</label>
-          <input id="biz_addr" class="form-control" placeholder="ที่อยู่/คำอธิบายท้ายบิล">
-        </div>
-        <div class="col-12">
-          <label class="form-label">หมายเหตุท้ายบิล</label>
-          <input id="biz_note" class="form-control" value="ขอบคุณที่ใช้บริการ">
-        </div>
-        <div class="col-12">
-          <label class="form-label">โลโก้/QR (อัปโหลดหรือ URL)</label>
-          <div class="input-group">
-            <span class="input-group-text">LOGO</span><input id="biz_logo" class="form-control" placeholder="https://..."><input id="biz_logo_file" type="file" class="form-control" accept="image/*">
-          </div>
-          <div class="input-group mt-1">
-            <span class="input-group-text">QR</span><input id="biz_qr" class="form-control" placeholder="https://..."><input id="biz_qr_file" type="file" class="form-control" accept="image/*">
-          </div>
-          <div class="hint mt-1">* ใส่เป็นลิงก์รูป หรือกดเลือกไฟล์เพื่อบันทึกเป็น dataURL (จดจำในเครื่อง)</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- คำนวณราคา -->
-    <section class="card p-3 mt-3 form-section">
-      <span class="badge-soft">คำนวณราคา</span>
-      <div class="grid-4">
-        <div>
-          <label class="form-label">ประเภทงาน</label>
-          <input id="jobName" class="form-control" placeholder="เช่น รับ-ส่งของ/ซ่อม/ติดตั้ง">
-        </div>
-        <div>
-          <label class="form-label">ค่าสินค้าจริง (ถ้ามี)</label>
-          <input id="otherCost" type="number" class="form-control" value="0">
-        </div>
-        <div>
-          <label class="form-label">ระยะทาง (กม.)</label>
-          <input id="km" type="number" step="0.1" class="form-control">
-          <div class="hint">ใส่เฉพาะ “ขาไป” หากเลือกไป-กลับ ระบบจะคูณ 2 ให้เอง</div>
-        </div>
-        <div>
-          <label class="form-label">ไป–กลับ?</label>
-          <select id="roundtrip" class="form-select"><option value="no" selected>เที่ยวเดียว</option><option value="yes">ไป–กลับ</option></select>
-        </div>
-        <div>
-          <label class="form-label">จุดแวะ</label>
-          <input id="stops" type="number" class="form-control" value="0">
-        </div>
-        <div>
-          <label class="form-label">รอคิว (นาที)</label>
-          <input id="wait" type="number" class="form-control" value="0">
-        </div>
-        <div>
-          <label class="form-label">ขนาด</label>
-          <select id="size" class="form-select"><option value="small">เล็ก</option><option value="medium">กลาง</option></select>
-        </div>
-        <div>
-          <label class="form-label">คนทำงาน</label>
-          <select id="workers" class="form-select"><option value="1">1 คน</option><option value="2">2 คน</option></select>
-        </div>
-        <div>
-          <label class="form-label">เงื่อนไข</label>
-          <div class="form-check"><input id="night" class="form-check-input" type="checkbox"><label class="form-check-label" for="night">กลางคืน</label></div>
-          <div class="form-check"><input id="rain" class="form-check-input" type="checkbox"><label class="form-check-label" for="rain">ฝนตก</label></div>
-          <div class="form-check"><input id="weekend" class="form-check-input" type="checkbox"><label class="form-check-label" for="weekend">เสาร์–อาทิตย์/นักขัต</label></div>
-        </div>
-        <div>
-          <label class="form-label">ส่วนลด (บาท)</label>
-          <input id="discount" type="number" class="form-control" value="0">
-        </div>
-        <div>
-          <label class="form-label">ภาษี</label>
-          <select id="vat" class="form-select"><option value="no" selected>ไม่คิด VAT</option><option value="yes">VAT 7%</option></select>
-        </div>
-      </div>
-
-      <div id="resultBox" class="mt-2">
-        <div class="h4 fw-bold text-primary" id="grandLabel">฿0</div>
-        <div class="small subtle" id="breakdownBox"></div>
-      </div>
-
-      <div class="d-flex gap-2 mt-2">
-        <button id="btnCompute" class="btn btn-primary"><i class="bi bi-calculator me-1"></i>คำนวณ</button>
-        <button id="btnCreateReceipt" class="btn btn-primary"><i class="bi bi-receipt me-1"></i>สร้างบิล</button>
-        <button id="btnSaveDraft" class="btn btn-outline-primary">บันทึกฉบับร่าง</button>
-        <button id="btnLoadLast" class="btn btn-outline-secondary">โหลดครั้งล่าสุด</button>
-        <button id="btnCopySummary" class="btn btn-outline-secondary">คัดลอกสรุป</button>
-      </div>
-
-      <div id="summaryBar" class="no-print mt-3">
-        <div class="fw-bold">รวม: <span id="grandSummary">฿0</span></div>
-        <div class="d-flex gap-2">
-          <button id="summaryCreate" class="btn btn-primary btn-sm">สร้างบิล</button>
-          <button id="summaryPrint" class="btn btn-outline-secondary btn-sm">พิมพ์</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- เอกสาร -->
-    <section class="card p-3 mt-3 form-section">
-      <span class="badge-soft">เอกสารสำหรับลูกค้า</span>
-      <div class="d-flex align-items-center justify-content-between">
-        <div class="section-title">ตารางรายการ (จัดคอลัมน์แน่น-คงที่)</div>
-        <div class="d-flex gap-2">
-          <div class="input-group input-group-sm" style="width:220px">
-            <span class="input-group-text">หัวเอกสาร</span>
-            <select id="docTitle" class="form-select form-select-sm">
-              <option value="ใบเสร็จ/บิลรับงาน" selected>ใบเสร็จ/บิลรับงาน</option>
-              <option value="ใบเสนอราคา">ใบเสนอราคา</option>
-              <option value="ใบแจ้งหนี้">ใบแจ้งหนี้</option>
-            </select>
-          </div>
-          <button id="btnAddRow" class="btn btn-outline-primary btn-sm">เพิ่มบรรทัด</button>
-          <div class="btn-group btn-group-sm">
-            <button id="btnCapClean" class="btn btn-outline-primary">PNG</button>
-            <button id="btnPDF" class="btn btn-outline-primary">PDF</button>
-            <button id="btnPrint" class="btn btn-outline-secondary">พิมพ์</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- mini form -->
-      <div class="row g-2 mt-1">
-        <div class="col-md-6"><div class="small subtle">ลูกค้า</div><input id="cust_name" class="form-control form-control-sm" placeholder="ชื่อลูกค้า/หน่วยงาน"></div>
-        <div class="col-md-3"><div class="small subtle">เบอร์โทร</div><input id="cust_phone" class="form-control form-control-sm" placeholder="080-xxx-xxxx"></div>
-        <div class="col-md-3"><div class="small subtle">เลขที่เอกสาร</div><input id="inv_no" class="form-control form-control-sm" readonly></div>
-        <div class="col-md-6"><div class="small subtle">ที่อยู่ลูกค้า</div><input id="cust_addr" class="form-control form-control-sm"></div>
-        <div class="col-md-3"><div class="small subtle">เลขผู้เสียภาษี</div><input id="cust_taxid" class="form-control form-control-sm" placeholder="(ถ้ามี)"></div>
-        <div class="col-md-3">
-          <div class="small subtle">วันที่/เวลา</div>
-          <div class="d-flex gap-1"><input id="inv_date" class="form-control form-control-sm"><input id="inv_time" class="form-control form-control-sm"></div>
-        </div>
-        <div class="col-md-9"><div class="small subtle">งาน/รายละเอียด</div><input id="inv_job" class="form-control form-control-sm"></div>
-        <div class="col-md-3"><div class="small subtle">หมายเหตุ</div><input id="inv_note" class="form-control form-control-sm"></div>
-      </div>
-
-      <div class="table-responsive mt-2">
-        <table class="table-receipt align-middle" id="rc_table">
-          <colgroup>
-            <col style="width:10%">
-            <col style="width:46%">
-            <col style="width:14%">
-            <col style="width:10%">
-            <col style="width:20%">
-          </colgroup>
-          <thead>
-            <tr>
-              <th>ลำดับ</th>
-              <th>รายการ</th>
-              <th>ราคา/หน่วย</th>
-              <th>จำนวน</th>
-              <th>รวม</th>
-            </tr>
-          </thead>
-          <tbody id="rc_items">
-            <tr><td class="text-muted" colspan="5">— กด “สร้างบิล” เพื่อใส่อัตโนมัติ หรือ “เพิ่มบรรทัด” —</td></tr>
-          </tbody>
-          <tfoot>
-            <tr><th class="text-end" colspan="4">ค่าสินค้าตามจริง</th><th class="text-end tnum" id="rc_other">฿0</th></tr>
-            <tr><th class="text-end" colspan="4">ส่วนลด</th><th class="text-end tnum" id="rc_discount">฿0</th></tr>
-            <tr><th class="text-end" colspan="4">Vat 7%</th><th class="text-end tnum" id="rc_vat">฿0</th></tr>
-            <tr><th class="text-end" colspan="4">รวมทั้งสิ้น</th><th class="text-end tnum" id="rc_total" style="font-size:1.05rem">฿0</th></tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <div class="row g-2">
-        <div class="col-md-3"><div class="small subtle">วิธีชำระเงิน</div><input id="pay_method" class="form-control form-control-sm" value="เงินสด"></div>
-        <div class="col-md-3"><div class="small subtle">สถานะ</div><select id="pay_status" class="form-select form-select-sm"><option>ค้างชำระ</option><option selected>ชำระแล้ว</option></select></div>
-        <div class="col-md-3"><div class="small subtle">เลขอ้างอิง</div><input id="pay_ref" class="form-control form-control-sm" placeholder="เช่น TX1234"></div>
-        <div class="col-md-3"><div class="small subtle">กำหนดชำระ</div><input id="pay_due" type="date" class="form-control form-control-sm"></div>
-      </div>
-
-      <section id="receipt" class="p-3 p-md-4 mt-3 rounded">
-        <div class="small subtle">บันทึกเป็น PNG/PDF/พิมพ์ จะใช้เวอร์ชัน “สวยพิเศษ” ให้อัตโนมัติ</div>
-        <div class="d-flex justify-content-between align-items-start mt-1">
-          <div>
-            <div class="fw-bold" id="docTitleView">ใบเสร็จ/บิลรับงาน</div>
-            <div class="small" id="bizNameView">alltasks24 — นครสวรรค์</div>
-          </div>
-          <div class="text-end">
-            <div class="small" id="bizContactView">โทร 080-000-0000 • LINE @yourline</div>
-            <div class="small" id="bizAddrView"></div>
-          </div>
-        </div>
-      </section>
-
-      <div class="d-flex justify-content-end gap-2 mt-3">
-        <button id="btnSaveBill" class="btn btn-primary btn-sm"><i class="bi bi-save me-1"></i>บันทึกบิล</button>
-        <button id="btnNewBill" class="btn btn-outline-secondary btn-sm">สร้างใหม่</button>
-      </div>
-    </section>
-
-    <!-- คลังบิล -->
-    <section class="card p-3 mt-3 form-section">
-      <span class="badge-soft">คลังบิล (LocalStorage)</span>
-      <div class="d-flex gap-2 align-items-center">
-        <input id="invSearch" class="form-control form-control-sm" placeholder="ค้นหา" style="max-width:300px">
-        <select id="invFilter" class="form-select form-select-sm" style="width:auto"><option value="all">ทั้งหมด</option><option value="paid">ชำระแล้ว</option><option value="unpaid">ค้างชำระ</option></select>
-        <div class="subtle small ms-auto">* เก็บไว้ในเครื่องของคุณ</div>
-      </div>
-      <div id="invList" class="vstack gap-2 mt-2"></div>
-      <div class="d-flex justify-content-between align-items-center mt-2">
-        <div id="invMeta" class="small subtle">–</div>
-        <ul id="invPager" class="pagination pagination-sm mb-0"></ul>
-      </div>
-    </section>
-        
-    <!-- รายละเอียดบิล (ดูอย่างเร็ว) -->
-    <section class="card p-3 mt-3" id="invQuickView">
-      <span class="badge-soft">รายละเอียดบิล (ดูอย่างเร็ว)</span>
-      <div id="invPreview" class="small subtle">เลือก “ดู/แก้ไข” จากคลังบิลด้านบน เพื่อแสดงรายละเอียดที่นี่</div>
-    </section>
-
+<h1 style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden">คำนวณราคา &amp; บิล</h1>
+<nav class="navbar brand">
+<div class="container-narrow container-fluid">
+<div class="d-flex align-items-center gap-2">
+<div class="logo-dot">A</div>
+<div>
+<div class="fw-bold">ระบบคำนวณค่าบริการ</div>
+<div class="small" style="opacity:.9">คำนวณราคา &amp; บิล • PNG/PDF/พิมพ์ • คลังบิล CRUD</div>
+</div>
+</div>
+<div class="ms-auto d-flex align-items-center gap-2">
+<div aria-label="paper" class="btn-group btn-group-sm" role="group">
+<button class="btn btn-light" id="paperA4">A4</button>
+<button class="btn btn-light" id="paperA5">A5</button>
+<button class="btn btn-light" id="paper80">80mm</button>
+</div>
+<div class="form-check form-switch ms-2">
+<input class="form-check-input" id="ui_dark" type="checkbox"/>
+<label class="form-check-label text-white-50" for="ui_dark">Dark</label>
+</div>
+</div>
+</div>
+</nav>
+<div class="container-narrow my-3">
+<!-- ตั้งค่า & สูตรคำนวณ -->
+<section class="card p-3 form-section">
+<span class="badge-soft">ตั้งค่า &amp; สูตรคำนวณ</span>
+<div class="d-flex justify-content-between align-items-center">
+<div class="section-title">ฐาน/ระยะ/รอคิว/ปัดเศษ</div>
+<div class="d-flex gap-2">
+<button class="btn btn-outline-primary btn-sm" id="btnCfgSave">บันทึกการตั้งค่า</button>
+<button class="btn btn-outline-secondary btn-sm" id="btnCfgLoad">โหลด</button>
+<button class="btn btn-outline-secondary btn-sm" id="btnCfgReset">Default</button>
+<span class="hint-toggle subtle small" id="toggleHints">แสดง/ซ่อนคำอธิบาย</span>
+</div>
+</div>
+<div class="grid-4 mt-2">
+<div>
+<label class="form-label">ฐานในเมือง</label>
+<input class="form-control" id="cfg_base" type="number" value="59"/>
+<div class="hint">ค่าเริ่มต้นของงานในพื้นที่บริการ (บาท)</div>
+</div>
+<div>
+<label class="form-label">ระยะในฐาน (กม.)</label>
+<input class="form-control" id="cfg_incKm" type="number" value="3"/>
+<div class="hint">ระยะทางที่รวมอยู่ในฐานแล้ว ไม่คิดเพิ่ม</div>
+</div>
+<div>
+<label class="form-label">เกินระยะ/กม. ชั้น1</label>
+<input class="form-control" id="cfg_perKm1" type="number" value="8"/>
+<div class="hint">คิดเพิ่มต่อกิโล หลังเกินระยะในฐาน จนถึงจุดเริ่มชั้น2</div>
+</div>
+<div>
+<label class="form-label">เริ่มชั้น2 ที่ (กม.)</label>
+<input class="form-control" id="cfg_tier2Start" type="number" value="15"/>
+<div class="hint">ตั้งแต่ระยะนี้ขึ้นไป ใช้เรตราคา “ชั้น2”</div>
+</div>
+<div>
+<label class="form-label">เกินระยะ/กม. ชั้น2</label>
+<input class="form-control" id="cfg_perKm2" type="number" value="6"/>
+<div class="hint">คิดเพิ่มต่อกิโล สำหรับช่วงระยะชั้น2</div>
+</div>
+<div>
+<label class="form-label">ขั้นต่ำ</label>
+<input class="form-control" id="cfg_minCharge" type="number" value="49"/>
+<div class="hint">ราคาต่ำสุดที่รับงาน (กันราคาต่ำเกินไป)</div>
+</div>
+<div>
+<label class="form-label">จุดแวะ/จุด</label>
+<input class="form-control" id="cfg_stop" type="number" value="10"/>
+<div class="hint">คิดเพิ่มต่อ 1 จุดแวะ</div>
+</div>
+<div>
+<label class="form-label">รอคิว/ชม.</label>
+<input class="form-control" id="cfg_wait" type="number" value="100"/>
+<div class="hint">ถ้าต้องรอคิว คิดราย 1 ชั่วโมง (ปัดขึ้นเป็นช่วงละ 15 นาที)</div>
+</div>
+<div>
+<label class="form-label">กลางคืน</label>
+<input class="form-control" id="cfg_night" type="number" value="10"/>
+<div class="hint">ค่าบริการเพิ่มพิเศษเมื่อทำงานเวลากลางคืน</div>
+</div>
+<div>
+<label class="form-label">ฝนตก</label>
+<input class="form-control" id="cfg_rain" type="number" value="8"/>
+<div class="hint">ค่าบริการเพิ่มเมื่อสภาพอากาศมีฝน</div>
+</div>
+<div>
+<label class="form-label">เสาร์–อาทิตย์/นักขัต</label>
+<input class="form-control" id="cfg_weekend" type="number" value="10"/>
+<div class="hint">เพิ่มพิเศษวันหยุด</div>
+</div>
+<div>
+<label class="form-label">ปัดเศษ</label>
+<select class="form-select" id="cfg_roundTo">
+<option value="1">ไม่ปัด</option><option selected="" value="5">5</option><option value="10">10</option>
+</select>
+<div class="hint">ปัดเศษรวมบริการให้ลงตัว (เช่น 5 บาท)</div>
+</div>
+<div>
+<label class="form-label">คูณขนาด</label>
+<input class="form-control" id="cfg_multSize" step="0.01" type="number" value="1.05"/>
+<div class="hint">ถ้าสินค้า/งาน “กลาง” ให้คูณอัตรานี้</div>
+</div>
+<div>
+<label class="form-label">คูณแรงงาน (2 คน)</label>
+<input class="form-control" id="cfg_multLabor" step="0.01" type="number" value="1.30"/>
+<div class="hint">หากต้องใช้ 2 คน ให้คูณอัตรานี้</div>
+</div>
+<div>
+<label class="form-label">ธีมสีหลัก</label>
+<input class="form-control form-control-color" id="ui_primary" type="color" value="#7C3AED"/>
+<div class="hint">เปลี่ยนสี UI/หัวเอกสารให้เข้ากับแบรนด์</div>
+</div>
+<div>
+<label class="form-label">ธีมสีรอง</label>
+<input class="form-control form-control-color" id="ui_accent" type="color" value="#A78BFA"/>
+<div class="hint">ใช้กับปุ่ม/แท็บ/เส้นไฮไลต์</div>
+</div>
+</div>
+<hr/>
+<div class="eyebrow">ข้อมูลร้าน</div>
+<div class="grid-3 mt-1">
+<div>
+<label class="form-label">ชื่อร้าน</label>
+<input class="form-control" id="biz_name" value="alltasks24 — นครสวรรค์"/>
+</div>
+<div>
+<label class="form-label">โทร</label>
+<input class="form-control" id="biz_phone" value="080-000-0000"/>
+</div>
+<div>
+<label class="form-label">LINE</label>
+<input class="form-control" id="biz_line" value="@yourline"/>
+</div>
+<div class="col-12">
+<label class="form-label">ที่อยู่</label>
+<input class="form-control" id="biz_addr" placeholder="ที่อยู่/คำอธิบายท้ายบิล"/>
+</div>
+<div class="col-12">
+<label class="form-label">หมายเหตุท้ายบิล</label>
+<input class="form-control" id="biz_note" value="ขอบคุณที่ใช้บริการ"/>
+</div>
+<div class="col-12">
+<label class="form-label">โลโก้/QR (อัปโหลดหรือ URL)</label>
+<div class="input-group">
+<span class="input-group-text">LOGO</span><input class="form-control" id="biz_logo" placeholder="https://..."/><input accept="image/*" class="form-control" id="biz_logo_file" type="file"/>
+</div>
+<div class="input-group mt-1">
+<span class="input-group-text">QR</span><input class="form-control" id="biz_qr" placeholder="https://..."/><input accept="image/*" class="form-control" id="biz_qr_file" type="file"/>
+</div>
+<div class="hint mt-1">* ใส่เป็นลิงก์รูป หรือกดเลือกไฟล์เพื่อบันทึกเป็น dataURL (จดจำในเครื่อง)</div>
+</div>
+</div>
+</section>
+<!-- คำนวณราคา -->
+<section class="card p-3 mt-3 form-section">
+<span class="badge-soft">คำนวณราคา</span>
+<div class="grid-4">
+<div>
+<label class="form-label">ประเภทงาน</label>
+<input class="form-control" id="jobName" placeholder="เช่น รับ-ส่งของ/ซ่อม/ติดตั้ง"/>
+</div>
+<div>
+<label class="form-label">ค่าสินค้าจริง (ถ้ามี)</label>
+<input class="form-control" id="otherCost" type="number" value="0"/>
+</div>
+<div>
+<label class="form-label">ระยะทาง (กม.)</label>
+<input class="form-control" id="km" step="0.1" type="number"/>
+<div class="hint">ใส่เฉพาะ “ขาไป” หากเลือกไป-กลับ ระบบจะคูณ 2 ให้เอง</div>
+</div>
+<div>
+<label class="form-label">ไป–กลับ?</label>
+<select class="form-select" id="roundtrip"><option selected="" value="no">เที่ยวเดียว</option><option value="yes">ไป–กลับ</option></select>
+</div>
+<div>
+<label class="form-label">จุดแวะ</label>
+<input class="form-control" id="stops" type="number" value="0"/>
+</div>
+<div>
+<label class="form-label">รอคิว (นาที)</label>
+<input class="form-control" id="wait" type="number" value="0"/>
+</div>
+<div>
+<label class="form-label">ขนาด</label>
+<select class="form-select" id="size"><option value="small">เล็ก</option><option value="medium">กลาง</option></select>
+</div>
+<div>
+<label class="form-label">คนทำงาน</label>
+<select class="form-select" id="workers"><option value="1">1 คน</option><option value="2">2 คน</option></select>
+</div>
+<div>
+<label class="form-label">เงื่อนไข</label>
+<div class="form-check"><input class="form-check-input" id="night" type="checkbox"/><label class="form-check-label" for="night">กลางคืน</label></div>
+<div class="form-check"><input class="form-check-input" id="rain" type="checkbox"/><label class="form-check-label" for="rain">ฝนตก</label></div>
+<div class="form-check"><input class="form-check-input" id="weekend" type="checkbox"/><label class="form-check-label" for="weekend">เสาร์–อาทิตย์/นักขัต</label></div>
+</div>
+<div>
+<label class="form-label">ส่วนลด (บาท)</label>
+<input class="form-control" id="discount" type="number" value="0"/>
+</div>
+<div>
+<label class="form-label">ภาษี</label>
+<select class="form-select" id="vat"><option selected="" value="no">ไม่คิด VAT</option><option value="yes">VAT 7%</option></select>
+</div>
+</div>
+<div class="mt-2" id="resultBox">
+<div class="h4 fw-bold text-primary" id="grandLabel">฿0</div>
+<div class="small subtle" id="breakdownBox"></div>
+</div>
+<div class="d-flex gap-2 mt-2">
+<button class="btn btn-primary" id="btnCompute"><i class="bi bi-calculator me-1"></i>คำนวณ</button>
+<button class="btn btn-primary" id="btnCreateReceipt"><i class="bi bi-receipt me-1"></i>สร้างบิล</button>
+<button class="btn btn-outline-primary" id="btnSaveDraft">บันทึกฉบับร่าง</button>
+<button class="btn btn-outline-secondary" id="btnLoadLast">โหลดครั้งล่าสุด</button>
+<button class="btn btn-outline-secondary" id="btnCopySummary">คัดลอกสรุป</button>
+</div>
+<div class="no-print mt-3" id="summaryBar">
+<div class="fw-bold">รวม: <span id="grandSummary">฿0</span></div>
+<div class="d-flex gap-2">
+<button class="btn btn-primary btn-sm" id="summaryCreate">สร้างบิล</button>
+<button class="btn btn-outline-secondary btn-sm" id="summaryPrint">พิมพ์</button>
+</div>
+</div>
+</section>
+<!-- เอกสาร -->
+<section class="card p-3 mt-3 form-section">
+<span class="badge-soft">เอกสารสำหรับลูกค้า</span>
+<div class="d-flex align-items-center justify-content-between">
+<div class="section-title">ตารางรายการ (จัดคอลัมน์แน่น-คงที่)</div>
+<div class="d-flex gap-2">
+<div class="input-group input-group-sm" style="width:220px">
+<span class="input-group-text">หัวเอกสาร</span>
+<select class="form-select form-select-sm" id="docTitle">
+<option selected="" value="ใบเสร็จ/บิลรับงาน">ใบเสร็จ/บิลรับงาน</option>
+<option value="ใบเสนอราคา">ใบเสนอราคา</option>
+<option value="ใบแจ้งหนี้">ใบแจ้งหนี้</option>
+</select>
+</div>
+<button class="btn btn-outline-primary btn-sm" id="btnAddRow">เพิ่มบรรทัด</button>
+<div class="btn-group btn-group-sm">
+<button class="btn btn-outline-primary" id="btnCapClean">PNG</button>
+<button class="btn btn-outline-primary" id="btnPDF">PDF</button>
+<button class="btn btn-outline-secondary" id="btnPrint">พิมพ์</button>
+</div>
+</div>
+</div>
+<!-- mini form -->
+<div class="row g-2 mt-1">
+<div class="col-md-6"><div class="small subtle">ลูกค้า</div><input class="form-control form-control-sm" id="cust_name" placeholder="ชื่อลูกค้า/หน่วยงาน"/></div>
+<div class="col-md-3"><div class="small subtle">เบอร์โทร</div><input class="form-control form-control-sm" id="cust_phone" placeholder="080-xxx-xxxx"/></div>
+<div class="col-md-3"><div class="small subtle">เลขที่เอกสาร</div><input class="form-control form-control-sm" id="inv_no" readonly=""/></div>
+<div class="col-md-6"><div class="small subtle">ที่อยู่ลูกค้า</div><input class="form-control form-control-sm" id="cust_addr"/></div>
+<div class="col-md-3"><div class="small subtle">เลขผู้เสียภาษี</div><input class="form-control form-control-sm" id="cust_taxid" placeholder="(ถ้ามี)"/></div>
+<div class="col-md-3">
+<div class="small subtle">วันที่/เวลา</div>
+<div class="d-flex gap-1"><input class="form-control form-control-sm" id="inv_date"/><input class="form-control form-control-sm" id="inv_time"/></div>
+</div>
+<div class="col-md-9"><div class="small subtle">งาน/รายละเอียด</div><input class="form-control form-control-sm" id="inv_job"/></div>
+<div class="col-md-3"><div class="small subtle">หมายเหตุ</div><input class="form-control form-control-sm" id="inv_note"/></div>
+</div>
+<div class="table-responsive mt-2">
+<table class="table-receipt align-middle" id="rc_table">
+<colgroup>
+<col style="width:10%"/>
+<col style="width:46%"/>
+<col style="width:14%"/>
+<col style="width:10%"/>
+<col style="width:20%"/>
+</colgroup>
+<thead>
+<tr>
+<th>ลำดับ</th>
+<th>รายการ</th>
+<th>ราคา/หน่วย</th>
+<th>จำนวน</th>
+<th>รวม</th>
+</tr>
+</thead>
+<tbody id="rc_items">
+<tr><td class="text-muted" colspan="5">— กด “สร้างบิล” เพื่อใส่อัตโนมัติ หรือ “เพิ่มบรรทัด” —</td></tr>
+</tbody>
+<tfoot>
+<tr><th class="text-end" colspan="4">ค่าสินค้าตามจริง</th><th class="text-end tnum" id="rc_other">฿0</th></tr>
+<tr><th class="text-end" colspan="4">ส่วนลด</th><th class="text-end tnum" id="rc_discount">฿0</th></tr>
+<tr><th class="text-end" colspan="4">Vat 7%</th><th class="text-end tnum" id="rc_vat">฿0</th></tr>
+<tr><th class="text-end" colspan="4">รวมทั้งสิ้น</th><th class="text-end tnum" id="rc_total" style="font-size:1.05rem">฿0</th></tr>
+</tfoot>
+</table>
+</div>
+<div class="row g-2">
+<div class="col-md-3"><div class="small subtle">วิธีชำระเงิน</div><input class="form-control form-control-sm" id="pay_method" value="เงินสด"/></div>
+<div class="col-md-3"><div class="small subtle">สถานะ</div><select class="form-select form-select-sm" id="pay_status"><option>ค้างชำระ</option><option selected="">ชำระแล้ว</option></select></div>
+<div class="col-md-3"><div class="small subtle">เลขอ้างอิง</div><input class="form-control form-control-sm" id="pay_ref" placeholder="เช่น TX1234"/></div>
+<div class="col-md-3"><div class="small subtle">กำหนดชำระ</div><input class="form-control form-control-sm" id="pay_due" type="date"/></div>
+</div>
+<section class="p-3 p-md-4 mt-3 rounded" id="receipt">
+<div class="small subtle">บันทึกเป็น PNG/PDF/พิมพ์ จะใช้เวอร์ชัน “สวยพิเศษ” ให้อัตโนมัติ</div>
+<div class="d-flex justify-content-between align-items-start mt-1">
+<div>
+<div class="fw-bold" id="docTitleView">ใบเสร็จ/บิลรับงาน</div>
+<div class="small" id="bizNameView">alltasks24 — นครสวรรค์</div>
+</div>
+<div class="text-end">
+<div class="small" id="bizContactView">โทร 080-000-0000 • LINE @yourline</div>
+<div class="small" id="bizAddrView"></div>
+</div>
+</div>
+</section>
+<div class="d-flex justify-content-end gap-2 mt-3">
+<button class="btn btn-primary btn-sm" id="btnSaveBill"><i class="bi bi-save me-1"></i>บันทึกบิล</button>
+<button class="btn btn-outline-secondary btn-sm" id="btnNewBill">สร้างใหม่</button>
+</div>
+</section>
+<!-- คลังบิล -->
+<section class="card p-3 mt-3 form-section">
+<span class="badge-soft">คลังบิล (LocalStorage)</span>
+<div class="d-flex gap-2 align-items-center">
+<input class="form-control form-control-sm" id="invSearch" placeholder="ค้นหา" style="max-width:300px"/>
+<select class="form-select form-select-sm" id="invFilter" style="width:auto"><option value="all">ทั้งหมด</option><option value="paid">ชำระแล้ว</option><option value="unpaid">ค้างชำระ</option></select>
+<div class="subtle small ms-auto">* เก็บไว้ในเครื่องของคุณ</div>
+</div>
+<div class="vstack gap-2 mt-2" id="invList"></div>
+<div class="d-flex justify-content-between align-items-center mt-2">
+<div class="small subtle" id="invMeta">–</div>
+<ul class="pagination pagination-sm mb-0" id="invPager"></ul>
+</div>
+</section>
+<!-- รายละเอียดบิล (ดูอย่างเร็ว) -->
+<section class="card p-3 mt-3" id="invQuickView">
+<span class="badge-soft">รายละเอียดบิล (ดูอย่างเร็ว)</span>
+<div class="small subtle" id="invPreview">เลือก “ดู/แก้ไข” จากคลังบิลด้านบน เพื่อแสดงรายละเอียดที่นี่</div>
+</section>
 <!-- คำอธิบายช่องตั้งค่า (ช่วยจำ) -->
 <section class="card p-3 mt-3" id="settings-help">
-  <div class="d-flex justify-content-between align-items-center mb-2">
-    <div>
-      <span class="badge bg-secondary-subtle text-secondary-emphasis">ช่วยจำ</span>
-      <span class="fw-semibold ms-2">คำอธิบายช่องตั้งค่า (ฐาน/ระยะ/รอคิว/ปัดเศษ)</span>
-    </div>
-    <button class="btn btn-outline-secondary btn-sm"
-            data-bs-toggle="collapse" data-bs-target="#settings-help-body"
-            aria-expanded="true" aria-controls="settings-help-body">
+<div class="d-flex justify-content-between align-items-center mb-2">
+<div>
+<span class="badge bg-secondary-subtle text-secondary-emphasis">ช่วยจำ</span>
+<span class="fw-semibold ms-2">คำอธิบายช่องตั้งค่า (ฐาน/ระยะ/รอคิว/ปัดเศษ)</span>
+</div>
+<button aria-controls="settings-help-body" aria-expanded="true" class="btn btn-outline-secondary btn-sm" data-bs-target="#settings-help-body" data-bs-toggle="collapse">
       แสดง/ซ่อน
     </button>
-  </div>
-
-  <div id="settings-help-body" class="collapse show">
-    <dl class="row gy-2 mb-3">
-      <dt class="col-sm-4">ฐานในเมือง</dt>
-      <dd class="col-sm-8">ราคาเริ่มต้นต่อหนึ่งงาน/หนึ่งเที่ยว ภายในพื้นที่บริการ</dd>
-
-      <dt class="col-sm-4">ระยะในฐาน (กม.)</dt>
-      <dd class="col-sm-8">ระยะที่ “รวมอยู่ในราคาเริ่มต้น” — ภายในระยะนี้ไม่คิดค่า กม. เพิ่ม</dd>
-
-      <dt class="col-sm-4">เกินระยะ/กม. ชั้น 1</dt>
-      <dd class="col-sm-8">ค่า/กม. สำหรับช่วงที่เกิน “ระยะในฐาน” จนถึงก่อน “เริ่มชั้น 2”</dd>
-
-      <dt class="col-sm-4">เริ่มชั้น 2 ที่ (กม.)</dt>
-      <dd class="col-sm-8">ตั้งแต่ระยะนี้ขึ้นไป เปลี่ยนไปใช้เรทราคา “ชั้น 2”</dd>
-
-      <dt class="col-sm-4">เกินระยะ/กม. ชั้น 2</dt>
-      <dd class="col-sm-8">ค่า/กม. สำหรับส่วนระยะตั้งแต่ “เริ่มชั้น 2” เป็นต้นไป</dd>
-
-      <dt class="col-sm-4">ขั้นต่ำ</dt>
-      <dd class="col-sm-8">กันราคาไม่ให้ต่ำเกินไป ถ้าต่ำกว่านี้จะยกขึ้นมาเท่าค่านี้</dd>
-
-      <dt class="col-sm-4">จุดแวะ/จุด</dt>
-      <dd class="col-sm-8">คิดเพิ่มเป็นเงินตรา ต่อ 1 จุดแวะ</dd>
-
-      <dt class="col-sm-4">รอคิว/ชม.</dt>
-      <dd class="col-sm-8">ค่ารอเป็นบาทต่อชั่วโมง (ระบบคูณเวลาที่กรอกให้)</dd>
-
-      <dt class="col-sm-4">กลางคืน / ฝนตก / เสาร์–อาทิตย์/นักขัต</dt>
-      <dd class="col-sm-8">ค่าบวกพิเศษแบบเป็นเงินตรา จะบวกเมื่อเลือกใช้เงื่อนไขนั้น</dd>
-
-      <dt class="col-sm-4">ปัดเศษ</dt>
-      <dd class="col-sm-8">ปัด “ราคาบริการ” ให้ลงตัวตามขั้น (เช่น 5 หรือ 10 บาท) เพื่อเลขสวย/คิดเงินง่าย</dd>
-
-      <dt class="col-sm-4">คูณขนาด</dt>
-      <dd class="col-sm-8">ตัวคูณเมื่อเลือกงาน “ขนาดกลาง” (เช่น 1.05 = เพิ่ม 5%)</dd>
-
-      <dt class="col-sm-4">คูณแรงงาน (2 คน)</dt>
-      <dd class="col-sm-8">ตัวคูณเมื่อใช้แรงงาน 2 คน (เช่น 1.30 = เพิ่ม 30%)</dd>
-
-      <dt class="col-sm-4">ธีมสีหลัก/ธีมสีรอง</dt>
-      <dd class="col-sm-8">ปรับโทนสีหน้าจอ/เอกสาร <u>ไม่กระทบราคา</u></dd>
-    </dl>
-
-    <div class="border-top pt-3">
-      <div class="fw-semibold mb-1">ลำดับการคำนวณ (ย่อ)</div>
-      <ol class="mb-2 small">
-        <li>ราคาเริ่มต้น = <strong>ฐานในเมือง</strong></li>
-        <li>บวกค่า กม. ตามช่วง (ชั้น 1 / ชั้น 2) — ถ้า “ไป–กลับ” ให้คูณระยะก่อนคิด</li>
-        <li>บวก <strong>จุดแวะ + รอคิว + (กลางคืน/ฝนตก/วันหยุดที่เลือก)</strong></li>
-        <li>ถ้ามี <strong>ขนาดกลาง</strong> หรือ <strong>แรงงาน 2 คน</strong> ⇒ คูณตัวคูณที่ตั้งไว้</li>
-        <li>บังคับ <strong>ขั้นต่ำ</strong> แล้ว <strong>ปัดเศษ</strong></li>
-        <li>รวมกับ <strong>ค่าสินค้าจริง − ส่วนลด + VAT (ถ้าเลือก)</strong> ⇒ <strong>ยอดสุทธิ</strong></li>
-      </ol>
-      <div class="small text-muted">
+</div>
+<div class="collapse show" id="settings-help-body">
+<dl class="row gy-2 mb-3">
+<dt class="col-sm-4">ฐานในเมือง</dt>
+<dd class="col-sm-8">ราคาเริ่มต้นต่อหนึ่งงาน/หนึ่งเที่ยว ภายในพื้นที่บริการ</dd>
+<dt class="col-sm-4">ระยะในฐาน (กม.)</dt>
+<dd class="col-sm-8">ระยะที่ “รวมอยู่ในราคาเริ่มต้น” — ภายในระยะนี้ไม่คิดค่า กม. เพิ่ม</dd>
+<dt class="col-sm-4">เกินระยะ/กม. ชั้น 1</dt>
+<dd class="col-sm-8">ค่า/กม. สำหรับช่วงที่เกิน “ระยะในฐาน” จนถึงก่อน “เริ่มชั้น 2”</dd>
+<dt class="col-sm-4">เริ่มชั้น 2 ที่ (กม.)</dt>
+<dd class="col-sm-8">ตั้งแต่ระยะนี้ขึ้นไป เปลี่ยนไปใช้เรทราคา “ชั้น 2”</dd>
+<dt class="col-sm-4">เกินระยะ/กม. ชั้น 2</dt>
+<dd class="col-sm-8">ค่า/กม. สำหรับส่วนระยะตั้งแต่ “เริ่มชั้น 2” เป็นต้นไป</dd>
+<dt class="col-sm-4">ขั้นต่ำ</dt>
+<dd class="col-sm-8">กันราคาไม่ให้ต่ำเกินไป ถ้าต่ำกว่านี้จะยกขึ้นมาเท่าค่านี้</dd>
+<dt class="col-sm-4">จุดแวะ/จุด</dt>
+<dd class="col-sm-8">คิดเพิ่มเป็นเงินตรา ต่อ 1 จุดแวะ</dd>
+<dt class="col-sm-4">รอคิว/ชม.</dt>
+<dd class="col-sm-8">ค่ารอเป็นบาทต่อชั่วโมง (ระบบคูณเวลาที่กรอกให้)</dd>
+<dt class="col-sm-4">กลางคืน / ฝนตก / เสาร์–อาทิตย์/นักขัต</dt>
+<dd class="col-sm-8">ค่าบวกพิเศษแบบเป็นเงินตรา จะบวกเมื่อเลือกใช้เงื่อนไขนั้น</dd>
+<dt class="col-sm-4">ปัดเศษ</dt>
+<dd class="col-sm-8">ปัด “ราคาบริการ” ให้ลงตัวตามขั้น (เช่น 5 หรือ 10 บาท) เพื่อเลขสวย/คิดเงินง่าย</dd>
+<dt class="col-sm-4">คูณขนาด</dt>
+<dd class="col-sm-8">ตัวคูณเมื่อเลือกงาน “ขนาดกลาง” (เช่น 1.05 = เพิ่ม 5%)</dd>
+<dt class="col-sm-4">คูณแรงงาน (2 คน)</dt>
+<dd class="col-sm-8">ตัวคูณเมื่อใช้แรงงาน 2 คน (เช่น 1.30 = เพิ่ม 30%)</dd>
+<dt class="col-sm-4">ธีมสีหลัก/ธีมสีรอง</dt>
+<dd class="col-sm-8">ปรับโทนสีหน้าจอ/เอกสาร <u>ไม่กระทบราคา</u></dd>
+</dl>
+<div class="border-top pt-3">
+<div class="fw-semibold mb-1">ลำดับการคำนวณ (ย่อ)</div>
+<ol class="mb-2 small">
+<li>ราคาเริ่มต้น = <strong>ฐานในเมือง</strong></li>
+<li>บวกค่า กม. ตามช่วง (ชั้น 1 / ชั้น 2) — ถ้า “ไป–กลับ” ให้คูณระยะก่อนคิด</li>
+<li>บวก <strong>จุดแวะ + รอคิว + (กลางคืน/ฝนตก/วันหยุดที่เลือก)</strong></li>
+<li>ถ้ามี <strong>ขนาดกลาง</strong> หรือ <strong>แรงงาน 2 คน</strong> ⇒ คูณตัวคูณที่ตั้งไว้</li>
+<li>บังคับ <strong>ขั้นต่ำ</strong> แล้ว <strong>ปัดเศษ</strong></li>
+<li>รวมกับ <strong>ค่าสินค้าจริง − ส่วนลด + VAT (ถ้าเลือก)</strong> ⇒ <strong>ยอดสุทธิ</strong></li>
+</ol>
+<div class="small text-muted">
         ทิป: เช็กราคาแปลก ๆ ด้วย 3 จุดนี้ — (1) ระยะในฐาน (2) เริ่มชั้น 2 ต้องมากกว่า “ระยะในฐาน” (3) ตัวคูณ 1.00/1.05/1.30 ตรงงานจริงหรือไม่
       </div>
-    </div>
-  </div>
+</div>
+</div>
 </section>
-    
-  </div>
-
-  <!-- Pretty print container (used for window.print) -->
-  <div id="prettyPrint"></div>
-
-  <script>
+</div>
+<!-- Pretty print container (used for window.print) -->
+<div id="prettyPrint"></div>
+<script>
     // ===== Utils =====
     const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
     const thBaht=n=>'฿'+(Math.round(n)).toLocaleString('th-TH');
@@ -969,7 +934,6 @@
       if(window.innerWidth<780){ $$('.hint').forEach(el=> el.style.display='none'); }
     });
   </script>
-
 <script>
 // --- Quick Preview below the LocalStorage list ---
 (function(){
@@ -1013,11 +977,6 @@
   });
 })();
 </script>
-
-
-
-
-
 <!-- === Cloud sync for Calculator Config & Invoices (Firestore) — SAFE FOR ADMIN === -->
 <script type="module">
   import { db, ensureAnonAuth } from './firebase-init.js';
@@ -1103,8 +1062,6 @@
     try{ onSnapshot(cfgRef, s=>{ if(s.exists()){ localStorage.setItem('cfg_v4', JSON.stringify(s.data())); } }); }catch(e){}
   });
 </script>
-
-
 <!-- PWA SW register (assistant v35) -->
 <script>
 if ('serviceWorker' in navigator) {
@@ -1113,5 +1070,5 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-</body>
+<script src="/copylink.js"></script></body>
 </html>

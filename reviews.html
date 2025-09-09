@@ -1,27 +1,24 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="th">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>รีวิวลูกค้าทั้งหมด • alltasks24.online</title>
-
-  <!-- Bootstrap + Icons + Font (ให้โทนเหมือนหน้าแรก) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>รีวิวลูกค้าทั้งหมด • alltasks24.online</title>
+<!-- Bootstrap + Icons + Font (ให้โทนเหมือนหน้าแรก) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
 <!-- Favicons -->
-<link rel="icon" href="/icons/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="manifest" href="/icons/site.webmanifest">
-<meta name="theme-color" content="#6C37FF">
-  
-  <!-- ใช้สไตล์เดียวกับหน้าแรก -->
-  <link rel="stylesheet" href="assets/styles.css">
-
-  <style>
+<link href="/icons/favicon.ico" rel="icon" sizes="any"/>
+<link href="/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="/icons/apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="/icons/site.webmanifest" rel="manifest"/>
+<meta content="#6C37FF" name="theme-color"/>
+<!-- ใช้สไตล์เดียวกับหน้าแรก -->
+<link href="assets/styles.css" rel="stylesheet"/>
+<style>
     /* แต่งหน้ารีวิวให้สวยขึ้นเล็กน้อย โดยไม่ไปทับของเดิม */
     .review-hero {
       background: linear-gradient(135deg, rgba(103,80,164,.1), rgba(59,18,94,.1));
@@ -41,62 +38,55 @@
     .review-date { color: rgba(0,0,0,.55); }
     .placeholder-line { display:block; height: .9rem; }
   </style>
-
 <!-- SEO:assistant-v35-start -->
-<link rel="canonical" href="https://alltasks24.online/reviews.html"/>
-<meta property="og:type" content="website"/>
-<meta property="og:title" content="รีวิวลูกค้าทั้งหมด • alltasks24.online"/>
-<meta property="og:description" content="บริการรับจ้างสารพัด 24 ชั่วโมง รับส่งของ เอกสาร แม่บ้าน ซักรีด งานช่าง และอีกมากมายในนครสวรรค์"/>
-<meta property="og:url" content="https://alltasks24.online/reviews.html"/>
-<meta property="og:image" content="https://alltasks24.online/icons/android-chrome-512x512.png"/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="รีวิวลูกค้าทั้งหมด • alltasks24.online"/>
-<meta name="twitter:description" content="บริการรับจ้างสารพัด 24 ชั่วโมง รับส่งของ เอกสาร แม่บ้าน ซักรีด งานช่าง และอีกมากมายในนครสวรรค์"/>
-<meta name="twitter:image" content="https://alltasks24.online/icons/android-chrome-512x512.png"/>
+<link href="https://alltasks24.online/reviews.html" rel="canonical">
+<meta content="website" property="og:type">
+<meta content="รีวิวลูกค้าทั้งหมด • alltasks24.online" property="og:title">
+<meta content="บริการรับจ้างสารพัด 24 ชั่วโมง รับส่งของ เอกสาร แม่บ้าน ซักรีด งานช่าง และอีกมากมายในนครสวรรค์" property="og:description">
+<meta content="https://alltasks24.online/reviews.html" property="og:url"/>
+<meta content="https://alltasks24.online/icons/android-chrome-512x512.png" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="รีวิวลูกค้าทั้งหมด • alltasks24.online" name="twitter:title"/>
+<meta content="บริการรับจ้างสารพัด 24 ชั่วโมง รับส่งของ เอกสาร แม่บ้าน ซักรีด งานช่าง และอีกมากมายในนครสวรรค์" name="twitter:description"/>
+<meta content="https://alltasks24.online/icons/android-chrome-512x512.png" name="twitter:image"/>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "CollectionPage", "name": "รีวิวลูกค้า - AllTasks24", "url": "https://alltasks24.online/reviews.html", "inLanguage": "th-TH", "about": "รีวิวและประสบการณ์จากลูกค้า AllTasks24"}]</script>
 <!-- SEO:assistant-v35-end -->
-
-<meta name="description" content="AllTasks24 — รับจ้างสารพัด 24 ชั่วโมง: ส่งของ งานช่าง ทำความสะอาด ซักรีด และบริการอื่นๆ ในจังหวัดนครสวรรค์ ติดต่อสะดวกตลอด 24 ชม.">
-</head>
+<meta content="AllTasks24 — รับจ้างสารพัด 24 ชั่วโมง: ส่งของ งานช่าง ทำความสะอาด ซักรีด และบริการอื่นๆ ในจังหวัดนครสวรรค์ ติดต่อสะดวกตลอด 24 ชม." name="description"/>
+</meta></meta></meta></link></head>
 <body class="bg-body-tertiary">
-
-  <!-- Hero / Navbar -->
-  <header class="review-hero py-4 sticky-top bg-white bg-opacity-75 backdrop-blur shadow-sm">
-    <div class="container d-flex align-items-center justify-content-between">
-      <a class="navbar-brand fw-bold text-decoration-none" style="color:var(--primary)" href="/">alltasks24.online</a>
-      <a class="btn btn-gradient btn-lg rounded-pill" href="/"><i class="bi bi-arrow-left me-1"></i> กลับหน้าแรก</a>
-    </div>
-  </header>
-
-  <main class="py-4">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-end mb-3">
-        <h1 class="h4 mb-0">รีวิวลูกค้าทั้งหมด</h1>
-        <!-- ค่าคะแนนเฉลี่ยจะเติม "หลังจาก" ดึงรายการสำเร็จ เพื่อไม่บล็อกการแสดงผล -->
-        <div id="avgAll" class="text-muted small"></div>
-      </div>
-
-      <!-- รายการรีวิว (เรนเดอร์ที่นี่) -->
-      <div id="reviewAllList" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3"></div>
-
-      <!-- ควบคุมการแบ่งหน้า -->
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        <div class="small text-muted" id="pageInfo"></div>
-        <div class="d-flex gap-2">
-          <button id="btnPrev" class="btn btn-gradient btn-lg rounded-pill" disabled>
-            <i class="bi bi-chevron-left"></i> ก่อนหน้า
+<!-- Hero / Navbar -->
+<header class="review-hero py-4 sticky-top bg-white bg-opacity-75 backdrop-blur shadow-sm">
+<div class="container d-flex align-items-center justify-content-between">
+<a class="navbar-brand fw-bold text-decoration-none" href="/" style="color:var(--primary)">alltasks24.online</a>
+<a class="btn btn-gradient btn-lg rounded-pill" href="/"><i class="bi bi-arrow-left me-1"></i> กลับหน้าแรก</a>
+</div>
+</header>
+<main class="py-4">
+<div class="container">
+<div class="d-flex justify-content-between align-items-end mb-3">
+<h1 class="h4 mb-0">รีวิวลูกค้าทั้งหมด</h1>
+<!-- ค่าคะแนนเฉลี่ยจะเติม "หลังจาก" ดึงรายการสำเร็จ เพื่อไม่บล็อกการแสดงผล -->
+<div class="text-muted small" id="avgAll"></div>
+</div>
+<!-- รายการรีวิว (เรนเดอร์ที่นี่) -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3" id="reviewAllList"></div>
+<!-- ควบคุมการแบ่งหน้า -->
+<div class="d-flex justify-content-between align-items-center mt-3">
+<div class="small text-muted" id="pageInfo"></div>
+<div class="d-flex gap-2">
+<button class="btn btn-gradient btn-lg rounded-pill" disabled="" id="btnPrev">
+<i class="bi bi-chevron-left"></i> ก่อนหน้า
           </button>
-          <button id="btnNext" class="btn btn-gradient btn-lg rounded-pill" disabled>
+<button class="btn btn-gradient btn-lg rounded-pill" disabled="" id="btnNext">
             ถัดไป <i class="bi bi-chevron-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script type="module">
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
     import { db } from './firebase-init.js';
     import {
       collection, query, where, orderBy, limit,
@@ -231,7 +221,6 @@
       if (count) avgEl.textContent = `คะแนนเฉลี่ย ${(sum/count).toFixed(1)}/5 จาก ${count} รีวิว`;
     } catch {}
   </script>
-
 <!-- PWA SW register (assistant v35) -->
 <script>
 if ('serviceWorker' in navigator) {
@@ -240,5 +229,5 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-</body>
+<script src="/copylink.js"></script></body>
 </html>
